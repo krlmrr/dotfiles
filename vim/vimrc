@@ -1,0 +1,14 @@
+syntax enable
+
+set backspace=indent,eol,start
+let mapleader = ' '
+
+set hlsearch
+set incsearch
+
+map ;; A;<Esc>
+map ,, A,<Esc>
+
+imap jj <Esc>
+
+nmap <Leader><space> :nohlsearch<cr>

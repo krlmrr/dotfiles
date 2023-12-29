@@ -17,29 +17,36 @@ export PATH="$PATH:$HOME/.bin"
 export PATH="$PATH:$HOME/.local/bin"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
-export NVM_DIR="$HOME/.nvm"
 
-alias stan="./vendor/bin/phpstan analyze -c larastan.neon"
-alias pest="./vendor/bin/pest"
-alias mfs="php artisan migrate:fresh --seed"
-alias pass="cd ~/code/api.foxworldtravel && php artisan passport:install"
+# OS
+alias yeet="sudo rm -rf"
+alias vim="nvim"
+alias ps="phpstorm"
+alias brewup="brew update && brew upgrade && brew upgrade --greedy && open /Applications/Raycast.app/"
+
+# Laravel
 alias a="php artisan"
 alias pam="php artisan migrate"
 alias pamf="php artisan migrate:fresh"
+alias mfs="php artisan migrate:fresh --seed"
+alias pail="php artisan pail"
 
-alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+alias pass="cd ~/code/api.foxworldtravel && php artisan passport:install"
+alias atf="a test --filter"
+
+# Laravel Vendor
+alias dust="./vendor/bin/duster fix"
+alias duster="./vendor/bin/duster"
+alias stan="./vendor/bin/phpstan analyze -c larastan.neon"
+alias pest="./vendor/bin/pest"
 alias pint="./vendor/bin/pint"
-alias vim="nvim"
+
+# NPM 
 alias watch="npm run watch"
 alias prod="npm run production"
-alias yeet="sudo rm -rf"
 alias dev="npm run dev"
 alias build="npm run build"
-alias atf="a test --filter"
+
+# Python
 alias python="python3"
 alias pip="pip3"
-alias brewup="brew update && brew upgrade && brew upgrade --greedy && open /Applications/Raycast.app/"
-alias dust="./vendor/bin/duster fix"
-alias duster="./vendor/bin/duster "
-alias ps="phpstorm"
-alias pail="php artisan pail"

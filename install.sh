@@ -27,6 +27,7 @@ ln -s $DOTFILES/phpactor $HOME/.config/phpactor
 # Scripts
 mkdir -p $HOME/.local/bin
 
+# Homebrew
 if ! command -v brew >/dev/null 2>&1
 then
     echo "Brew is not installed"

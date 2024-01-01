@@ -50,5 +50,3 @@ alias build="npm run build"
 # Python
 alias python="python3"
 alias pip="pip3"
-
-# eval "$(starship init zsh)"

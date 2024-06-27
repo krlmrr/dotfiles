@@ -2,6 +2,7 @@
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Zsh
+rm -rf $HOME/.zshrc
 ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
 
 # Neovim
@@ -21,17 +22,11 @@ ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
 ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
 
 # Tmux Plugin Manager
+rm -rf $HOME/.tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Tmux
 ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
-
-# Phpactor
-rm -rf $HOME/.config/phpactor
-ln -s $DOTFILES/phpactor $HOME/.config/phpactor
-
-# Scripts
-mkdir -p $HOME/.local/bin
 
 # Homebrew
 if ! command -v brew >/dev/null 2>&1

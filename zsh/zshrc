@@ -43,6 +43,11 @@ alias pest="./vendor/bin/pest"
 alias pint="./vendor/bin/pint"
 alias insights="php artisan insights"
 
+# Filament 
+alias fu="php artisan make:filament-user"
+alias fr="php artisan make:filament-resource --generate"
+alias frm="php artisan make:filament-relation-manager"
+
 # NPM 
 alias watch="npm run watch"
 alias prod="npm run production"

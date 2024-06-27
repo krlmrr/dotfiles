@@ -5,7 +5,7 @@ ZSH_THEME="robbyrussell"
 plugins=(
 	git
 	zsh-autosuggestions
-	zsh-syntax-highlighting 
+	zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -21,6 +21,7 @@ alias yeet="sudo rm -rf"
 alias vim="nvim"
 alias code="code ."
 alias ps="phpstorm ."
+alias zed="zed ."
 alias brewup="brew update && brew upgrade && brew upgrade --greedy && open /Applications/Raycast.app/"
 alias mkd="mkdir -p "
 
@@ -43,12 +44,12 @@ alias pest="./vendor/bin/pest"
 alias pint="./vendor/bin/pint"
 alias insights="php artisan insights"
 
-# Filament 
+# Filament
 alias fu="php artisan make:filament-user"
 alias fr="php artisan make:filament-resource --generate"
 alias frm="php artisan make:filament-relation-manager"
 
-# NPM 
+# NPM
 alias watch="npm run watch"
 alias prod="npm run production"
 alias dev="npm run dev"

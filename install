@@ -1,33 +1,51 @@
 #! /bin/bash sh
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# HushLogin
+cp $DOTFILES/.hushlogin $HOME/.hushlogin
+
 # VS Code
-# rm -rf $HOME/.vscode/templates
-# ln -s $DOTFILES/vs_code/templates $HOME/.vscode/templates
+if [ ! -d "$HOME/.config/vs_code/" ]; then
+    ln -s $DOTFILES/vs_code $HOME/.config/vs_code
+fi
 
 # Ghostty
 rm -rf $HOME/.config/ghostty
 ln -s $DOTFILES/ghostty $HOME/.config/ghostty
 
-# Zsh
-# rm -rf $HOME/.zshrc
-# ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
-
 # Neovim
-# rm -rf $HOME/.config/nvim
-# ln -s $DOTFILES/nvim $HOME/.config/nvim
+rm -rf $HOME/.config/nvim
+ln -s $DOTFILES/nvim $HOME/.config/nvim
 
 # Vimrc
-# rm -rf $HOME/.vimrc
-# ln -s $DOTFILES/vim/vimrc $HOME/.vimrc
+rm -rf $HOME/.vimrc
+ln -s $DOTFILES/vim/vimrc $HOME/.vimrc
 
 # IdeaVim
 # rm -rf $HOME/.ideavimrc
 # ln -s $DOTFILES/vim/ideavimrc $HOME/.ideavimrc
 
 # Git
-# ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
-# ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
+ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
+ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
+
+# Oh My Zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+# ZSH Extensions
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+fi
+
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+# Zsh
+rm -rf $HOME/.zshrc
+ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
 
 # Tmux Plugin Manager
 # rm -rf $HOME/.tmux

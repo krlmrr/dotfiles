@@ -1,42 +1,50 @@
 #! /bin/bash sh
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# VS Code
+# rm -rf $HOME/.vscode/templates
+# ln -s $DOTFILES/vs_code/templates $HOME/.vscode/templates
+
+# Ghostty
+rm -rf $HOME/.config/ghostty
+ln -s $DOTFILES/ghostty $HOME/.config/ghostty
+
 # Zsh
-rm -rf $HOME/.zshrc
-ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
+# rm -rf $HOME/.zshrc
+# ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
 
 # Neovim
-rm -rf $HOME/.config/nvim
-ln -s $DOTFILES/nvim $HOME/.config/nvim
+# rm -rf $HOME/.config/nvim
+# ln -s $DOTFILES/nvim $HOME/.config/nvim
 
 # Vimrc
-rm -rf $HOME/.vimrc
-ln -s $DOTFILES/vim/vimrc $HOME/.vimrc
+# rm -rf $HOME/.vimrc
+# ln -s $DOTFILES/vim/vimrc $HOME/.vimrc
 
 # IdeaVim
-rm -rf $HOME/.ideavimrc
-ln -s $DOTFILES/vim/ideavimrc $HOME/.ideavimrc
+# rm -rf $HOME/.ideavimrc
+# ln -s $DOTFILES/vim/ideavimrc $HOME/.ideavimrc
 
 # Git
-ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
-ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
+# ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
+# ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
 
 # Tmux Plugin Manager
-rm -rf $HOME/.tmux
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# rm -rf $HOME/.tmux
+# git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Tmux
-ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
+# ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 
 # Homebrew
-if ! command -v brew >/dev/null 2>&1
-then
-    echo "Brew is not installed"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
+# if ! command -v brew >/dev/null 2>&1
+# then
+#     echo "Brew is not installed"
+#     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# fi
 
-if ! command -v tmux >/dev/null 2>&1
-then
-    echo "Tmux is not installed"
-    brew install tmux
-fi
+# if ! command -v tmux >/dev/null 2>&1
+# then
+#     echo "Tmux is not installed"
+#     brew install tmux
+# fi

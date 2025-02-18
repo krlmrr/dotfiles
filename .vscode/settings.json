@@ -5,7 +5,13 @@
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "**/Thumbs.db": true
+        "**/Thumbs.db": true,
+        ".phpunit.cache": true,
+        "_ide_helper.php": true,
+        ".editorconfig": true,
+        ".npmrc": true,
+        ".shiftrc": true,
+        ".styleci.yml": true
     },
     "hide-files.files": []
 }

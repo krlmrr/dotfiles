@@ -1,0 +1,12 @@
+theme = dark:onehalfdark,light:catppuccin-latte
+macos-titlebar-proxy-icon = hidden
+font-family = FiraCode Nerd Font
+font-size = 18
+adjust-cell-height = 100%
+window-padding-x = 20
+window-padding-y = 10
+working-directory = /Users/karlmurray/herd
+window-save-state = always
+cursor-style = bar
+confirm-close-surface = false
+macos-option-as-alt = true

@@ -1,6 +1,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#757575'
 
 plugins=(
 	git
@@ -17,36 +18,38 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
 
 # OS
+alias nz="nvim ~/.zshrc"
+alias lz="lazygit"
 alias yeet="sudo rm -rf"
 alias vim="nvim"
-alias code="code ."
-alias ps="phpstorm ."
-alias zed="zed ."
-alias brewup="brew update && brew upgrade && brew upgrade --greedy && open /Applications/Raycast.app/"
-alias mkd="mkdir -p "
+alias brewup="brew update && brew upgrade && brew upgrade --greedy && brew cleanup && open /Applications/Raycast.app/"
+alias mkd="mkdir -p"
+alias sourcez="source ~/.zshrc"
+alias code.="code ."
 
 # Laravel
 alias a="php artisan"
+alias solo="a solo"
 alias pam="php artisan migrate"
 alias pamf="php artisan migrate:fresh"
-alias mfs="php artisan migrate:fresh --seed"
-alias pail="php artisan pail"
-alias res="php artisan make:filament-resource --generate"
+alias pamfs="php artisan migrate:fresh --seed"
 
-alias pass="cd ~/code/api.foxworldtravel && php artisan passport:install"
-alias atf="a test --filter"
+# Laravel Test
+alias test="clear && a test"
+alias tp="clear && a test -p"
+alias tf="clear && a test --filter"
 
 # Laravel Vendor
 alias dust="./vendor/bin/duster fix"
 alias duster="./vendor/bin/duster"
-alias stan="./vendor/bin/phpstan analyze -c larastan.neon"
-alias pest="./vendor/bin/pest"
 alias pint="./vendor/bin/pint"
-alias insights="php artisan insights"
+alias pail="php artisan pail"
 
 # Filament
 alias fu="php artisan make:filament-user"
 alias fr="php artisan make:filament-resource --generate"
+alias res="php artisan make:filament-resource"
+alias fp="php artisan make:filament-page"
 alias frm="php artisan make:filament-relation-manager"
 
 # NPM

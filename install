@@ -1,8 +1,15 @@
 #! /bin/bash sh
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+echo "Hello! I'm installing your dotfiles..."
+
 # HushLogin
 cp $DOTFILES/.hushlogin $HOME/.hushlogin
+
+if [ ! -d "$HOME/.ssh" ]; then
+   ssh-keygen -t ed25519 -C "karl@karlm.dev"
+   cat $HOME/.ssh/id_ed25519.pub
+fi
 
 # VS Code
 if [ ! -d "$HOME/.config/vs_code/" ]; then
@@ -28,10 +35,6 @@ ln -s $DOTFILES/nvim $HOME/.config/nvim
 # Vimrc
 rm -rf $HOME/.vimrc
 ln -s $DOTFILES/vim/vimrc $HOME/.vimrc
-
-# IdeaVim
-# rm -rf $HOME/.ideavimrc
-# ln -s $DOTFILES/vim/ideavimrc $HOME/.ideavimrc
 
 # Git
 ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
@@ -74,3 +77,5 @@ ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
 #     echo "Tmux is not installed"
 #     brew install tmux
 # fi
+
+echo "I'm done installing your dotfiles. Goodbye!"

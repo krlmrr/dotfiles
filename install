@@ -59,23 +59,24 @@ rm -rf $HOME/.zshrc
 ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
 
 # Tmux Plugin Manager
-# rm -rf $HOME/.tmux
-# git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+rm -rf $HOME/.tmux
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Tmux
-# ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
+rm -rf $HOME/.tmux
+ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 
 # Homebrew
-# if ! command -v brew >/dev/null 2>&1
-# then
-#     echo "Brew is not installed"
-#     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# fi
+if ! command -v brew >/dev/null 2>&1
+then
+    echo "Brew is not installed"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
-# if ! command -v tmux >/dev/null 2>&1
-# then
-#     echo "Tmux is not installed"
-#     brew install tmux
-# fi
+if ! command -v tmux >/dev/null 2>&1
+then
+    echo "Tmux is not installed"
+    brew install tmux
+fi
 
 echo "I'm done installing your dotfiles. Goodbye!"

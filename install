@@ -12,9 +12,7 @@ if [ ! -d "$HOME/.ssh" ]; then
 fi
 
 # VS Code
-if [ ! -d "$HOME/.config/vs_code/" ]; then
-    ln -s $DOTFILES/vs_code $HOME/.config/vs_code
-fi
+ln -s $DOTFILES/vs_code $HOME/.config/vs_code
 
 # Karabiner -- Keyboard settings for macOS
 rm -rf $HOME/.config/karabiner
@@ -58,24 +56,30 @@ fi
 rm -rf $HOME/.zshrc
 ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
 
-# Tmux Plugin Manager
-# rm -rf $HOME/.tmux
-# git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# Homebrew
+if ! command -v brew >/dev/null 2>&1
+then
+    echo "Brew is not installed"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+if ! command -v nvim >/dev/null 2>&1
+then
+    echo "Nvim is not installed"
+    /bin/bash -c "brew install neovim"
+fi
 
 # Tmux
-# ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
+ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 
-# Homebrew
-# if ! command -v brew >/dev/null 2>&1
-# then
-#     echo "Brew is not installed"
-#     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# fi
+if ! command -v tmux >/dev/null 2>&1
+then
+    echo "Tmux is not installed"
+    brew install tmux
+fi
 
-# if ! command -v tmux >/dev/null 2>&1
-# then
-#     echo "Tmux is not installed"
-#     brew install tmux
-# fi
+# Tmux Plugin Manager
+rm -rf $HOME/.tmux
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 echo "I'm done installing your dotfiles. Goodbye!"

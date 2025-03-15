@@ -44,6 +44,7 @@ alias dust="./vendor/bin/duster fix"
 alias duster="./vendor/bin/duster"
 alias pint="./vendor/bin/pint"
 alias pail="php artisan pail"
+alias stan="./vendor/bin/phpstan analyse"
 
 # Filament
 alias fu="php artisan make:filament-user"

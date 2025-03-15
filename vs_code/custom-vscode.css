@@ -18,7 +18,10 @@
     margin: 0 !important;
 }
 .pane-header {
-    margin: 0 0 0 10px;
+    margin: 0 0 0 15px;
+}
+.monaco-list-rows {
+    margin-left: 14px;
 }
 .slider {
     width: 4px !important;

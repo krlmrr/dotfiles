@@ -20,9 +20,6 @@
 .pane-header {
     margin: 0 0 0 15px;
 }
-.monaco-list-rows {
-    margin-left: 14px;
-}
 .slider {
     width: 4px !important;
     border-radius: 20px;

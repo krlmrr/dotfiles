@@ -8,3 +8,5 @@
 	required = true
 [pull]
 	rebase = false
+[core]
+	excludesfile = /Users/karlm/.gitignore

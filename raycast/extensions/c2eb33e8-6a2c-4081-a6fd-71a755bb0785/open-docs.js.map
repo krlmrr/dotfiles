@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/open-docs.ts"],
+  "sourcesContent": ["import { open } from \"@raycast/api\";\n\nexport default async function main() {\n  await open(\"https://herd.laravel.com/docs\");\n}\n"],
+  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAqB,wBAErB,eAAOF,GAA8B,CACnC,QAAM,QAAK,+BAA+B,CAC5C",
+  "names": ["open_docs_exports", "__export", "main", "__toCommonJS", "import_api"]
+}

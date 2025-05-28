@@ -68,8 +68,12 @@ then
     echo "Nvim is not installed"
     /bin/bash -c "brew install neovim"
 fi
+# Tmux Plugin Manager
+rm -rf $HOME/.tmux
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Tmux
+rm -rf $HOME/.tmux
 ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 
 if ! command -v tmux >/dev/null 2>&1
@@ -81,5 +85,17 @@ fi
 # Tmux Plugin Manager
 rm -rf $HOME/.tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# Homebrew
+if ! command -v brew >/dev/null 2>&1
+then
+    echo "Brew is not installed"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+if ! command -v tmux >/dev/null 2>&1
+then
+    echo "Tmux is not installed"
+    brew install tmux
+fi
 
 echo "I'm done installing your dotfiles. Goodbye!"

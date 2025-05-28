@@ -3,26 +3,9 @@
     text-align: center !important;
     padding-left: 8px;
 }
-.tabs-container {
-    margin-left: 6px
-}
 /* Gets rid of the Gear Icon and Action Icon */
 .action-toolbar-container {
     display: none !important;
-}
-.actions-container {
-    margin-left: 14px !important;
-    gap: 10px;
-}
-.monaco-action-bar {
-    margin: 0 !important;
-}
-.pane-header {
-    margin: 0 0 0 15px;
-}
-.slider {
-    width: 4px !important;
-    border-radius: 20px;
 }
 /* Command Palette */
 .quick-input-widget {
@@ -50,16 +33,6 @@
     backdrop-filter: blur(8px);
     z-index: 50;
 }
-/* This hides the Command center but leaves the functionality intact */
-/* Mostly to fix the Close button padding */
-/* .command-center-center {
-    background-color: transparent !important;
-    border: transparent !important;
-}
-.command-center-quick-pick {
-    display: none !important;
-} */
-
 /* Hide the Custom CSS Icon in the Status Bar */
 .__CUSTOM_CSS_JS_INDICATOR_CLS {
     display: none !important;

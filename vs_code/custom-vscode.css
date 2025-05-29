@@ -19,17 +19,23 @@
     padding: 8px !important;
 }
 /* Command Palette List */
+.monaco-list-row.focused {
+    background-color: #474e5c6e !important;
+}
 .monaco-list-rows {
     background-color: #282c34 !important;
-}
-.monaco-list-row.focused {
-    background-color: #3e4451 !important;
 }
 /* Command palette text input */
 .quick-input-filter .monaco-inputbox {
     border-radius: 8px !important;
     padding: 8px !important;
     margin-bottom: 10px !important;
+}
+.suggest-input-container {
+    border-radius: 8px !important;
+    padding: 8px !important;
+    padding-left: 10px !important;
+    margin-right: -8px !important;
 }
 /* Hides the VSCode logo when the editor is empty. */
 .letterpress {

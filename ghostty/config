@@ -10,3 +10,4 @@ window-save-state = always
 cursor-style = bar
 confirm-close-surface = false
 macos-option-as-alt = true
+shell-integration-features = sudo

@@ -26,6 +26,7 @@ alias brewup="brew update && brew upgrade && brew upgrade --greedy && brew clean
 alias mkd="mkdir -p"
 alias sourcez="source ~/.zshrc"
 alias code.="code ."
+alias ps.="phpstorm ."
 
 # Laravel
 alias a="php artisan"
@@ -45,6 +46,7 @@ alias duster="./vendor/bin/duster"
 alias pint="./vendor/bin/pint"
 alias pail="php artisan pail"
 alias stan="./vendor/bin/phpstan analyse"
+alias pest="./vendor/bin/pest"
 
 # Filament
 alias fu="php artisan make:filament-user"
@@ -75,3 +77,7 @@ export HERD_PHP_83_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/c
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+
+# Herd injected PHP 8.2 configuration.
+export HERD_PHP_82_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/82/"

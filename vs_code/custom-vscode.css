@@ -1,3 +1,7 @@
+/* Change the cyan color to use the blue instead */
+.mtk10 {
+    color: #61AFEF !important;
+}
 /* Fixes alignment issues with relative line numbers */
 .relative-current-line-number{
     text-align: center !important;
@@ -10,8 +14,16 @@
 /* Command Palette */
 .quick-input-widget {
     top: 25% !important;
+    background-color: #282c34 !important;
     box-shadow: 0px 8px 20px rgba(0, 0, 0, .45) !important;
     padding: 8px !important;
+}
+/* Command Palette List */
+.monaco-list-rows {
+    background-color: #282c34 !important;
+}
+.monaco-list-row.focused {
+    background-color: #3e4451 !important;
 }
 /* Command palette text input */
 .quick-input-filter .monaco-inputbox {

@@ -31,12 +31,6 @@
     padding: 8px !important;
     margin-bottom: 10px !important;
 }
-.suggest-input-container {
-    border-radius: 8px !important;
-    padding: 8px !important;
-    padding-left: 10px !important;
-    margin-right: -8px !important;
-}
 /* Hides the VSCode logo when the editor is empty. */
 .letterpress {
     display: none !important;

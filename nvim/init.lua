@@ -221,7 +221,18 @@ require('lazy').setup({
         -- Enable `lukas-reineke/indent-blankline.nvim`
         -- See `:help ibl`
         main = 'ibl',
-        opts = {},
+        opts = {
+            indent = { char = '│' },
+            scope = { show_start = false, show_end = false },
+        },
+    },
+
+    -- Rainbow brackets
+    {
+        'HiPhish/rainbow-delimiters.nvim',
+        config = function()
+            require('rainbow-delimiters.setup').setup {}
+        end,
     },
 
     -- "gc" to comment visual regions/lines

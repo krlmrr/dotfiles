@@ -71,6 +71,16 @@ then
     /bin/bash -c "brew install neovim"
 fi
 
+# Neovim dependencies
+brew install ripgrep fd
+
+# Lazygit
+mkdir -p "$HOME/Library/Application Support/lazygit"
+ln -sf $DOTFILES/lazygit/config.yml "$HOME/Library/Application Support/lazygit/config.yml"
+
+# Fonts
+cp $DOTFILES/fonts/MonoLisa/*.ttf $HOME/Library/Fonts/
+
 # Tmux Plugin Manager
 rm -rf $HOME/.tmux
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

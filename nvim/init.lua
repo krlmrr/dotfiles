@@ -157,7 +157,7 @@ require('lazy').setup({
             require('onedark').setup {
                 style = 'dark',
                 colors = {
-                    cyan = "#828997",  -- Replace cyan with gray
+                    cyan = "#7aa2f7",  -- Softer blue instead of cyan
                     orange = "#e5c07b",  -- Softer orange (more yellow)
                 },
                 highlights = {

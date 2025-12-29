@@ -1,1 +1,4 @@
 .DS_Store
+raycast/extensions/
+*.bak
+karabiner/automatic_backups/

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/open-config.ts"],
-  "sourcesContent": ["import { open } from \"@raycast/api\";\nimport { homedir } from \"os\";\n\nexport default async function main() {\n  const path = `${homedir()}/Library/Application Support/Herd`;\n  await open(path);\n}\n"],
-  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAAA,IAAAI,EAAqB,wBACrBC,EAAwB,cAExB,eAAOH,GAA8B,CACnC,IAAMI,EAAO,MAAG,WAAQ,CAAC,oCACzB,QAAM,QAAKA,CAAI,CACjB",
-  "names": ["open_config_exports", "__export", "main", "__toCommonJS", "import_api", "import_os", "path"]
-}

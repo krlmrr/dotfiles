@@ -1,13 +1,17 @@
-theme = dark:onehalfdark,light:catppuccin-latte
+theme = dark:one half dark,light:catppuccin-latte
 macos-titlebar-proxy-icon = hidden
-font-family = FiraCode Nerd Font
-font-size = 18
+# font-family = FiraCode Nerd Font
+font-size = 22
 adjust-cell-height = 100%
 window-padding-x = 20
-window-padding-y = 10
+# Window padding for top and bottom set independently
+window-padding-y = 10,0
 working-directory = /Users/karlmurray/herd
 window-save-state = always
 cursor-style = bar
 confirm-close-surface = false
 macos-option-as-alt = true
 shell-integration-features = sudo
+auto-update-channel = tip
+title = "  "
+keybind = shift+enter=text:\x1b\r

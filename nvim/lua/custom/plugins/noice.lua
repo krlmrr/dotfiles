@@ -54,6 +54,29 @@ return {
         },
         opts = { skip = true },
       },
+      -- Suppress "Initializing JS/TS server" messages
+      {
+        filter = {
+          event = "notify",
+          find = "Initializing",
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = "msg_show",
+          find = "Initializing",
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = "lsp",
+          kind = "progress",
+          find = "Initializing",
+        },
+        opts = { skip = true },
+      },
     },
   },
 }

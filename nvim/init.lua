@@ -26,6 +26,7 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+
 -- Remove all underline styling
 vim.api.nvim_set_hl(0, "@lsp.type.function", {})
 vim.api.nvim_set_hl(0, "@lsp.type.method", {})
@@ -74,7 +75,16 @@ require('lazy').setup({
 
             -- Useful status updates for LSP
             -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-            { 'j-hui/fidget.nvim',       opts = {} },
+            {
+                'j-hui/fidget.nvim',
+                opts = {
+                    progress = {
+                        suppress_on_insert = true,
+                        ignore_done_already = true,
+                        ignore = { "ts_ls" },
+                    },
+                },
+            },
 
             -- Additional lua configuration, makes nvim stuff amazing!
             'folke/neodev.nvim',
@@ -203,6 +213,9 @@ require('lazy').setup({
                 },
             }
             require('onedark').load()
+            -- Transparent statusline background
+            vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
+            vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
         end,
     },
 
@@ -210,23 +223,59 @@ require('lazy').setup({
         -- Set lualine as statusline
         'nvim-lualine/lualine.nvim',
         -- See `:help lualine.txt`
-        opts = {
-            options = {
-                icons_enabled = false,
-                theme = 'onedark',
-                component_separators = '|',
-                section_separators = '',
-                globalstatus = true,
-            },
-            sections = {
-                lualine_a = { 'mode' },
-                lualine_b = { 'branch', 'diff', 'diagnostics' },
-                lualine_c = { 'filename' },
-                lualine_x = {},
-                lualine_y = {},
-                lualine_z = { 'location' },
-            },
-        },
+        config = function()
+            local custom_theme = {
+                normal = {
+                    a = { fg = '#282c34', bg = '#98c379', gui = 'bold' },
+                    b = { fg = '#abb2bf', bg = 'NONE' },
+                    c = { fg = '#5c6370', bg = 'NONE' },
+                    x = { fg = '#abb2bf', bg = 'NONE' },
+                    z = { fg = '#282c34', bg = '#98c379', gui = 'bold' },
+                },
+                insert = {
+                    a = { fg = '#282c34', bg = '#61afef', gui = 'bold' },
+                    z = { fg = '#282c34', bg = '#61afef', gui = 'bold' },
+                },
+                visual = {
+                    a = { fg = '#282c34', bg = '#c678dd', gui = 'bold' },
+                    z = { fg = '#282c34', bg = '#c678dd', gui = 'bold' },
+                },
+                replace = {
+                    a = { fg = '#282c34', bg = '#e06c75', gui = 'bold' },
+                    z = { fg = '#282c34', bg = '#e06c75', gui = 'bold' },
+                },
+                command = {
+                    a = { fg = '#282c34', bg = '#e5c07b', gui = 'bold' },
+                    z = { fg = '#282c34', bg = '#e5c07b', gui = 'bold' },
+                },
+                inactive = {
+                    a = { fg = '#5c6370', bg = '#3e4452' },
+                    b = { fg = '#5c6370', bg = 'NONE' },
+                    c = { fg = '#5c6370', bg = 'NONE' },
+                    z = { fg = '#5c6370', bg = '#3e4452' },
+                },
+            }
+            require('lualine').setup {
+                options = {
+                    icons_enabled = true,
+                    theme = custom_theme,
+                    component_separators = { left = '', right = '' },
+                    section_separators = { left = '\u{e0b0}', right = '\u{e0b2}' },
+                    globalstatus = true,
+                },
+                sections = {
+                    lualine_a = { 'mode' },
+                    lualine_b = { 'diff', 'diagnostics' },
+                    lualine_c = {},
+                    lualine_x = { { 'filetype', fmt = function(str)
+                        if str == 'php' then return 'PHP' end
+                        return str:sub(1,1):upper()..str:sub(2)
+                    end } },
+                    lualine_y = {},
+                    lualine_z = { 'branch' },
+                },
+            }
+        end,
     },
 
     {
@@ -298,6 +347,7 @@ require('lazy').setup({
             require('ibl').setup {
                 indent = { char = '│', highlight = "IblIndent" },
                 scope = { enabled = true, highlight = highlight, show_start = false, show_end = false },
+                exclude = { filetypes = { 'dashboard', 'alpha', 'starter' } },
             }
 
             -- Make default indent lines subtle gray

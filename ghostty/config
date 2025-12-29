@@ -2,8 +2,12 @@ theme = dark:one half dark,light:catppuccin-latte
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
 macos-titlebar-proxy-icon = hidden
-# font-family = FiraCode Nerd Font
-font-size = 22
+font-family = MonoLisa
+font-style = Medium
+font-style-italic = Medium Italic
+font-style-bold = Medium
+font-style-bold-italic = Medium Italic
+font-size = 18
 adjust-cell-height = 100%
 window-padding-x = 20
 # Window padding for top and bottom set independently

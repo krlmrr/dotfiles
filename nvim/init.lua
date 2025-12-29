@@ -158,12 +158,16 @@ require('lazy').setup({
                 style = 'dark',
                 colors = {
                     cyan = "#828997",  -- Replace cyan with gray
+                    orange = "#e5c07b",  -- Softer orange (more yellow)
                 },
                 highlights = {
                     ["@keyword"] = { fg = '$purple' },
                     ["@function.builtin"] = { fg = '$blue' },
                     ["@type.builtin"] = { fg = '$yellow' },
                     ["String"] = { fg = '$green' },
+                    ["@string"] = { fg = '$green' },
+                    ["Comment"] = { fg = '#61AEEF' },
+                    ["@comment"] = { fg = '#61AEEF' },
                 },
             }
             require('onedark').load()

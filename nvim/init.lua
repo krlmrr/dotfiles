@@ -360,10 +360,6 @@ vim.o.termguicolors = true
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
--- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
 -- Disable underlines in diagnostics
 vim.diagnostic.config({
     underline = false,
@@ -786,6 +782,12 @@ vim.keymap.set("i", ",,", "<Esc>A,<Esc>")
 
 -- Neo-tree
 vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file tree" })
+
+-- Move to first non-blank after j/k (and arrow keys)
+vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true })
+vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true })
+vim.keymap.set('n', '<Down>', 'j_', { noremap = true, silent = true })
+vim.keymap.set('n', '<Up>', 'k_', { noremap = true, silent = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

@@ -9,6 +9,7 @@ vim.o.softtabstop = 4  -- Number of spaces inserted instead of a TAB character
 vim.o.shiftwidth = 4   -- Number of spaces inserted when indenting
 vim.o.swapfile = false -- Disable swap files
 vim.o.scrolloff = 999  -- Keep cursor centered
+vim.o.wrap = false     -- Disable line wrapping
 vim.o.cursorline = false -- Disable cursor line highlighting
 
 -- Remove all underline styling
@@ -84,7 +85,7 @@ require('lazy').setup({
     },
 
     -- Useful plugin to show you pending keybinds.
-    { 'folke/which-key.nvim',  opts = {} },
+    { 'folke/which-key.nvim',  opts = { delay = 500 } },
     {
         -- Adds git related signs to the gutter, as well as utilities for managing changes
         'lewis6991/gitsigns.nvim',

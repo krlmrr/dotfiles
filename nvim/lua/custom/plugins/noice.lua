@@ -31,6 +31,21 @@ return {
         },
         opts = { skip = true },
       },
+      -- Hide "no lines in buffer" messages
+      {
+        filter = {
+          event = "msg_show",
+          find = "lines in buffer",
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = "notify",
+          find = "lines in buffer",
+        },
+        opts = { skip = true },
+      },
     },
   },
 }

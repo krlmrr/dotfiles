@@ -11,6 +11,18 @@ vim.o.swapfile = false -- Disable swap files
 vim.o.scrolloff = 999  -- Keep cursor centered
 vim.o.wrap = false     -- Disable line wrapping
 vim.o.cursorline = false -- Disable cursor line highlighting
+vim.opt.shortmess:append('s') -- Suppress "no lines in buffer" messages
+
+-- Force 4-space indentation for Vue files
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "vue",
+    callback = function()
+        vim.opt_local.tabstop = 4
+        vim.opt_local.shiftwidth = 4
+        vim.opt_local.softtabstop = 4
+        vim.opt_local.expandtab = true
+    end,
+})
 
 -- Remove all underline styling
 vim.api.nvim_set_hl(0, "@lsp.type.function", {})
@@ -762,6 +774,7 @@ vim.lsp.enable('intelephense')
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 require('luasnip.loaders.from_vscode').lazy_load()
+require('luasnip.loaders.from_vscode').lazy_load({ paths = { vim.fn.stdpath('config') .. '/snippets' } })
 luasnip.config.setup {}
 
 cmp.setup {

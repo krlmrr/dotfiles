@@ -6,7 +6,17 @@ return {
       formatters_by_ft = {
         lua = { "stylua" },
         javascript = { "prettier" },
-        xml = { "xmlformat" }
+        typescript = { "prettier" },
+        xml = { "xmlformat" },
+        php = { "pint" },
+        blade = { "blade-formatter" },
+      },
+      formatters = {
+        pint = {
+          command = "vendor/bin/pint",
+          args = { "$FILENAME" },
+          stdin = false,
+        },
       },
       format_on_save = {
         lsp_fallback = true,

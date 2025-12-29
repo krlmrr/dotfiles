@@ -1,31 +1,26 @@
--- Unless you are still migrating, remove the deprecated commands from v1.x
-vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
-
 return {
   'nvim-neo-tree/neo-tree.nvim',
-  cmd = 'Neotree',
-  keys = {
-    { '<leader>n', ':Neotree toggle<CR>' },
-    { '<leader>N', ':Neotree focus<CR>' },
-  },
-  version = "*",
+  branch = "v3.x",
+  lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
-    "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+    "nvim-tree/nvim-web-devicons",
     "MunifTanjim/nui.nvim",
   },
   config = function()
+    vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE" })
+
     require('neo-tree').setup {
-      popup_border_style = "rounded",
-      default_component_configs = {
-        filesystem = {
-          follow_current_file = {
-            enabled = false,         -- This will find and focus the file in the active buffer every time
-            --               -- the current file is changed while the tree is open.
-            leave_dirs_open = false, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
-          },
-        }
-      }
+      window = {
+        position = "right",
+      },
+      filesystem = {
+        follow_current_file = {
+          enabled = true,
+        },
+      },
     }
   end,
 }

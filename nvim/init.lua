@@ -242,13 +242,44 @@ require('lazy').setup({
                 vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
                 vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
                 vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#7aa2f7" })
+                -- Clear tag name highlights so rainbow-delimiters colors the whole tag
+                vim.api.nvim_set_hl(0, "@tag", {})
+                vim.api.nvim_set_hl(0, "@tag.html", {})
+                vim.api.nvim_set_hl(0, "@tag.vue", {})
+                vim.api.nvim_set_hl(0, "@tag.delimiter", {})
+                vim.api.nvim_set_hl(0, "@tag.delimiter.html", {})
+                vim.api.nvim_set_hl(0, "@tag.delimiter.vue", {})
+                vim.api.nvim_set_hl(0, "@punctuation.bracket", {})
+                vim.api.nvim_set_hl(0, "@punctuation.bracket.vue", {})
             end)
 
-            require('rainbow-delimiters.setup').setup {
+            local rainbow = require('rainbow-delimiters')
+            vim.g.rainbow_delimiters = {
+                strategy = {
+                    [''] = rainbow.strategy['global'],
+                    html = rainbow.strategy['global'],
+                    vue = rainbow.strategy['global'],
+                    javascript = rainbow.strategy['global'],
+                    typescript = rainbow.strategy['global'],
+                    php = rainbow.strategy['global'],
+                },
+                query = {
+                    [''] = 'rainbow-delimiters',
+                    lua = 'rainbow-blocks',
+                },
                 highlight = highlight,
             }
 
-            vim.g.rainbow_delimiters = { highlight = highlight }
+            -- Refresh rainbow-delimiters on text changes
+            vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+                callback = function(args)
+                    local rd = require('rainbow-delimiters')
+                    if rd.is_enabled(args.buf) then
+                        rd.disable(args.buf)
+                        rd.enable(args.buf)
+                    end
+                end,
+            })
 
             require('ibl').setup {
                 indent = { char = '│', highlight = "IblIndent" },
@@ -293,6 +324,12 @@ require('lazy').setup({
             'nvim-treesitter/nvim-treesitter-textobjects',
         },
         build = ':TSUpdate',
+    },
+
+    {
+        -- Auto-close and auto-rename HTML tags
+        'windwp/nvim-ts-autotag',
+        opts = {},
     },
 
     -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
@@ -476,7 +513,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
     require('nvim-treesitter.configs').setup {
         -- Add languages to be installed here that you want installed for treesitter
-        ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash', 'php', 'html', 'css', 'json', 'yaml', 'markdown', 'phpdoc', 'regex' },
+        ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash', 'php', 'html', 'css', 'json', 'yaml', 'markdown', 'phpdoc', 'regex', 'vue' },
 
         -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
         auto_install = false,

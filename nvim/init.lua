@@ -8,6 +8,7 @@ vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a T
 vim.o.softtabstop = 4  -- Number of spaces inserted instead of a TAB character
 vim.o.shiftwidth = 4   -- Number of spaces inserted when indenting
 vim.o.swapfile = false -- Disable swap files
+vim.o.scrolloff = 999  -- Keep cursor centered
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then

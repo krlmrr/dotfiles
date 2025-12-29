@@ -9,6 +9,14 @@ vim.o.softtabstop = 4  -- Number of spaces inserted instead of a TAB character
 vim.o.shiftwidth = 4   -- Number of spaces inserted when indenting
 vim.o.swapfile = false -- Disable swap files
 vim.o.scrolloff = 999  -- Keep cursor centered
+vim.o.cursorline = false -- Disable cursor line highlighting
+
+-- Remove all underline styling
+vim.api.nvim_set_hl(0, "@lsp.type.function", {})
+vim.api.nvim_set_hl(0, "@lsp.type.method", {})
+vim.api.nvim_set_hl(0, "LspReferenceText", {})
+vim.api.nvim_set_hl(0, "LspReferenceRead", {})
+vim.api.nvim_set_hl(0, "LspReferenceWrite", {})
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
@@ -170,6 +178,13 @@ require('lazy').setup({
                     ["@string"] = { fg = '$green' },
                     ["Comment"] = { fg = '#61AEEF' },
                     ["@comment"] = { fg = '#61AEEF' },
+                    -- Remove all underlines
+                    ["@lsp.type.function"] = { fmt = 'none' },
+                    ["@lsp.type.method"] = { fmt = 'none' },
+                    ["@lsp.type.class"] = { fmt = 'none' },
+                    ["@lsp.type.namespace"] = { fmt = 'none' },
+                    ["@lsp.typemod.function.declaration"] = { fmt = 'none' },
+                    ["@lsp.typemod.method.declaration"] = { fmt = 'none' },
                 },
             }
             require('onedark').load()
@@ -309,6 +324,17 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Disable underlines in diagnostics
+vim.diagnostic.config({
+    underline = false,
+})
+
+-- Enable inlay hints by default, toggle with <leader>th
+vim.lsp.inlay_hint.enable(true)
+vim.keymap.set('n', '<leader>th', function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = '[T]oggle inlay [H]ints' })
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
@@ -480,7 +506,18 @@ end, 0)
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
+    -- Enable inlay hints (parameter hints like PhpStorm)
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+
+    -- Toggle inlay hints with <leader>ih
+    vim.keymap.set('n', '<leader>ih', function()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
+    end, { buffer = bufnr, desc = 'Toggle inlay hints' })
+
+    -- Disable semantic token highlighting (removes underlines on current function)
+    client.server_capabilities.semanticTokensProvider = nil
+
     -- NOTE: Remember that lua is a real programming language, and as such it is possible
     -- to define small helper and utility functions so you don't have to repeat yourself
     -- many times.
@@ -546,6 +583,10 @@ local servers = {
 
     intelephense = {
         filetypes = { 'php' },
+        init_options = {
+            licenceKey = "00EQQ3RLLHSB4FE",
+            globalStoragePath = vim.fn.expand("~/Library/Application Support/intelephense"),
+        },
         settings = {
             intelephense = {
                 stubs = {
@@ -565,6 +606,24 @@ local servers = {
                 },
                 environment = {
                     includePaths = {},
+                },
+                licenceKey = "00EQQ3RLLHSB4FE",
+                inlayHints = {
+                    parameterNames = {
+                        enabled = "all",
+                    },
+                    parameterTypes = {
+                        enabled = true,
+                    },
+                    variableTypes = {
+                        enabled = true,
+                    },
+                    propertyDeclarationTypes = {
+                        enabled = true,
+                    },
+                    functionReturnTypes = {
+                        enabled = true,
+                    },
                 },
             },
         },
@@ -594,15 +653,37 @@ mason_lspconfig.setup {
     ensure_installed = vim.tbl_keys(servers),
     handlers = {
         function(server_name)
+            if server_name == "intelephense" then return end -- Skip, configured below
+            local server_config = servers[server_name] or {}
             require('lspconfig')[server_name].setup {
                 capabilities = capabilities,
                 on_attach = on_attach,
-                settings = servers[server_name],
-                filetypes = (servers[server_name] or {}).filetypes,
+                settings = server_config.settings or server_config,
+                filetypes = server_config.filetypes,
+                init_options = server_config.init_options,
             }
         end,
     },
 }
+
+-- Configure intelephense separately with license (nvim 0.11+ API)
+local intelephense_licence_path = vim.fn.expand("~/Library/Application Support/intelephense/licence.txt")
+local intelephense_licence_key = nil
+if vim.fn.filereadable(intelephense_licence_path) == 1 then
+    intelephense_licence_key = vim.fn.readfile(intelephense_licence_path)[1]
+end
+
+vim.lsp.config.intelephense = {
+    cmd = { 'intelephense', '--stdio' },
+    filetypes = { 'php' },
+    root_markers = { 'composer.json', '.git' },
+    init_options = {
+        licenceKey = intelephense_licence_key,
+        globalStoragePath = vim.fn.expand("~/Library/Application Support/intelephense"),
+    },
+    settings = servers.intelephense.settings,
+}
+vim.lsp.enable('intelephense')
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`

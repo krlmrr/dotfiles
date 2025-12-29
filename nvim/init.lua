@@ -833,6 +833,9 @@ vim.keymap.set("i", ",,", "<Esc>A,<Esc>")
 -- Neo-tree
 vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file tree" })
 
+-- Close buffer without saving
+vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer" })
+
 -- Move to first non-blank after j/k (and arrow keys)
 vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true })
 vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true })

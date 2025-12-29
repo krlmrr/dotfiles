@@ -46,6 +46,14 @@ return {
         },
         opts = { skip = true },
       },
+      -- Show "No write since last change" only once
+      {
+        filter = {
+          event = "msg_show",
+          find = "E162",
+        },
+        opts = { skip = true },
+      },
     },
   },
 }

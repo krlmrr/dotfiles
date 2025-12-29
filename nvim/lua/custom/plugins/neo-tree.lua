@@ -13,8 +13,30 @@ return {
     vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE" })
 
     require('neo-tree').setup {
+      close_if_last_window = true,
       window = {
         position = "right",
+        width = 40,
+        mappings = {},
+      },
+      default_component_configs = {
+        indent = {
+          with_markers = false,
+        },
+      },
+      event_handlers = {
+        {
+          event = "neo_tree_buffer_enter",
+          handler = function()
+            vim.opt_local.number = false
+            vim.opt_local.relativenumber = false
+            vim.opt_local.statuscolumn = ""
+            -- Make q and :q quit Neovim when neo-tree is focused
+            vim.keymap.set("n", "q", "<cmd>qa<cr>", { buffer = true, silent = true })
+            vim.cmd("cnoreabbrev <buffer> q qa")
+            vim.cmd("cnoreabbrev <buffer> q! qa!")
+          end,
+        },
       },
       filesystem = {
         follow_current_file = {

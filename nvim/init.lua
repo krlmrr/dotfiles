@@ -11,9 +11,10 @@ vim.o.swapfile = false -- Disable swap files
 vim.o.scrolloff = 999  -- Keep cursor centered
 vim.o.wrap = false     -- Disable line wrapping
 vim.o.cursorline = false -- Disable cursor line highlighting
+vim.o.autoindent = true  -- Copy indent from current line when starting a new line
 vim.opt.shortmess:append('s') -- Suppress "no lines in buffer" messages
 
--- Force 4-space indentation for Vue files
+-- Force 4-space indentation for Vue files and disable treesitter indent
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "vue",
     callback = function()
@@ -21,6 +22,7 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.opt_local.shiftwidth = 4
         vim.opt_local.softtabstop = 4
         vim.opt_local.expandtab = true
+        vim.opt_local.indentexpr = ""
     end,
 })
 
@@ -662,8 +664,8 @@ local servers = {
     -- gopls = {},
     -- pyright = {},
     -- rust_analyzer = {},
-    -- tsserver = {},
     -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+
 
     intelephense = {
         filetypes = { 'php' },
@@ -769,6 +771,30 @@ vim.lsp.config.intelephense = {
 }
 vim.lsp.enable('intelephense')
 
+-- Configure Vue + TypeScript (nvim 0.11+ API)
+local vue_language_server_path = vim.fn.expand('~/.local/share/nvim/mason/packages/vue-language-server/node_modules/@vue/language-server')
+
+local vue_plugin = {
+    name = '@vue/typescript-plugin',
+    location = vue_language_server_path,
+    languages = { 'vue' },
+}
+
+vim.lsp.config.ts_ls = {
+    init_options = {
+        plugins = { vue_plugin },
+    },
+    filetypes = { 'typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'vue' },
+}
+vim.lsp.enable('ts_ls')
+
+vim.lsp.config.vue_ls = {
+    cmd = { 'vue-language-server', '--stdio' },
+    filetypes = { 'vue' },
+    root_markers = { 'package.json', '.git' },
+}
+vim.lsp.enable('vue_ls')
+
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
@@ -835,6 +861,15 @@ vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle fil
 
 -- Close buffer without saving
 vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer" })
+
+-- Auto-indent when pressing i on an empty line
+vim.keymap.set("n", "i", function()
+    if vim.fn.getline('.') == '' then
+        return '"_cc'
+    else
+        return 'i'
+    end
+end, { expr = true, noremap = true })
 
 -- Move to first non-blank after j/k (and arrow keys)
 vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true })

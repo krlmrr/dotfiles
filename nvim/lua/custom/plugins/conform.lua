@@ -7,6 +7,7 @@ return {
         lua = { "stylua" },
         javascript = { "prettier" },
         typescript = { "prettier" },
+        vue = { "prettier" },
         xml = { "xmlformat" },
         php = { "pint" },
         blade = { "blade-formatter" },
@@ -16,6 +17,15 @@ return {
           command = "vendor/bin/pint",
           args = { "$FILENAME" },
           stdin = false,
+        },
+        prettier = {
+          command = function()
+            local local_prettier = vim.fn.getcwd() .. "/node_modules/.bin/prettier"
+            if vim.fn.executable(local_prettier) == 1 then
+              return local_prettier
+            end
+            return "prettier"
+          end,
         },
       },
       format_on_save = {

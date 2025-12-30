@@ -2,6 +2,7 @@ theme = dark:one half dark,light:catppuccin-latte
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
 macos-titlebar-proxy-icon = hidden
+macos-window-shadow = false
 font-family = MonoLisa
 font-style = Medium
 font-style-italic = Medium Italic

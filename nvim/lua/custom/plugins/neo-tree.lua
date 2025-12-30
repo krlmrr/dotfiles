@@ -11,6 +11,9 @@ return {
     vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = "#abb2bf", bold = false })
+    vim.api.nvim_set_hl(0, "NeoTreeFileName", { fg = "#abb2bf", bold = false })
+    vim.api.nvim_set_hl(0, "NeoTreeRootName", { fg = "#abb2bf", bold = false })
 
     require('neo-tree').setup {
       close_if_last_window = true,
@@ -41,6 +44,12 @@ return {
       filesystem = {
         follow_current_file = {
           enabled = true,
+        },
+        filtered_items = {
+          visible = true,
+          hide_dotfiles = false,
+          hide_gitignored = false,
+          hide_hidden = false,
         },
       },
     }

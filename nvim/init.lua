@@ -947,6 +947,17 @@ vim.keymap.set('n', ';', ':', { noremap = true, desc = "Command mode" })
 vim.keymap.set("i", ";;", "<Esc>A;<Esc>", { desc = "Add semicolon at end" })
 vim.keymap.set("i", ",,", "<Esc>A,<Esc>", { desc = "Add comma at end" })
 
+-- Terminal mode
+vim.keymap.set("n", "<leader>tt", "<cmd>botright split | term<cr><cmd>startinsert<cr>", { desc = "Open terminal" })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.api.nvim_create_autocmd("TermOpen", {
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.statuscolumn = ""
+  end,
+})
+
 -- Neo-tree
 vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file tree" })
 

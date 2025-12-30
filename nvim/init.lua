@@ -10,6 +10,33 @@ vim.o.softtabstop = 4         -- Number of spaces inserted instead of a TAB char
 vim.o.shiftwidth = 4          -- Number of spaces inserted when indenting
 vim.o.swapfile = false        -- Disable swap files
 vim.o.scrolloff = 10
+-- Show winbar only when multiple splits exist
+vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "WinNew", "WinClosed" }, {
+  callback = function()
+    vim.schedule(function()
+      local wins = vim.api.nvim_tabpage_list_wins(0)
+      -- Count only non-floating windows
+      local real_wins = {}
+      for _, win in ipairs(wins) do
+        if vim.api.nvim_win_is_valid(win) then
+          local cfg = vim.api.nvim_win_get_config(win)
+          if cfg.relative == '' then
+            table.insert(real_wins, win)
+          end
+        end
+      end
+      for _, win in ipairs(real_wins) do
+        pcall(function()
+          if #real_wins > 1 then
+            vim.wo[win].winbar = '  %t'
+          else
+            vim.wo[win].winbar = ''
+          end
+        end)
+      end
+    end)
+  end,
+})
 vim.o.wrap = false            -- Disable line wrapping
 vim.o.cursorline = false      -- Disable cursor line highlighting
 vim.o.autoindent = true       -- Copy indent from current line when starting a new line
@@ -922,8 +949,12 @@ vim.keymap.set("n", "<leader>w", "<cmd>close<cr>", { desc = "Close split" })
 -- Save file
 vim.keymap.set("n", "<leader>s", "<cmd>w<cr>", { desc = "Save file" })
 
--- Vertical split
-vim.keymap.set("n", "<leader>v", "<cmd>vsplit<cr>", { desc = "Vertical split" })
+-- New vertical split with empty buffer (opens on right) and open Telescope
+vim.keymap.set("n", "<leader>v", function()
+  vim.cmd('rightbelow vnew')
+  require('telescope.builtin').find_files({ hidden = true })
+end, { desc = "New vertical split" })
+
 
 -- Auto-indent when pressing i on an empty line
 vim.keymap.set("n", "i", function()

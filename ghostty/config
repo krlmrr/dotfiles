@@ -12,8 +12,11 @@ adjust-cell-height = 100%
 window-padding-x = 20,10
 # Window padding for top and bottom set independently
 window-padding-y = 10,0
+window-padding-balance = true
 working-directory = /Users/karlmurray/herd
 window-save-state = always
+window-width = 160
+window-height = 50
 cursor-style = bar
 confirm-close-surface = false
 macos-option-as-alt = true

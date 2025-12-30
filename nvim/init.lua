@@ -227,26 +227,23 @@ require('lazy').setup({
         config = function()
             local custom_theme = {
                 normal = {
-                    a = { fg = '#282c34', bg = '#98c379', gui = 'bold' },
+                    a = { fg = '#abb2bf', bg = 'NONE' },
                     b = { fg = '#abb2bf', bg = 'NONE' },
                     c = { fg = '#5c6370', bg = 'NONE' },
                     x = { fg = '#abb2bf', bg = 'NONE' },
+                    y = { fg = '#abb2bf', bg = 'NONE' },
                     z = { fg = '#282c34', bg = '#98c379', gui = 'bold' },
                 },
                 insert = {
-                    a = { fg = '#282c34', bg = '#61afef', gui = 'bold' },
                     z = { fg = '#282c34', bg = '#61afef', gui = 'bold' },
                 },
                 visual = {
-                    a = { fg = '#282c34', bg = '#c678dd', gui = 'bold' },
                     z = { fg = '#282c34', bg = '#c678dd', gui = 'bold' },
                 },
                 replace = {
-                    a = { fg = '#282c34', bg = '#e06c75', gui = 'bold' },
                     z = { fg = '#282c34', bg = '#e06c75', gui = 'bold' },
                 },
                 command = {
-                    a = { fg = '#282c34', bg = '#e5c07b', gui = 'bold' },
                     z = { fg = '#282c34', bg = '#e5c07b', gui = 'bold' },
                 },
                 inactive = {
@@ -265,18 +262,18 @@ require('lazy').setup({
                     globalstatus = true,
                 },
                 sections = {
-                    lualine_a = { 'mode' },
-                    lualine_b = { 'diff' },
-                    lualine_c = {},
-                    lualine_x = {},
-                    lualine_y = {},
-                    lualine_z = {
+                    lualine_a = {
+                        'branch',
                         { 'filetype', fmt = function(str)
                             if str == 'php' then return 'PHP' end
                             return str:sub(1,1):upper()..str:sub(2)
                         end },
-                        'branch'
                     },
+                    lualine_b = {},
+                    lualine_c = {},
+                    lualine_x = {},
+                    lualine_y = { 'diff' },
+                    lualine_z = { 'mode' },
                 },
             }
         end,

@@ -955,7 +955,24 @@ vim.keymap.set("n", "<leader>s", "<cmd>w<cr>", { desc = "Save file" })
 -- New vertical split with empty buffer (opens on right) and open Telescope
 vim.keymap.set("n", "<leader>v", function()
   vim.cmd('rightbelow vnew')
-  require('telescope.builtin').find_files({ hidden = true })
+  local new_buf = vim.api.nvim_get_current_buf()
+  require('telescope.builtin').find_files({
+    hidden = true,
+    attach_mappings = function(prompt_bufnr, map)
+      local actions = require('telescope.actions')
+      actions.close:enhance({
+        post = function()
+          -- If buffer is still empty/unnamed, close the split
+          vim.schedule(function()
+            if vim.api.nvim_buf_is_valid(new_buf) and vim.api.nvim_buf_get_name(new_buf) == '' then
+              vim.api.nvim_buf_delete(new_buf, { force = true })
+            end
+          end)
+        end,
+      })
+      return true
+    end,
+  })
 end, { desc = "New vertical split" })
 
 

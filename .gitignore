@@ -2,3 +2,4 @@
 raycast/extensions/
 *.bak
 karabiner/automatic_backups/
+.claude/

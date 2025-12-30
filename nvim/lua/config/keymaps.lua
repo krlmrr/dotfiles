@@ -31,6 +31,12 @@ vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 -- Neo-tree
 vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file tree" })
 
+-- Window navigation
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+
 -- Buffers and windows
 vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer (force)" })
 vim.keymap.set("n", "<leader>w", "<cmd>close<cr>", { desc = "Close split" })

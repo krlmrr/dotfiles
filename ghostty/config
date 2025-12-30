@@ -25,3 +25,4 @@ auto-update-channel = tip
 title = "  "
 keybind = shift+enter=text:\x1b\r
 keybind = super+comma=text:nvim ~/.config/ghostty/config\x0d
+keybind = super+s=text:\x1b:w\x0d

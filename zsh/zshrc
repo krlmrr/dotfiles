@@ -1,7 +1,14 @@
 # Auto-attach to tmux
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     cd ~/herd
-    tmux attach -t main 2>/dev/null || tmux new -s main
+    while true; do
+        if [ "$(tmux list-sessions 2>/dev/null | wc -l)" -gt 1 ]; then
+            # Multiple sessions - show picker
+            tmux attach \; choose-tree -s
+        else
+            tmux attach 2>/dev/null || tmux new -s main
+        fi
+    done
 fi
 
 export ZSH="$HOME/.oh-my-zsh"

@@ -50,6 +50,9 @@ return {
           hide_dotfiles = false,
           hide_gitignored = false,
           hide_hidden = false,
+          never_show = {
+            ".DS_Store",
+          },
         },
       },
     }

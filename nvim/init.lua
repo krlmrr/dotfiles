@@ -9,20 +9,20 @@ vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
     local arg = vim.fn.argv(0)
     if arg ~= "" and vim.fn.isdirectory(arg) == 1 then
-      vim.cmd("bd")  -- Delete the directory buffer
-      vim.cmd("cd " .. vim.fn.fnameescape(arg))  -- Set cwd to the directory
-      require('dashboard'):instance()  -- Open dashboard
+      vim.cmd("bd")                             -- Delete the directory buffer
+      vim.cmd("cd " .. vim.fn.fnameescape(arg)) -- Set cwd to the directory
+      require('dashboard'):instance()           -- Open dashboard
     end
   end,
 })
 
 vim.opt.statuscolumn = "%=%{v:relnum?v:relnum:v:lnum}   "
 
-vim.o.tabstop = 4             -- A TAB character looks like 4 spaces
-vim.o.expandtab = true        -- Pressing the TAB key will insert spaces instead of a TAB character
-vim.o.softtabstop = 4         -- Number of spaces inserted instead of a TAB character
-vim.o.shiftwidth = 4          -- Number of spaces inserted when indenting
-vim.o.swapfile = false        -- Disable swap files
+vim.o.tabstop = 4      -- A TAB character looks like 4 spaces
+vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a TAB character
+vim.o.softtabstop = 4  -- Number of spaces inserted instead of a TAB character
+vim.o.shiftwidth = 4   -- Number of spaces inserted when indenting
+vim.o.swapfile = false -- Disable swap files
 vim.o.scrolloff = 10
 -- Show winbar only when multiple editor splits exist (excludes neo-tree)
 vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "WinNew", "WinClosed" }, {
@@ -310,6 +310,9 @@ require('lazy').setup({
           component_separators = { left = '', right = '' },
           section_separators = { left = '', right = '' },
           globalstatus = true,
+          disabled_filetypes = {
+            statusline = { 'dashboard' },
+          },
         },
         sections = {
           lualine_a = { 'branch', 'diff' },

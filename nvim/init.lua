@@ -596,7 +596,7 @@ vim.keymap.set('n', '<leader>s/', telescope_live_grep_open_files, { desc = '[S]e
 vim.keymap.set('n', '<leader>ss', require('telescope.builtin').builtin, { desc = '[S]earch [S]elect Telescope' })
 vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', function()
-  require('telescope.builtin').find_files({ hidden = true })
+  require('telescope.builtin').find_files({ hidden = true, cwd = vim.fn.getcwd() })
 end, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
@@ -962,6 +962,7 @@ vim.keymap.set("n", "<leader>v", function()
   local new_buf = vim.api.nvim_get_current_buf()
   require('telescope.builtin').find_files({
     hidden = true,
+    cwd = vim.fn.getcwd(),
     attach_mappings = function(prompt_bufnr, map)
       local actions = require('telescope.actions')
       actions.close:enhance({

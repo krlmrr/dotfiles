@@ -9,7 +9,7 @@ font-style-bold = Medium
 font-style-bold-italic = Medium Italic
 font-size = 18
 adjust-cell-height = 100%
-window-padding-x = 20
+window-padding-x = 20,10
 # Window padding for top and bottom set independently
 window-padding-y = 10,0
 working-directory = /Users/karlmurray/herd

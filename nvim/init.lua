@@ -1,5 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.g.loaded_matchparen = 1  -- Disable matching bracket highlighting
 
 vim.opt.statuscolumn = "%=%{v:relnum?v:relnum:v:lnum}   "
 
@@ -8,7 +9,7 @@ vim.o.expandtab = true -- Pressing the TAB key will insert spaces instead of a T
 vim.o.softtabstop = 4  -- Number of spaces inserted instead of a TAB character
 vim.o.shiftwidth = 4   -- Number of spaces inserted when indenting
 vim.o.swapfile = false -- Disable swap files
-vim.o.scrolloff = 999  -- Keep cursor centered
+vim.o.scrolloff = 10
 vim.o.wrap = false     -- Disable line wrapping
 vim.o.cursorline = false -- Disable cursor line highlighting
 vim.o.autoindent = true  -- Copy indent from current line when starting a new line
@@ -265,14 +266,17 @@ require('lazy').setup({
                 },
                 sections = {
                     lualine_a = { 'mode' },
-                    lualine_b = { 'diff', 'diagnostics' },
+                    lualine_b = { 'diff' },
                     lualine_c = {},
-                    lualine_x = { { 'filetype', fmt = function(str)
-                        if str == 'php' then return 'PHP' end
-                        return str:sub(1,1):upper()..str:sub(2)
-                    end } },
+                    lualine_x = {},
                     lualine_y = {},
-                    lualine_z = { 'branch' },
+                    lualine_z = {
+                        { 'filetype', fmt = function(str)
+                            if str == 'php' then return 'PHP' end
+                            return str:sub(1,1):upper()..str:sub(2)
+                        end },
+                        'branch'
+                    },
                 },
             }
         end,
@@ -892,9 +896,9 @@ cmp.setup {
         end, { 'i', 's' }),
     },
     sources = {
-        { name = 'nvim_lsp' },
-        { name = 'luasnip' },
-        { name = 'path' },
+        { name = 'nvim_lsp', max_item_count = 5 },
+        { name = 'luasnip', max_item_count = 3 },
+        { name = 'path', max_item_count = 3 },
     },
 }
 

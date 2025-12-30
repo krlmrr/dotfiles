@@ -24,4 +24,4 @@ shell-integration-features = sudo
 auto-update-channel = tip
 title = "  "
 keybind = shift+enter=text:\x1b\r
-keybind = super+comma=open_config
+keybind = super+comma=text:nvim ~/.config/ghostty/config\x0d

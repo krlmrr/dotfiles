@@ -288,22 +288,21 @@ require('lazy').setup({
           icons_enabled = true,
           theme = custom_theme,
           component_separators = { left = '', right = '' },
-          section_separators = { left = '\u{e0b0}', right = '\u{e0b2}' },
+          section_separators = { left = '', right = '' },
           globalstatus = true,
         },
         sections = {
-          lualine_a = {
-            'branch',
+          lualine_a = { 'branch', 'diff' },
+          lualine_b = {},
+          lualine_c = {},
+          lualine_x = {},
+          lualine_y = {
             { 'filetype', fmt = function(str)
               if str == 'php' then return 'PHP' end
               return str:sub(1, 1):upper() .. str:sub(2)
             end },
           },
-          lualine_b = {},
-          lualine_c = {},
-          lualine_x = {},
-          lualine_y = { 'diff' },
-          lualine_z = { 'mode' },
+          lualine_z = { { 'mode', separator = { left = '\u{e0b2}' } } },
         },
       }
     end,
@@ -936,6 +935,7 @@ vim.opt.hlsearch = true
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("i", "jj", "<ESC>")
+vim.keymap.set('n', ';', ':', { noremap = true })
 
 vim.keymap.set("i", ";;", "<Esc>A;<Esc>")
 vim.keymap.set("i", ",,", "<Esc>A,<Esc>")

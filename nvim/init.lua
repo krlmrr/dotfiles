@@ -247,6 +247,10 @@ require('lazy').setup({
       -- Muted winbar color (same for active and inactive)
       vim.api.nvim_set_hl(0, "WinBar", { fg = "#5c6370", bg = "NONE" })
       vim.api.nvim_set_hl(0, "WinBarNC", { fg = "#5c6370", bg = "NONE" })
+      -- Inlay hints color
+      vim.api.nvim_set_hl(0, "LspInlayHint", { fg = "#848B98", bg = "NONE" })
+      -- Transparent floating windows
+      vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
     end,
   },
 
@@ -933,12 +937,12 @@ cmp.setup {
 
 vim.opt.hlsearch = true
 
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-vim.keymap.set("i", "jj", "<ESC>")
-vim.keymap.set('n', ';', ':', { noremap = true })
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+vim.keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode" })
+vim.keymap.set('n', ';', ':', { noremap = true, desc = "Command mode" })
 
-vim.keymap.set("i", ";;", "<Esc>A;<Esc>")
-vim.keymap.set("i", ",,", "<Esc>A,<Esc>")
+vim.keymap.set("i", ";;", "<Esc>A;<Esc>", { desc = "Add semicolon at end" })
+vim.keymap.set("i", ",,", "<Esc>A,<Esc>", { desc = "Add comma at end" })
 
 -- Neo-tree
 vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle file tree" })
@@ -983,7 +987,7 @@ vim.keymap.set("n", "i", function()
   else
     return 'i'
   end
-end, { expr = true, noremap = true })
+end, { expr = true, noremap = true, desc = "Insert (auto-indent on empty)" })
 
 -- Move to next line and auto-indent if it's blank, otherwise normal o
 vim.keymap.set("n", "o", function()
@@ -993,7 +997,7 @@ vim.keymap.set("n", "o", function()
   else
     return 'o'
   end
-end, { expr = true, noremap = true })
+end, { expr = true, noremap = true, desc = "New line below (reuse blank)" })
 
 -- Move to previous line and auto-indent if it's blank, otherwise normal O
 vim.keymap.set("n", "O", function()
@@ -1003,13 +1007,13 @@ vim.keymap.set("n", "O", function()
   else
     return 'O'
   end
-end, { expr = true, noremap = true })
+end, { expr = true, noremap = true, desc = "New line above (reuse blank)" })
 
 -- Move to first non-blank after j/k (and arrow keys)
-vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true })
-vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true })
-vim.keymap.set('n', '<Down>', 'j_', { noremap = true, silent = true })
-vim.keymap.set('n', '<Up>', 'k_', { noremap = true, silent = true })
+vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true, desc = "Down and first non-blank" })
+vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true, desc = "Up and first non-blank" })
+vim.keymap.set('n', '<Down>', 'j_', { noremap = true, silent = true, desc = "Down and first non-blank" })
+vim.keymap.set('n', '<Up>', 'k_', { noremap = true, silent = true, desc = "Up and first non-blank" })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

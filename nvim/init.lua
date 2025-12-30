@@ -922,6 +922,26 @@ vim.keymap.set("n", "i", function()
     end
 end, { expr = true, noremap = true })
 
+-- Move to next line and auto-indent if it's blank, otherwise normal o
+vim.keymap.set("n", "o", function()
+    local next_line = vim.fn.getline(vim.fn.line('.') + 1)
+    if next_line == '' then
+        return 'j"_cc'
+    else
+        return 'o'
+    end
+end, { expr = true, noremap = true })
+
+-- Move to previous line and auto-indent if it's blank, otherwise normal O
+vim.keymap.set("n", "O", function()
+    local prev_line = vim.fn.getline(vim.fn.line('.') - 1)
+    if prev_line == '' then
+        return 'k"_cc'
+    else
+        return 'O'
+    end
+end, { expr = true, noremap = true })
+
 -- Move to first non-blank after j/k (and arrow keys)
 vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true })
 vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true })

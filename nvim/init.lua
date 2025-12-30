@@ -244,6 +244,9 @@ require('lazy').setup({
       -- Transparent statusline background
       vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
       vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
+      -- Muted winbar color (same for active and inactive)
+      vim.api.nvim_set_hl(0, "WinBar", { fg = "#5c6370", bg = "NONE" })
+      vim.api.nvim_set_hl(0, "WinBarNC", { fg = "#5c6370", bg = "NONE" })
     end,
   },
 

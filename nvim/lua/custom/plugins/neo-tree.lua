@@ -1,7 +1,7 @@
 return {
   'nvim-neo-tree/neo-tree.nvim',
   branch = "v3.x",
-  lazy = false,
+  cmd = "Neotree",  -- Only load when Neotree command is called
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons",
@@ -20,7 +20,9 @@ return {
       window = {
         position = "right",
         width = 40,
-        mappings = {},
+        mappings = {
+          ["<bs>"] = "none",
+        },
       },
       default_component_configs = {
         indent = {
@@ -42,6 +44,12 @@ return {
         },
       },
       filesystem = {
+        hijack_netrw_behavior = "disabled",
+        hide_root_node = true,
+        bind_to_cwd = true,
+        cwd_target = {
+          sidebar = "global",
+        },
         follow_current_file = {
           enabled = true,
         },

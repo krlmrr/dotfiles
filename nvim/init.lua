@@ -1,6 +1,20 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.loaded_matchparen = 1 -- Disable matching bracket highlighting
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Show dashboard when opening a directory
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    local arg = vim.fn.argv(0)
+    if arg ~= "" and vim.fn.isdirectory(arg) == 1 then
+      vim.cmd("bd")  -- Delete the directory buffer
+      vim.cmd("cd " .. vim.fn.fnameescape(arg))  -- Set cwd to the directory
+      require('dashboard'):instance()  -- Open dashboard
+    end
+  end,
+})
 
 vim.opt.statuscolumn = "%=%{v:relnum?v:relnum:v:lnum}   "
 
@@ -10,24 +24,26 @@ vim.o.softtabstop = 4         -- Number of spaces inserted instead of a TAB char
 vim.o.shiftwidth = 4          -- Number of spaces inserted when indenting
 vim.o.swapfile = false        -- Disable swap files
 vim.o.scrolloff = 10
--- Show winbar only when multiple splits exist
+-- Show winbar only when multiple editor splits exist (excludes neo-tree)
 vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "WinNew", "WinClosed" }, {
   callback = function()
     vim.schedule(function()
       local wins = vim.api.nvim_tabpage_list_wins(0)
-      -- Count only non-floating windows
-      local real_wins = {}
+      local editor_wins = {}
       for _, win in ipairs(wins) do
         if vim.api.nvim_win_is_valid(win) then
           local cfg = vim.api.nvim_win_get_config(win)
-          if cfg.relative == '' then
-            table.insert(real_wins, win)
+          local buf = vim.api.nvim_win_get_buf(win)
+          local ft = vim.bo[buf].filetype
+          -- Exclude floating windows and neo-tree
+          if cfg.relative == '' and ft ~= 'neo-tree' then
+            table.insert(editor_wins, win)
           end
         end
       end
-      for _, win in ipairs(real_wins) do
+      for _, win in ipairs(editor_wins) do
         pcall(function()
-          if #real_wins > 1 then
+          if #editor_wins > 1 then
             vim.wo[win].winbar = '  %t'
           else
             vim.wo[win].winbar = ''
@@ -137,7 +153,7 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = { delay = 500 } },
+  { 'folke/which-key.nvim',  opts = { delay = 150 } },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -302,6 +318,7 @@ require('lazy').setup({
           lualine_x = {},
           lualine_y = {
             { 'filetype', fmt = function(str)
+              if str == 'neo-tree' then return '' end
               if str == 'php' then return 'PHP' end
               return str:sub(1, 1):upper() .. str:sub(2)
             end },

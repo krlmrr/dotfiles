@@ -24,8 +24,8 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous dia
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
--- Terminal
-vim.keymap.set("n", "<leader>tt", "<cmd>botright split | term<cr><cmd>startinsert<cr>", { desc = "Open terminal" })
+-- Terminal (floating terminal is in floatterm.lua plugin)
+-- Esc exits terminal mode for non-floating terminals
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Neo-tree

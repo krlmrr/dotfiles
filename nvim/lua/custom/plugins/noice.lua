@@ -40,6 +40,8 @@ return {
       { filter = { event = "notify", find = "window%-picker" }, opts = { skip = true } },
       { filter = { event = "notify", find = "[Ll]oading" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "[Ll]oading" }, opts = { skip = true } },
+      { filter = { event = "msg_show", find = "modifiable" }, opts = { skip = true } },
+      { filter = { event = "notify", find = "modifiable" }, opts = { skip = true } },
       -- Route remaining messages to mini view
       { filter = { event = "msg_show" }, view = "mini" },
       { filter = { event = "notify" }, view = "mini" },

@@ -82,26 +82,9 @@ return {
                         end
                     end
 
-                    -- If no MRU files, put cursor on "empty files" line and lock it
+                    -- If no MRU files, hide cursorline entirely
                     if max_line == min_line then
-                        local empty_line = nil
-                        for i, line in ipairs(lines) do
-                            if line:match('empty') then
-                                empty_line = i
-                                break
-                            end
-                        end
-                        if empty_line then
-                            vim.api.nvim_win_set_cursor(0, { empty_line, 0 })
-                            -- Block all cursor movement
-                            local opts = { buffer = bufnr, nowait = true, silent = true }
-                            vim.keymap.set('n', 'j', '<Nop>', opts)
-                            vim.keymap.set('n', 'k', '<Nop>', opts)
-                            vim.keymap.set('n', '<Down>', '<Nop>', opts)
-                            vim.keymap.set('n', '<Up>', '<Nop>', opts)
-                            vim.keymap.set('n', 'gg', '<Nop>', opts)
-                            vim.keymap.set('n', 'G', '<Nop>', opts)
-                        end
+                        vim.opt_local.cursorline = false
                         return
                     end
 

@@ -30,9 +30,40 @@ return {
       default_component_configs = {
         indent = {
           with_markers = false,
+          padding = 2,
+        },
+        icon = {
+          padding = " ",
         },
         name = {
-          use_git_status_colors = false,
+          use_git_status_colors = true,
+        },
+        -- Git status colors (use_git_status_colors = true):
+        -- Added     = Green       | Staged    = Green
+        -- Modified  = Yellow      | Unstaged  = Yellow/Orange
+        -- Deleted   = Red         | Conflict  = Red
+        -- Renamed   = Purple      | Ignored   = Gray
+        -- Untracked = Orange
+        git_status = {
+          symbols = {
+            added     = "",
+            modified  = "",
+            deleted   = "",
+            renamed   = "",
+            untracked = "",
+            ignored   = "",
+            unstaged  = "",
+            staged    = "",
+            conflict  = "",
+          },
+        },
+        diagnostics = {
+          symbols = {
+            error = "",
+            warn  = "",
+            info  = "",
+            hint  = "",
+          },
         },
       },
       event_handlers = {

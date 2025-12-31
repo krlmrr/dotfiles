@@ -39,7 +39,14 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
 -- Buffers and windows
 vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer (force)" })
-vim.keymap.set("n", "<leader>w", "<cmd>close<cr>", { desc = "Close split" })
+vim.keymap.set("n", "<leader>w", function()
+  if vim.bo.filetype == 'dashboard' then return end
+  if vim.fn.winnr('$') > 1 then
+    vim.cmd('close')
+  else
+    vim.cmd('enew | bd# | Dashboard')
+  end
+end, { desc = "Close split (or return to dashboard)" })
 vim.keymap.set("n", "<leader>s", "<cmd>w<cr>", { desc = "Save file" })
 
 -- New vertical split with Telescope

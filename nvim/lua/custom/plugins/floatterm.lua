@@ -78,9 +78,31 @@ local function reset_terminal()
   toggle_terminal()
 end
 
+local function run_in_terminal(cmd)
+  -- Close window if open
+  if terminal.win and vim.api.nvim_win_is_valid(terminal.win) then
+    vim.api.nvim_win_close(terminal.win, true)
+    terminal.win = nil
+  end
+  -- Delete buffer if exists
+  if terminal.buf and vim.api.nvim_buf_is_valid(terminal.buf) then
+    vim.api.nvim_buf_delete(terminal.buf, { force = true })
+  end
+  -- Create new buffer with command
+  terminal.buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_call(terminal.buf, function()
+    vim.fn.termopen(cmd, { cwd = vim.fn.getcwd() })
+  end)
+  -- Create floating window
+  terminal.win = create_float_win(terminal.buf)
+  -- Enter insert mode so keys go to terminal
+  vim.cmd('startinsert')
+end
+
 -- Set up keymaps
 vim.keymap.set({ 'n', 't' }, '<leader>tt', toggle_terminal, { desc = 'Toggle floating terminal' })
 vim.keymap.set({ 'n', 't' }, '<leader>tr', reset_terminal, { desc = 'Reset floating terminal' })
+vim.keymap.set('n', '<leader>pt', function() run_in_terminal('./vendor/bin/pest --parallel') end, { desc = 'Run Pest tests' })
 
 -- Close terminal with Escape when in terminal mode inside float
 vim.api.nvim_create_autocmd('TermOpen', {

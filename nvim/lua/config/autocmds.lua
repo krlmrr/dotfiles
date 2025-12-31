@@ -87,3 +87,43 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     vim.cmd('echo "Saved."')
   end,
 })
+
+-- Dotfiles auto-sync
+local dotfiles = vim.fn.expand("~/.config/nvim")
+
+-- Pull updates on startup (if any)
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    vim.defer_fn(function()
+      vim.fn.jobstart("git -C " .. dotfiles .. " fetch", {
+        on_exit = function()
+          local status = vim.fn.systemlist("git -C " .. dotfiles .. " status -uno")
+          for _, line in ipairs(status) do
+            if line:match("Your branch is behind") then
+              vim.fn.jobstart("git -C " .. dotfiles .. " pull", {
+                on_exit = function(_, code)
+                  if code == 0 then
+                    vim.notify("Dotfiles updated!", vim.log.levels.INFO)
+                  end
+                end,
+              })
+              break
+            end
+          end
+        end,
+      })
+    end, 500)
+  end,
+})
+
+-- Push changes on exit (if any)
+vim.api.nvim_create_autocmd("VimLeave", {
+  callback = function()
+    local changes = vim.fn.system("git -C " .. dotfiles .. " status --porcelain")
+    if changes ~= "" then
+      vim.fn.system("git -C " .. dotfiles .. " add -A")
+      vim.fn.system("git -C " .. dotfiles .. " commit -m 'sync'")
+      vim.fn.system("git -C " .. dotfiles .. " push")
+    end
+  end,
+})

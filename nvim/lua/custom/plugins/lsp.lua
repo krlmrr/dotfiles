@@ -102,6 +102,7 @@ return {
           Lua = {
             workspace = { checkThirdParty = false },
             telemetry = { enable = false },
+            hint = { arrayIndex = "Disable" },
           },
         },
       },

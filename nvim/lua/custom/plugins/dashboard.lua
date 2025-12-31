@@ -30,6 +30,16 @@ return {
         vim.api.nvim_create_autocmd('FileType', {
             pattern = 'dashboard',
             callback = function()
+                -- Close neo-tree if open (only if already loaded)
+                for _, win in ipairs(vim.api.nvim_list_wins()) do
+                    local buf = vim.api.nvim_win_get_buf(win)
+                    if vim.bo[buf].filetype == 'neo-tree' then
+                        vim.api.nvim_win_close(win, true)
+                    end
+                end
+                -- Disable <leader>e on dashboard
+                vim.keymap.set('n', '<leader>e', '<Nop>', { buffer = true, silent = true })
+
                 vim.defer_fn(function()
                     vim.cmd('highlight Cursor blend=100')
                     vim.opt.guicursor:append('a:Cursor/lCursor')

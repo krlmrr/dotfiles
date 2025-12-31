@@ -9,7 +9,7 @@ return {
         progress = {
           suppress_on_insert = true,
           ignore_done_already = true,
-          ignore = { "ts_ls" },
+          ignore = { "ts_ls", "lua_ls" },
         },
       },
     },

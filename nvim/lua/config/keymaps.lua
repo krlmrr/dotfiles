@@ -40,10 +40,18 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 -- Buffers and windows
 vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer (force)" })
 vim.keymap.set("n", "<leader>w", function()
-  if vim.bo.filetype == 'dashboard' then return end
-  if vim.fn.winnr('$') > 1 then
+  if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end
+  -- Count non-neo-tree windows
+  local real_wins = 0
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local ft = vim.bo[buf].filetype
+    if ft ~= 'neo-tree' then real_wins = real_wins + 1 end
+  end
+  if real_wins > 1 then
     vim.cmd('close')
   else
+    vim.cmd('Neotree close')
     vim.cmd('enew | bd# | Dashboard')
   end
 end, { desc = "Close split (or return to dashboard)" })

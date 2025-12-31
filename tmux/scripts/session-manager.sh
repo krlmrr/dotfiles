@@ -7,6 +7,7 @@
 # - d: detach session
 # - x: kill session
 # - X: kill all (except current)
+# - R: reload tmux config
 # - j/k: navigate
 # - Esc/q: cancel
 
@@ -81,7 +82,7 @@ while true; do
 
     # Draw help
     printf '\033[%d;3H' $((rows - 1))
-    printf '\033[38;2;92;99;112menter:switch  /:search  n:new  r:rename  d:detach  x:kill  X:all  q:quit\033[0m'
+    printf '\033[38;2;92;99;112menter:switch  /:search  n:new  r:rename  d:detach  x:kill  X:all  R:reload  q:quit\033[0m'
 
     # Read key
     read -rsn1 key
@@ -160,6 +161,10 @@ while true; do
             done
             build_sessions "$search_filter"
             selected=0
+            ;;
+        R)
+            tmux source-file ~/.tmux.conf
+            exit 0
             ;;
         $'\e')
             # Esc clears filter, or exits if no filter

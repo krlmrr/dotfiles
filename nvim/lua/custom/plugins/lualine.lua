@@ -42,12 +42,15 @@ return {
         },
       },
       sections = {
-        lualine_a = { 'branch', 'diff' },
+        lualine_a = {
+          { 'branch', cond = function() return vim.bo.buftype ~= 'terminal' end },
+          { 'diff', cond = function() return vim.bo.buftype ~= 'terminal' end },
+        },
         lualine_b = {},
         lualine_c = {},
         lualine_x = {},
         lualine_y = {
-          { 'filetype', fmt = function(str)
+          { 'filetype', cond = function() return vim.bo.buftype ~= 'terminal' end, fmt = function(str)
             if str == 'neo-tree' then return '' end
             if str == 'TelescopePrompt' then return '' end
             if str == 'php' then return 'PHP' end

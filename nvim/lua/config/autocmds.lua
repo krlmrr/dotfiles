@@ -10,9 +10,12 @@ vim.api.nvim_create_autocmd("VimEnter", {
         require('dashboard'):instance()
       else
         -- File passed: find project root (git) or use file's parent
-        local git_root = vim.fn.systemlist('git -C ' .. vim.fn.shellescape(vim.fn.fnamemodify(arg, ":p:h")) .. ' rev-parse --show-toplevel')[1]
-        local dir = (vim.v.shell_error == 0 and git_root) or vim.fn.fnamemodify(arg, ":p:h")
-        vim.cmd("cd " .. vim.fn.fnameescape(dir))
+        local file_dir = vim.fn.fnamemodify(arg, ":p:h")
+        local git_root = vim.fn.systemlist('git -C ' .. vim.fn.shellescape(file_dir) .. ' rev-parse --show-toplevel')[1]
+        local dir = (vim.v.shell_error == 0 and git_root and vim.fn.isdirectory(git_root) == 1) and git_root or file_dir
+        if vim.fn.isdirectory(dir) == 1 then
+          vim.cmd("cd " .. vim.fn.fnameescape(dir))
+        end
       end
     end
   end,

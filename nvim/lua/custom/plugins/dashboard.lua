@@ -31,12 +31,14 @@ return {
             pattern = 'dashboard',
             callback = function()
                 -- Close neo-tree if open (only if already loaded)
-                for _, win in ipairs(vim.api.nvim_list_wins()) do
-                    local buf = vim.api.nvim_win_get_buf(win)
-                    if vim.bo[buf].filetype == 'neo-tree' then
-                        vim.api.nvim_win_close(win, true)
+                vim.schedule(function()
+                    for _, win in ipairs(vim.api.nvim_list_wins()) do
+                        local buf = vim.api.nvim_win_get_buf(win)
+                        if vim.bo[buf].filetype == 'neo-tree' then
+                            pcall(vim.api.nvim_win_close, win, true)
+                        end
                     end
-                end
+                end)
                 -- Disable <leader>e on dashboard
                 vim.keymap.set('n', '<leader>e', '<Nop>', { buffer = true, silent = true })
 
@@ -104,7 +106,7 @@ return {
                         buffer = bufnr,
                         callback = update_shortcuts,
                     })
-                end, 10)
+                end, 50)
             end,
         })
         -- Restore cursor when leaving dashboard

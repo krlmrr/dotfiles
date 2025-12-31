@@ -121,9 +121,12 @@ vim.api.nvim_create_autocmd("VimLeave", {
   callback = function()
     local changes = vim.fn.system("git -C " .. dotfiles .. " status --porcelain")
     if changes ~= "" then
-      vim.fn.system("git -C " .. dotfiles .. " add -A")
-      vim.fn.system("git -C " .. dotfiles .. " commit -m 'sync'")
-      vim.fn.system("git -C " .. dotfiles .. " push")
+      local msg = vim.fn.input("Dotfiles commit message (empty to skip): ")
+      if msg ~= "" then
+        vim.fn.system("git -C " .. dotfiles .. " add -A")
+        vim.fn.system("git -C " .. dotfiles .. " commit -m " .. vim.fn.shellescape(msg))
+        vim.fn.system("git -C " .. dotfiles .. " push")
+      end
     end
   end,
 })

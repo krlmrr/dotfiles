@@ -57,12 +57,18 @@ vim.keymap.set("n", "<leader>w", function()
 end, { desc = "Close split (or return to dashboard)" })
 vim.keymap.set("n", "<leader>s", "<cmd>w<cr>", { desc = "Save file" })
 
--- Restart neovim (saves files, reopens current file)
+-- Restart neovim (saves files, reopens current file in project root)
 vim.keymap.set("n", "<leader>rc", function()
   local file = vim.fn.expand('%:p')
+  -- Find project root by looking for .git
+  local git_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
+  local root = (vim.v.shell_error == 0 and git_root) or vim.fn.getcwd()
   vim.cmd('wa')
-  local cmd = file ~= '' and ('nvim ' .. vim.fn.shellescape(file)) or 'nvim'
-  vim.fn.jobstart('sleep 0.1 && tmux send-keys -t ' .. vim.env.TMUX_PANE .. ' ' .. vim.fn.shellescape(cmd) .. ' Enter', { detach = true })
+  local pane = vim.env.TMUX_PANE
+  -- Send space separately, then command (histignorespace skips space-prefixed commands)
+  local cmd = 'nvr ' .. vim.fn.shellescape(root)
+  if file ~= '' then cmd = cmd .. ' ' .. vim.fn.shellescape(file) end
+  vim.fn.jobstart('sleep 0.1 && tmux send-keys -t ' .. pane .. ' Space && tmux send-keys -t ' .. pane .. ' -l ' .. vim.fn.shellescape(cmd) .. ' && tmux send-keys -t ' .. pane .. ' Enter', { detach = true })
   vim.cmd('qa!')
 end, { desc = "Restart nvim" })
 

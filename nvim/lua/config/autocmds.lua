@@ -9,8 +9,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
         vim.cmd("cd " .. vim.fn.fnameescape(arg))
         require('dashboard'):instance()
       else
-        -- File passed: set parent directory as cwd
-        local dir = vim.fn.fnamemodify(arg, ":p:h")
+        -- File passed: find project root (git) or use file's parent
+        local git_root = vim.fn.systemlist('git -C ' .. vim.fn.shellescape(vim.fn.fnamemodify(arg, ":p:h")) .. ' rev-parse --show-toplevel')[1]
+        local dir = (vim.v.shell_error == 0 and git_root) or vim.fn.fnamemodify(arg, ":p:h")
         vim.cmd("cd " .. vim.fn.fnameescape(dir))
       end
     end

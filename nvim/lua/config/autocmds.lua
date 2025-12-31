@@ -76,3 +76,10 @@ vim.api.nvim_create_autocmd("TermOpen", {
     vim.opt_local.statuscolumn = ""
   end,
 })
+
+-- Show "Saved." on file write
+vim.api.nvim_create_autocmd("BufWritePost", {
+  callback = function()
+    vim.cmd('echo "Saved."')
+  end,
+})

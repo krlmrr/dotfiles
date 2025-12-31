@@ -27,26 +27,22 @@ return {
       lsp_doc_border = true,
     },
     routes = {
-      -- Route most messages to mini view (subtle bottom line)
-      { filter = { event = "msg_show" }, view = "mini" },
-      { filter = { event = "notify" }, view = "mini" },
-      -- Skip noisy messages entirely
+      -- Skip noisy messages entirely (must be before general routing)
       { filter = { event = "msg_show", find = "written" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "lines in buffer" }, opts = { skip = true } },
       { filter = { event = "notify", find = "lines in buffer" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "E162" }, opts = { skip = true } },
       { filter = { event = "notify", find = "Initializing" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "Initializing" }, opts = { skip = true } },
-      -- Skip all LSP progress messages
       { filter = { event = "lsp", kind = "progress" }, opts = { skip = true } },
-      -- Skip "No information available" hover messages
       { filter = { event = "notify", find = "No information available" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "No information available" }, opts = { skip = true } },
-      -- Skip window-picker messages
       { filter = { event = "notify", find = "window%-picker" }, opts = { skip = true } },
-      -- Skip lua_ls workspace loading (but not errors)
       { filter = { event = "notify", find = "[Ll]oading" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "[Ll]oading" }, opts = { skip = true } },
+      -- Route remaining messages to mini view
+      { filter = { event = "msg_show" }, view = "mini" },
+      { filter = { event = "notify" }, view = "mini" },
     },
   },
 }

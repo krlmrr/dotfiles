@@ -49,6 +49,7 @@ return {
         lualine_y = {
           { 'filetype', fmt = function(str)
             if str == 'neo-tree' then return '' end
+            if str == 'TelescopePrompt' then return '' end
             if str == 'php' then return 'PHP' end
             return str:sub(1, 1):upper() .. str:sub(2)
           end },

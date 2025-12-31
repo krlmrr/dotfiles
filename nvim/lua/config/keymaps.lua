@@ -57,6 +57,15 @@ vim.keymap.set("n", "<leader>w", function()
 end, { desc = "Close split (or return to dashboard)" })
 vim.keymap.set("n", "<leader>s", "<cmd>w<cr>", { desc = "Save file" })
 
+-- Restart neovim (saves files, reopens current file)
+vim.keymap.set("n", "<leader>rc", function()
+  local file = vim.fn.expand('%:p')
+  vim.cmd('wa')
+  local cmd = file ~= '' and ('nvim ' .. vim.fn.shellescape(file)) or 'nvim'
+  vim.fn.jobstart('sleep 0.1 && tmux send-keys -t ' .. vim.env.TMUX_PANE .. ' ' .. vim.fn.shellescape(cmd) .. ' Enter', { detach = true })
+  vim.cmd('qa!')
+end, { desc = "Restart nvim" })
+
 -- New vertical split with Telescope
 vim.keymap.set("n", "<leader>v", function()
   vim.cmd('rightbelow vnew')

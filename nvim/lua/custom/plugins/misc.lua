@@ -7,10 +7,10 @@ return {
   },
 
   -- Show pending keybinds
-  { 'folke/which-key.nvim', opts = { delay = 150 } },
+  { 'folke/which-key.nvim',   opts = { delay = 150 } },
 
   -- Comment with gc
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',  opts = {} },
 
   -- Auto-close HTML tags
   { 'windwp/nvim-ts-autotag', opts = {} },

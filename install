@@ -72,7 +72,7 @@ then
 fi
 
 # Neovim dependencies
-brew install ripgrep fd
+brew install ripgrep fd fzf
 
 # Lazygit
 mkdir -p "$HOME/Library/Application Support/lazygit"

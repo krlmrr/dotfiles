@@ -1,104 +1,183 @@
 #!/bin/bash
 
-# Session manager with fzf
+# Session manager - pure bash, no dependencies
 # - Enter: switch to session
 # - n: new session
 # - r: rename session
 # - d: detach session
 # - x: kill session
 # - X: kill all (except current)
-# - /: search
 # - j/k: navigate
-# - Esc: cancel
+# - Esc/q: cancel
 
 current_session=$(tmux display-message -p '#S')
-# Get terminal width and subtract margins (3 each side + fzf pointer)
-width=$(($(tput cols) - 9))
 
-while true; do
-    # Get sessions with details: name, windows, attached status (padded to full width)
-    sessions=$(tmux list-sessions -F '#{session_name}|#{session_windows}|#{?session_attached,attached,}' 2>/dev/null | while IFS='|' read -r name windows attached; do
+# Hide cursor, restore on exit
+tput civis
+trap 'tput cnorm' EXIT
+
+# Build session list
+build_sessions() {
+    local filter="$(echo "$1" | tr '[:upper:]' '[:lower:]')"
+    sessions=()
+    while IFS='|' read -r name windows attached; do
+        # Skip if filter set and doesn't match (case-insensitive)
+        local name_lower="$(echo "$name" | tr '[:upper:]' '[:lower:]')"
+        if [ -n "$filter" ] && [[ "$name_lower" != *"$filter"* ]]; then
+            continue
+        fi
         if [ "$name" = "$current_session" ]; then
             marker="*"
         else
             marker=" "
         fi
-        # Format: marker name (X windows) [attached] - padded to fill width
         if [ -n "$attached" ]; then
-            printf "%-${width}s\n" "$(printf "%s %-20s %2s windows  [attached]" "$marker" "$name" "$windows")"
+            sessions+=("$marker $name|$windows windows  [attached]")
         else
-            printf "%-${width}s\n" "$(printf "%s %-20s %2s windows" "$marker" "$name" "$windows")"
+            sessions+=("$marker $name|$windows windows")
         fi
-    done)
+    done < <(tmux list-sessions -F '#{session_name}|#{session_windows}|#{?session_attached,attached,}' 2>/dev/null)
+}
 
-    # Exit if no sessions
-    [ -z "$sessions" ] && exit 0
+build_sessions ""
+[ ${#sessions[@]} -eq 0 ] && exit 0
 
-    # Run fzf with keybindings
-    selected=$(echo "$sessions" | FZF_DEFAULT_OPTS="" fzf \
-        --height=100% \
-        --layout=reverse \
-        --border=none \
-        --margin=0,3 \
-        --no-clear \
-        --prompt="Search > " \
-        --preview='echo "enter: switch | /: search | n: new | r: rename | d: detach | x: kill | X: kill all"' \
-        --preview-window=bottom:1:wrap \
-        --expect=n,r,d,x,X \
-        --no-sort \
-        --ansi \
-        --disabled \
-        --bind='/:enable-search,j:down,k:up,esc:abort' \
-        --color='bg:-1,bg+:#3e4452,fg:#abb2bf,fg+:#abb2bf,hl:#61afef,hl+:#61afef,info:#e5c07b,prompt:#61afef,pointer:#98c379,marker:#98c379,header:#5c6370,gutter:-1,query:#abb2bf,spinner:-1,border:-1,preview-bg:-1')
+selected=0
+search_filter=""
 
-    # Parse fzf output (first line is the key pressed, second is selection)
-    key=$(echo "$selected" | head -1)
-    # Extract session name (second field, trim whitespace)
-    choice=$(echo "$selected" | tail -1 | awk '{print $2}')
+# Get selected session name
+get_selected_name() {
+    local line="${sessions[$selected]}"
+    echo "$line" | sed 's/^[* ] //' | cut -d'|' -f1 | xargs
+}
 
-    if [ "$key" = "n" ]; then
-        # New session - use second fzf as input
-        session_name=$(echo "" | fzf --height=100% --layout=reverse --border=none --margin=1,3 --print-query --prompt="New session > " --header="Enter name and press Enter" --color='bg:-1,bg+:#3e4452,fg:#abb2bf,fg+:#abb2bf,prompt:#61afef,header:#5c6370,gutter:-1' | head -1)
-        if [ -n "$session_name" ]; then
-            tmux new-session -d -s "$session_name"
-            tmux switch-client -t "$session_name"
-            exit 0
+# Main loop
+while true; do
+    # Clear and draw
+    printf '\033[2J\033[H'
+
+    rows=$(tput lines)
+    cols=$(tput cols)
+
+    # Draw sessions
+    for i in "${!sessions[@]}"; do
+        IFS='|' read -r left right <<< "${sessions[$i]}"
+
+        printf '\033[%d;3H' $((i + 2))
+
+        line="$left  $right"
+        if [ $i -eq $selected ]; then
+            printf '\033[48;2;62;68;82m%-*s\033[0m' "$((cols - 6))" "$line"
+        else
+            printf '%s' "$line"
         fi
-        # Loop back if cancelled
-    elif [ "$key" = "r" ]; then
-        # Rename session - use second fzf as input
-        if [ -n "$choice" ]; then
-            new_name=$(echo "" | fzf --height=100% --layout=reverse --border=none --margin=1,3 --print-query --query="$choice" --prompt="Rename to > " --header="Edit name and press Enter" --color='bg:-1,bg+:#3e4452,fg:#abb2bf,fg+:#abb2bf,prompt:#61afef,header:#5c6370,gutter:-1' | head -1)
-            if [ -n "$new_name" ]; then
-                tmux rename-session -t "$choice" "$new_name"
-                [ "$choice" = "$current_session" ] && current_session="$new_name"
-            fi
-        fi
-        # Loop back to show updated list
-    elif [ "$key" = "d" ]; then
-        # Detach all clients from selected session
-        if [ -n "$choice" ]; then
-            tmux detach-client -s "$choice" 2>/dev/null
-        fi
-        # Loop back to show updated list
-    elif [ "$key" = "x" ]; then
-        # Kill the selected session
-        if [ -n "$choice" ] && [ "$choice" != "$current_session" ]; then
-            tmux kill-session -t "$choice" 2>/dev/null
-        fi
-        # Loop back to show updated list
-    elif [ "$key" = "X" ]; then
-        # Kill all sessions except current
-        tmux list-sessions -F '#S' | while read -r session; do
-            [ "$session" != "$current_session" ] && tmux kill-session -t "$session" 2>/dev/null
-        done
-        # Loop back to show updated list
-    elif [ -n "$choice" ]; then
-        # Switch to selected session
-        tmux switch-client -t "$choice"
-        exit 0
-    else
-        # Nothing selected, exit
-        exit 0
+    done
+
+    # Draw filter status if active
+    if [ -n "$search_filter" ]; then
+        printf '\033[%d;3H' $((rows - 2))
+        printf 'Filter: %s  (esc to clear)' "$search_filter"
     fi
+
+    # Draw help
+    printf '\033[%d;3H' $((rows - 1))
+    printf '\033[38;2;92;99;112menter:switch  /:search  n:new  r:rename  d:detach  x:kill  X:all  q:quit\033[0m'
+
+    # Read key
+    read -rsn1 key
+
+    case "$key" in
+        j) ((selected < ${#sessions[@]} - 1)) && ((selected++)) ;;
+        k) ((selected > 0)) && ((selected--)) ;;
+        /)
+            # Real-time search
+            search_filter=""
+            tput cnorm
+            while true; do
+                build_sessions "$search_filter"
+                selected=0
+
+                # Redraw with search prompt
+                printf '\033[2J\033[H'
+                for i in "${!sessions[@]}"; do
+                    IFS='|' read -r left right <<< "${sessions[$i]}"
+                    printf '\033[%d;3H' $((i + 2))
+                    line="$left  $right"
+                    if [ $i -eq $selected ]; then
+                        printf '\033[48;2;62;68;82m%-*s\033[0m' "$((cols - 6))" "$line"
+                    else
+                        printf '%s' "$line"
+                    fi
+                done
+                printf '\033[%d;3H' $((rows - 1))
+                printf 'Search: %s' "$search_filter"
+
+                read -rsn1 skey
+                if [[ "$skey" == $'\e' ]]; then
+                    search_filter=""
+                    build_sessions ""
+                    break
+                elif [[ "$skey" == "" ]]; then
+                    # Enter - keep filter and exit search mode
+                    break
+                elif [[ "$skey" == $'\x7f' || "$skey" == $'\b' ]]; then
+                    search_filter="${search_filter%?}"
+                else
+                    search_filter+="$skey"
+                fi
+            done
+            tput civis
+            selected=0
+            ;;
+        n)
+            printf '\033[%d;3H\033[K' $((rows - 1))
+            printf 'New session name: '
+            read -r new_name
+            [ -n "$new_name" ] && tmux new-session -d -s "$new_name" && tmux switch-client -t "$new_name"
+            exit 0
+            ;;
+        r)
+            name=$(get_selected_name)
+            printf '\033[%d;3H\033[K' $((rows - 1))
+            printf 'Rename to: '
+            read -r new_name
+            [ -n "$new_name" ] && tmux rename-session -t "$name" "$new_name"
+            ;;
+        d)
+            name=$(get_selected_name)
+            tmux detach-client -s "$name" 2>/dev/null
+            ;;
+        x)
+            name=$(get_selected_name)
+            [ "$name" != "$current_session" ] && tmux kill-session -t "$name" 2>/dev/null
+            build_sessions "$search_filter"
+            [ ${#sessions[@]} -eq 0 ] && exit 0
+            ((selected >= ${#sessions[@]})) && ((selected--))
+            ;;
+        X)
+            tmux list-sessions -F '#S' | while read -r s; do
+                [ "$s" != "$current_session" ] && tmux kill-session -t "$s" 2>/dev/null
+            done
+            build_sessions "$search_filter"
+            selected=0
+            ;;
+        $'\e')
+            # Esc clears filter, or exits if no filter
+            if [ -n "$search_filter" ]; then
+                search_filter=""
+                build_sessions ""
+                selected=0
+            else
+                exit 0
+            fi
+            ;;
+        q)
+            exit 0
+            ;;
+        "")
+            name=$(get_selected_name)
+            tmux switch-client -t "$name"
+            exit 0
+            ;;
+    esac
 done

@@ -49,8 +49,20 @@ return {
                     vim.opt_local.cursorline = true
                     vim.wo.cursorlineopt = 'line'
 
-                    -- Clamp cursor to MRU lines only
                     local bufnr = vim.api.nvim_get_current_buf()
+                    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+
+                    -- Find shortcuts line by content (reliable anchor point)
+                    local shortcuts_line = nil
+                    for i, line in ipairs(lines) do
+                        if line:match('Find') and line:match('Quit') then
+                            shortcuts_line = i - 1  -- 0-indexed
+                            break
+                        end
+                    end
+                    if not shortcuts_line then return end
+
+                    -- Get dashboard namespace
                     local ns = nil
                     for name, id in pairs(vim.api.nvim_get_namespaces()) do
                         if name:match('dashboard') then
@@ -60,14 +72,38 @@ return {
                     end
                     if not ns then return end
 
-                    local min_line, max_line = math.huge, 0
+                    -- Find MRU file lines (extmarks with virt_text AFTER shortcuts line)
+                    local min_line = shortcuts_line
+                    local max_line = shortcuts_line
                     for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, { details = true })) do
-                        if mark[4].virt_text then
-                            min_line = math.min(min_line, mark[2])
-                            max_line = math.max(max_line, mark[2])
+                        local line = mark[2]
+                        if mark[4].virt_text and line > shortcuts_line then
+                            max_line = math.max(max_line, line)
                         end
                     end
-                    if min_line == math.huge then return end
+
+                    -- If no MRU files, put cursor on "empty files" line and lock it
+                    if max_line == min_line then
+                        local empty_line = nil
+                        for i, line in ipairs(lines) do
+                            if line:match('empty') then
+                                empty_line = i
+                                break
+                            end
+                        end
+                        if empty_line then
+                            vim.api.nvim_win_set_cursor(0, { empty_line, 0 })
+                            -- Block all cursor movement
+                            local opts = { buffer = bufnr, nowait = true, silent = true }
+                            vim.keymap.set('n', 'j', '<Nop>', opts)
+                            vim.keymap.set('n', 'k', '<Nop>', opts)
+                            vim.keymap.set('n', '<Down>', '<Nop>', opts)
+                            vim.keymap.set('n', '<Up>', '<Nop>', opts)
+                            vim.keymap.set('n', 'gg', '<Nop>', opts)
+                            vim.keymap.set('n', 'G', '<Nop>', opts)
+                        end
+                        return
+                    end
 
                     -- Highlight groups for shortcut keys
                     vim.cmd('highlight DashboardShortCut guifg=#61afef guibg=NONE')
@@ -83,11 +119,11 @@ return {
                             vim.api.nvim_win_set_cursor(0, { max_line + 1, 0 })
                             cursor_line = max_line
                         end
-                        -- Update shortcut highlights
+                        -- Update shortcut highlights (only for marks at shortcuts_line or after)
                         for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, { details = true })) do
                             local line = mark[2]
                             local details = mark[4]
-                            if details.virt_text then
+                            if details.virt_text and line >= shortcuts_line then
                                 local hl = line == cursor_line and 'DashboardShortCutCursor' or 'DashboardShortCut'
                                 vim.api.nvim_buf_set_extmark(bufnr, ns, line, mark[3], {
                                     id = mark[1],

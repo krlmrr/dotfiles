@@ -18,9 +18,9 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 
 local function create_float_win(buf)
   local width = vim.o.columns
-  local height = vim.o.lines - 4  -- Account for cmdline/statusline
-  local row = math.floor((vim.o.lines - height) / 2) - 1
-  local col = math.floor((vim.o.columns - width) / 2)
+  local height = vim.o.lines - 3  -- Account for cmdline/statusline
+  local row = 0
+  local col = 0
 
   local win = vim.api.nvim_open_win(buf, true, {
     relative = 'editor',

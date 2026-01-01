@@ -58,6 +58,7 @@ return {
             ["<CR>"] = "Confirm",
           },
           i = {
+            ["<Esc>"] = "Close",
             ["<C-c>"] = "Close",
             ["<CR>"] = "Confirm",
             ["<C-p>"] = "HistoryPrev",

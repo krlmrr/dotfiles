@@ -80,8 +80,15 @@ vim.api.nvim_create_autocmd("BufDelete", {
 vim.o.mouse = 'a'
 vim.o.clipboard = 'unnamedplus'
 
--- Performance
+-- Performance (updatetime also controls CursorHold delay)
 vim.o.updatetime = 250
+
+-- Auto-reload on cursor idle
+vim.api.nvim_create_autocmd("CursorHold", {
+  callback = function()
+    vim.cmd("checktime")
+  end,
+})
 vim.o.timeoutlen = 300
 
 -- Completion

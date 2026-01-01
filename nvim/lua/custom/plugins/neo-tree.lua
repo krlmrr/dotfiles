@@ -55,6 +55,15 @@ return {
       return original_fn_confirm(msg, choices, default, type)
     end
 
+    -- Auto-refresh neo-tree on focus/idle
+    vim.api.nvim_create_autocmd({ "FocusGained", "CursorHold" }, {
+      callback = function()
+        if package.loaded["neo-tree.sources.manager"] then
+          require("neo-tree.sources.manager").refresh("filesystem")
+        end
+      end,
+    })
+
     require('neo-tree').setup {
       use_popups_for_input = false, -- Use vim.ui.input (dressing.nvim)
       close_if_last_window = true,

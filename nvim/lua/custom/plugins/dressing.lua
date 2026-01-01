@@ -2,11 +2,11 @@ return {
   "stevearc/dressing.nvim",
   lazy = false, -- Load immediately to override vim.ui.input before neo-tree
   config = function()
-    -- Custom highlights for dressing
-    vim.api.nvim_set_hl(0, "DressingInputBorder", { fg = "#61AFEF", bg = "NONE" })
+    -- Custom highlights for dressing (solid background to prevent show-through)
+    vim.api.nvim_set_hl(0, "DressingInputBorder", { fg = "#61AFEF", bg = "#282c34" })
     vim.api.nvim_set_hl(0, "DressingInputTitle", { fg = "#282c34", bg = "#61AFEF", bold = true })
-    vim.api.nvim_set_hl(0, "DressingInputText", { fg = "#abb2bf", bg = "NONE" })
-    vim.api.nvim_set_hl(0, "DressingInputNormalFloat", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "DressingInputText", { fg = "#abb2bf", bg = "#282c34" })
+    vim.api.nvim_set_hl(0, "DressingInputNormalFloat", { bg = "#282c34" })
 
     -- Wrap vim.ui.input to intercept neo-tree prompts before dressing sees them
     local original_ui_input = vim.ui.input
@@ -19,18 +19,24 @@ return {
         local clear_default = true
         if opts.prompt:match("new file or directory") then
           title = " New File/Directory "
-        elseif opts.prompt:match("[Rr]ename") then
+        elseif opts.prompt:match("[Rr]ename") or opts.prompt:match("Enter new name") then
           title = " Rename "
           clear_default = false -- Keep default for rename
-        elseif opts.prompt:match("[Cc]opy") then
+        elseif opts.prompt:match("[Cc]opy") or opts.prompt:match("copy to") then
           title = " Copy To "
-        elseif opts.prompt:match("[Mm]ove") then
+        elseif opts.prompt:match("[Mm]ove") or opts.prompt:match("move to") then
           title = " Move To "
+          clear_default = false -- Keep default for move
         end
         opts.prompt = title
         if clear_default then
           opts.default = ""
         end
+        -- Defer to fix timing issue on first open
+        vim.defer_fn(function()
+          original_ui_input(opts, on_confirm)
+        end, 10)
+        return
       end
       return original_ui_input(opts, on_confirm)
     end

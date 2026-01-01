@@ -3,6 +3,15 @@ return {
     event = 'VimEnter',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
+        -- Set highlights before dashboard loads
+        vim.cmd('highlight DashboardShortCut guifg=#61afef guibg=NONE')
+        vim.cmd('highlight DashboardShortCutCursor guifg=#61afef guibg=#3e4452')
+        vim.cmd('highlight DashboardHeader guifg=#abb2bf guibg=NONE')
+        vim.cmd('highlight DashboardMruTitle guifg=#abb2bf guibg=NONE')
+        vim.cmd('highlight DashboardMruIcon guifg=#abb2bf guibg=NONE')
+        vim.cmd('highlight DashboardFiles guifg=#abb2bf guibg=NONE')
+        vim.cmd('highlight DashboardFooter guifg=#abb2bf guibg=NONE')
+
         require('dashboard').setup({
             theme = 'hyper',
             config = {
@@ -90,8 +99,8 @@ return {
                     if not min_line then min_line = shortcuts_line end
                     if not max_line then max_line = shortcuts_line end
 
-                    -- If no MRU files, show cursorline on "empty files" and lock cursor
-                    if max_line == min_line then
+                    -- If no MRU files (min_line fell back to shortcuts_line), show cursorline on "empty files" and lock cursor
+                    if min_line == shortcuts_line then
                         local empty_line = nil
                         for i, line in ipairs(lines) do
                             if line:match('empty') then

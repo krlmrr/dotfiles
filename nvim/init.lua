@@ -27,6 +27,7 @@ require('config.vim-motions')
 
 -- Neovide settings (not supported in config.toml)
 if vim.g.neovide then
+  vim.opt.linespace = 40
   vim.g.neovide_padding_top = 40
   vim.g.neovide_padding_bottom = 0
   vim.g.neovide_padding_left = 40

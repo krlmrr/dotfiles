@@ -1,20 +1,27 @@
+-- Store initial working directory before any autocmds change it
+vim.g.project_root = vim.fn.getcwd()
+
 -- Set project root and show dashboard when opening a directory
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
     local arg = vim.fn.argv(0)
     if arg ~= "" then
-      if vim.fn.isdirectory(arg) == 1 then
+      -- Get absolute path without trailing slash
+      local abs_arg = vim.fn.fnamemodify(arg, ":p"):gsub("/$", "")
+      if vim.fn.isdirectory(abs_arg) == 1 then
         -- Directory passed: set as cwd and show dashboard
         vim.cmd("bd")
-        vim.cmd("cd " .. vim.fn.fnameescape(arg))
+        vim.cmd("cd " .. vim.fn.fnameescape(abs_arg))
+        vim.g.project_root = abs_arg
         require('dashboard'):instance()
       else
         -- File passed: find project root (git) or use file's parent
-        local file_dir = vim.fn.fnamemodify(arg, ":p:h")
+        local file_dir = vim.fn.fnamemodify(abs_arg, ":h")
         local git_root = vim.fn.systemlist('git -C ' .. vim.fn.shellescape(file_dir) .. ' rev-parse --show-toplevel')[1]
         local dir = (vim.v.shell_error == 0 and git_root and vim.fn.isdirectory(git_root) == 1) and git_root or file_dir
         if vim.fn.isdirectory(dir) == 1 then
           vim.cmd("cd " .. vim.fn.fnameescape(dir))
+          vim.g.project_root = dir
         end
       end
     end

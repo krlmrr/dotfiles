@@ -19,6 +19,7 @@ return {
           i = {
             ['<C-u>'] = false,
             ['<C-d>'] = false,
+            ['<Esc>'] = require('telescope.actions').close,
           },
         },
       },
@@ -80,5 +81,6 @@ return {
     vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
     vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
     vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+    vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
   end,
 }

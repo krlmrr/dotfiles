@@ -23,3 +23,4 @@ require('lazy').setup({
 
 -- Load keymaps after plugins
 require('config.keymaps')
+require('config.vim-motions')

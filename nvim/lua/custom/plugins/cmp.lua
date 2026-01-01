@@ -35,7 +35,10 @@ return {
           select = true,
         },
         ['<Tab>'] = cmp.mapping(function(fallback)
-          if cmp.visible() then
+          local supermaven = require("supermaven-nvim.completion_preview")
+          if supermaven.has_suggestion() then
+            supermaven.on_accept_suggestion()
+          elseif cmp.visible() then
             cmp.select_next_item()
           elseif luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()

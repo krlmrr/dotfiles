@@ -129,12 +129,20 @@ return {
             vim.keymap.set("n", "q", "<cmd>qa<cr>", { buffer = true, silent = true })
             vim.cmd("cnoreabbrev <buffer> q qa")
             vim.cmd("cnoreabbrev <buffer> q! qa!")
+            -- Disable scroll animation in Neovide
+            if vim.g.neovide then
+              vim.g.neovide_scroll_animation_length = 0
+            end
           end,
         },
         {
           event = "neo_tree_buffer_leave",
           handler = function()
             vim.cmd("highlight Cursor blend=0")
+            -- Restore scroll animation in Neovide
+            if vim.g.neovide then
+              vim.g.neovide_scroll_animation_length = 0.3
+            end
           end,
         },
       },

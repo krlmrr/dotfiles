@@ -37,6 +37,44 @@ vim.wo.foldcolumn = '0'
 -- Files
 vim.o.swapfile = false
 vim.o.undofile = true
+vim.o.autoread = true
+
+-- Auto-reload files when changed externally (real-time with libuv)
+local watch_handles = {}
+vim.api.nvim_create_autocmd("BufReadPost", {
+  callback = function(args)
+    local bufnr = args.buf
+    local filepath = vim.api.nvim_buf_get_name(bufnr)
+    if filepath == "" or not vim.uv.fs_stat(filepath) then return end
+
+    -- Clean up existing watcher for this buffer
+    if watch_handles[bufnr] then
+      watch_handles[bufnr]:stop()
+      watch_handles[bufnr] = nil
+    end
+
+    local handle = vim.uv.new_fs_event()
+    watch_handles[bufnr] = handle
+    handle:start(filepath, {}, function(err)
+      if err then return end
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].modified then
+          vim.cmd("checktime " .. bufnr)
+        end
+      end)
+    end)
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufDelete", {
+  callback = function(args)
+    local handle = watch_handles[args.buf]
+    if handle then
+      handle:stop()
+      watch_handles[args.buf] = nil
+    end
+  end,
+})
 
 -- Mouse and clipboard
 vim.o.mouse = 'a'

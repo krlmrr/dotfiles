@@ -8,6 +8,7 @@ return {
         javascript = { "prettier" },
         typescript = { "prettier" },
         vue = { "prettier" },
+        json = { "prettier" },
         xml = { "xmlformat" },
         php = { "pint" },
         blade = { "blade-formatter" },

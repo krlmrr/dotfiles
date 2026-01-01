@@ -7,12 +7,10 @@ echo "Hello! I'm installing your dotfiles..."
 touch $HOME/.hushlogin
 
 if [ ! -d "$HOME/.ssh" ]; then
-   ssh-keygen -t ed25519 -C "karl@karlm.dev"
+   read -p "Enter your email for SSH key: " email
+   ssh-keygen -t ed25519 -C "$email"
    cat $HOME/.ssh/id_ed25519.pub
 fi
-
-# VS Code
-ln -s $DOTFILES/vs_code $HOME/.config/vs_code
 
 # Karabiner -- Keyboard settings for macOS
 rm -rf $HOME/.config/karabiner
@@ -82,11 +80,10 @@ ln -sf $DOTFILES/lazygit/config.yml "$HOME/Library/Application Support/lazygit/c
 cp $DOTFILES/fonts/MonoLisa/*.ttf $HOME/Library/Fonts/
 
 # Tmux Plugin Manager
-rm -rf $HOME/.tmux
+rm -rf $HOME/.tmux/plugins/tpm
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Tmux
-rm -rf $HOME/.tmux
 ln -sf $DOTFILES/tmux/tmux.conf $HOME/.tmux.conf
 
 if ! command -v tmux >/dev/null 2>&1

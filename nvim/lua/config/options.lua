@@ -103,7 +103,7 @@ vim.diagnostic.config({
 })
 
 -- Inlay hints
-vim.lsp.inlay_hint.enable(true)
+vim.lsp.inlay_hint.enable(false)
 
 -- Remove underline styling
 vim.api.nvim_set_hl(0, "@lsp.type.function", {})

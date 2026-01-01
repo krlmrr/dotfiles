@@ -73,14 +73,22 @@ return {
                     if not ns then return end
 
                     -- Find MRU file lines (extmarks with virt_text AFTER shortcuts line)
-                    local min_line = shortcuts_line
-                    local max_line = shortcuts_line
+                    local min_line = nil
+                    local max_line = nil
                     for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, { details = true })) do
                         local line = mark[2]
                         if mark[4].virt_text and line > shortcuts_line then
-                            max_line = math.max(max_line, line)
+                            if not min_line then
+                                min_line = line
+                            else
+                                min_line = math.min(min_line, line)
+                            end
+                            max_line = max_line and math.max(max_line, line) or line
                         end
                     end
+                    -- Fallback if no MRU files found
+                    if not min_line then min_line = shortcuts_line end
+                    if not max_line then max_line = shortcuts_line end
 
                     -- If no MRU files, show cursorline on "empty files" and lock cursor
                     if max_line == min_line then

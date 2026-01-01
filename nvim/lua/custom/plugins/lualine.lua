@@ -52,7 +52,10 @@ return {
         lualine_y = {
           { 'filetype', cond = function() return vim.bo.buftype ~= 'terminal' end, fmt = function(str)
             if str == 'neo-tree' then return '' end
+            if str == 'neo-tree-popup' then return '' end
             if str == 'TelescopePrompt' then return '' end
+            if str == 'DressingInput' then return '' end
+            if str == 'DressingSelect' then return '' end
             if str == 'php' then return 'PHP' end
             return str:sub(1, 1):upper() .. str:sub(2)
           end },

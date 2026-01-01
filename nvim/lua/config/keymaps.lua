@@ -123,6 +123,10 @@ vim.keymap.set("n", "O", function()
   end
 end, { expr = true, noremap = true, desc = "New line above (reuse blank)" })
 
+-- Auto-indent on paste
+vim.keymap.set('n', 'p', 'p`[v`]=', { noremap = true, silent = true, desc = "Paste and indent" })
+vim.keymap.set('n', 'P', 'P`[v`]=', { noremap = true, silent = true, desc = "Paste before and indent" })
+
 -- Move to first non-blank after j/k
 vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true, desc = "Down and first non-blank" })
 vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true, desc = "Up and first non-blank" })

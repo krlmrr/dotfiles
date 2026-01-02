@@ -4,16 +4,6 @@ return {
     { 'williamboman/mason.nvim', config = true },
     'williamboman/mason-lspconfig.nvim',
     {
-      'j-hui/fidget.nvim',
-      opts = {
-        progress = {
-          suppress_on_insert = true,
-          ignore_done_already = true,
-          ignore = { "ts_ls", "lua_ls" },
-        },
-      },
-    },
-    {
       'folke/lazydev.nvim',
       ft = 'lua',
       opts = {

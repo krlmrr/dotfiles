@@ -7,6 +7,58 @@ return {
     vim.api.nvim_set_hl(0, "DressingInputTitle", { fg = "#282c34", bg = "#61AFEF", bold = true })
     vim.api.nvim_set_hl(0, "DressingInputText", { fg = "#abb2bf", bg = "#282c34" })
     vim.api.nvim_set_hl(0, "DressingInputNormalFloat", { bg = "#282c34" })
+    vim.api.nvim_set_hl(0, "DressingSelectCursorLine", { bg = "#3e4452" })
+
+    -- Helper to hide cursor (used in select dialogs)
+    local function hide_cursor()
+      vim.cmd("highlight Cursor blend=100")
+      vim.opt.guicursor:append("a:Cursor/lCursor")
+    end
+    local function show_cursor()
+      vim.cmd("highlight Cursor blend=0")
+      vim.opt.guicursor:remove("a:Cursor/lCursor")
+    end
+
+    -- Wrap vim.ui.select to customize confirmation dialogs
+    local original_ui_select = vim.ui.select
+    vim.ui.select = function(items, opts, on_choice)
+      opts = opts or {}
+      -- Only customize confirmation dialogs
+      if opts.kind == "confirmation" then
+        vim.defer_fn(hide_cursor, 10)
+        local hints = { Yes = "y", No = "n" }
+        opts.format_item = function(item)
+          local hint = hints[item] or item:sub(1, 1):lower()
+          return item .. " [" .. hint .. "]"
+        end
+        vim.defer_fn(function()
+          local buf = vim.api.nvim_get_current_buf()
+          -- Remove leading spaces from lines
+          local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+          for i, line in ipairs(lines) do
+            lines[i] = line:gsub("^%s+", "")
+          end
+          vim.bo[buf].modifiable = true
+          vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+          vim.bo[buf].modifiable = false
+          -- Add y/n keymaps
+          for i, item in ipairs(items) do
+            local key = hints[item] or item:sub(1, 1):lower()
+            vim.keymap.set("n", key, function()
+              vim.api.nvim_win_close(0, true)
+              show_cursor()
+              if on_choice then on_choice(item, i) end
+            end, { buffer = buf, nowait = true })
+          end
+        end, 10)
+        original_ui_select(items, opts, function(...)
+          show_cursor()
+          if on_choice then on_choice(...) end
+        end)
+      else
+        original_ui_select(items, opts, on_choice)
+      end
+    end
 
     -- Wrap vim.ui.input to intercept neo-tree prompts before dressing sees them
     local original_ui_input = vim.ui.input
@@ -17,7 +69,8 @@ return {
       if is_neotree then
         local title = " Input "
         local clear_default = true
-        if opts.prompt:match("new file or directory") then
+        local is_new_file = opts.prompt:match("new file or directory")
+        if is_new_file then
           title = " New File/Directory "
         elseif opts.prompt:match("[Rr]ename") or opts.prompt:match("Enter new name") then
           title = " Rename "
@@ -32,9 +85,27 @@ return {
         if clear_default then
           opts.default = ""
         end
+        -- Wrap callback to auto-add / for directories (no extension = directory)
+        -- Use trailing * to force file creation (e.g., "Makefile*" → "Makefile")
+        local wrapped_confirm = on_confirm
+        if is_new_file then
+          wrapped_confirm = function(value)
+            if value and value ~= "" then
+              if value:match("%*$") then
+                value = value:sub(1, -2) -- Strip trailing *, create as file
+              elseif not value:match("%/$") then
+                local basename = value:match("[^/]+$") or value
+                if not basename:match("%.") then
+                  value = value .. "/"
+                end
+              end
+            end
+            on_confirm(value)
+          end
+        end
         -- Defer to fix timing issue on first open
         vim.defer_fn(function()
-          original_ui_input(opts, on_confirm)
+          original_ui_input(opts, wrapped_confirm)
         end, 10)
         return
       end
@@ -85,6 +156,11 @@ return {
       select = {
         enabled = true,
         backend = { "builtin" },
+        get_config = function(opts)
+          if opts.kind == "confirmation" then
+            return { builtin = { show_numbers = false } }
+          end
+        end,
         builtin = {
           border = "rounded",
           relative = "editor",
@@ -94,8 +170,15 @@ return {
           max_width = 40,
           win_options = {
             winblend = 0,
-            winhighlight = "Normal:DressingInputText,NormalFloat:DressingInputNormalFloat,FloatBorder:DressingInputBorder,FloatTitle:DressingInputTitle",
+            cursorline = true,
+            signcolumn = "no",
+            foldcolumn = "0",
+            number = false,
+            relativenumber = false,
+            statuscolumn = "",
+            winhighlight = "Normal:DressingInputText,NormalFloat:DressingInputNormalFloat,FloatBorder:DressingInputBorder,FloatTitle:DressingInputTitle,CursorLine:DressingSelectCursorLine",
           },
+          show_numbers = true,
           override = function(conf)
             conf.anchor = "NW"
             conf.row = math.floor((vim.o.lines - 6) / 2)

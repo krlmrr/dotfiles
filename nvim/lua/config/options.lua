@@ -83,9 +83,10 @@ vim.o.clipboard = 'unnamedplus'
 -- Performance (updatetime also controls CursorHold delay)
 vim.o.updatetime = 250
 
--- Auto-reload on cursor idle
+-- Auto-reload on cursor idle (skip special windows)
 vim.api.nvim_create_autocmd("CursorHold", {
   callback = function()
+    if vim.fn.getcmdwintype() ~= "" then return end
     vim.cmd("checktime")
   end,
 })

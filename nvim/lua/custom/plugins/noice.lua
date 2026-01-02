@@ -44,6 +44,8 @@ return {
       { filter = { event = "notify", find = "modifiable" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "Operation canceled" }, opts = { skip = true } },
       { filter = { event = "notify", find = "Operation canceled" }, opts = { skip = true } },
+      { filter = { event = "notify", find = "Deleted" }, opts = { skip = true } },
+      { filter = { event = "msg_show", find = "Deleted" }, opts = { skip = true } },
       -- Route remaining messages to mini view
       { filter = { event = "msg_show" }, view = "mini" },
       { filter = { event = "notify" }, view = "mini" },

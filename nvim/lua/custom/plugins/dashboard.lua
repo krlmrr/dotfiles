@@ -136,11 +136,11 @@ return {
                             vim.api.nvim_win_set_cursor(0, { max_line + 1, 0 })
                             cursor_line = max_line
                         end
-                        -- Update shortcut highlights (only for marks at shortcuts_line or after)
+                        -- Update shortcut highlights only on MRU file lines
                         for _, mark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, { details = true })) do
                             local line = mark[2]
                             local details = mark[4]
-                            if details.virt_text and line >= shortcuts_line then
+                            if details.virt_text and line > shortcuts_line and line >= min_line and line <= max_line then
                                 local hl = line == cursor_line and 'DashboardShortCutCursor' or 'DashboardShortCut'
                                 vim.api.nvim_buf_set_extmark(bufnr, ns, line, mark[3], {
                                     id = mark[1],
@@ -159,6 +159,27 @@ return {
                         buffer = bufnr,
                         callback = update_shortcuts,
                     })
+
+                    -- Build list of MRU files matching cwd
+                    local cwd = vim.fn.getcwd()
+                    local mru_files = {}
+                    for _, file in ipairs(vim.v.oldfiles) do
+                        if file:find(cwd, 1, true) == 1 and vim.fn.filereadable(file) == 1 then
+                            table.insert(mru_files, file)
+                            if #mru_files >= 5 then break end
+                        end
+                    end
+
+                    -- Add Enter mapping to open MRU files
+                    vim.keymap.set('n', '<CR>', function()
+                        local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
+                        if cursor_line >= min_line and cursor_line <= max_line then
+                            local idx = cursor_line - min_line + 1
+                            if mru_files[idx] then
+                                vim.cmd('edit ' .. vim.fn.fnameescape(mru_files[idx]))
+                            end
+                        end
+                    end, { buffer = bufnr, nowait = true, silent = true })
                 end, 50)
             end,
         })

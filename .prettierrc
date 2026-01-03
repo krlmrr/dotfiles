@@ -6,6 +6,16 @@
   "singleAttributePerLine": true,
   "htmlWhitespaceSensitivity": "css",
   "printWidth": 100,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^vue$"
+    "^@laravel/(.*)$",
+    "^@/layouts/(.*)$",
+    "^@/components/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true,
   "overrides": [
     {
       "files": "**/*.yml",

@@ -41,11 +41,11 @@ export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/Users/karlm/Library/Python/3.13/bin:$PATH"
 
 # OS
-alias nz="nvim ~/.zshrc"
+alias nv="clear && nvim ."
+alias nz="nv ~/.zshrc"
 alias lz="lazygit"
 alias yeet="sudo rm -rf"
 alias vim="nvim"
-alias nv="clear && (neovide . &>/dev/null &)"
 alias brewup="brew update && brew upgrade && brew upgrade --greedy && brew cleanup && open /Applications/Raycast.app/"
 alias mkd="mkdir -p"
 alias sourcez="source ~/.zshrc"

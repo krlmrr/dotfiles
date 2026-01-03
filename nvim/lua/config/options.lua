@@ -33,6 +33,8 @@ vim.o.scrolloff = 10
 vim.o.termguicolors = true
 vim.wo.signcolumn = 'no'
 vim.wo.foldcolumn = '0'
+vim.o.laststatus = 3 -- Global statusline (works with lualine globalstatus)
+vim.o.cmdheight = 1
 
 -- Files
 vim.o.swapfile = false

@@ -12,31 +12,47 @@ if [ ! -d "$HOME/.ssh" ]; then
    cat $HOME/.ssh/id_ed25519.pub
 fi
 
+# Git
+ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
+ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
+
+# Homebrew
+if ! command -v brew >/dev/null 2>&1
+then
+    echo "Brew is not installed"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
 # Karabiner -- Keyboard settings for macOS
 rm -rf $HOME/.config/karabiner
 ln -s $DOTFILES/karabiner $HOME/.config/karabiner
-
-# Raycast
-rm -rf $HOME/.config/raycast
-ln -s $DOTFILES/raycast $HOME/.config/raycast
 
 # Ghostty
 rm -rf $HOME/.config/ghostty
 ln -s $DOTFILES/ghostty $HOME/.config/ghostty
 
+if ! command -v nvim >/dev/null 2>&1
+then
+    echo "Nvim is not installed"
+    /bin/bash -c "brew install neovim"
+fi
+
 # Neovim
 rm -rf $HOME/.config/nvim
 ln -s $DOTFILES/nvim $HOME/.config/nvim
 
-# Vimrc
-rm -rf $HOME/.vimrc
-rm -rf $HOME/.ideavimrc
-ln -s $DOTFILES/vim/vimrc $HOME/.vimrc
-ln -s $DOTFILES/vim/ideavimrc $HOME/.ideavimrc
+if ! command -v nvim >/dev/null 2>&1
+then
+    echo "Nvim is not installed"
+    /bin/bash -c "brew install neovim"
+fi
 
-# Git
-ln -sf $DOTFILES/git/gitconfig $HOME/.gitconfig
-ln -sf $DOTFILES/git/gitignore_global $HOME/.gitignore_global
+# Neovim dependencies
+brew install ripgrep fd fzf
+
+# Lazygit
+mkdir -p "$HOME/Library/Application Support/lazygit"
+ln -sf $DOTFILES/lazygit/config.yml "$HOME/Library/Application Support/lazygit/config.yml"
 
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -52,29 +68,9 @@ if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 fi
 
-# Zsh
+# Zsh Config
 rm -rf $HOME/.zshrc
 ln -sf $DOTFILES/zsh/zshrc $HOME/.zshrc
-
-# Homebrew
-if ! command -v brew >/dev/null 2>&1
-then
-    echo "Brew is not installed"
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-fi
-
-if ! command -v nvim >/dev/null 2>&1
-then
-    echo "Nvim is not installed"
-    /bin/bash -c "brew install neovim"
-fi
-
-# Neovim dependencies
-brew install ripgrep fd fzf
-
-# Lazygit
-mkdir -p "$HOME/Library/Application Support/lazygit"
-ln -sf $DOTFILES/lazygit/config.yml "$HOME/Library/Application Support/lazygit/config.yml"
 
 # Fonts
 cp $DOTFILES/fonts/MonoLisa/*.ttf $HOME/Library/Fonts/

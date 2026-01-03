@@ -1,28 +1,32 @@
+title = "  "
 theme = dark:one half dark,light:catppuccin-latte
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
 macos-titlebar-proxy-icon = hidden
+
 font-family = MonoLisa
 font-style = Medium
 font-style-italic = Medium Italic
 font-style-bold = Medium
 font-style-bold-italic = Medium Italic
 font-size = 18
-adjust-cell-height = 100%
-window-padding-x = 20,10
-# Window padding for top and bottom set independently
-window-padding-y = 10,0
+
+adjust-cell-height = 70%
+
 window-padding-balance = true
-working-directory = /Users/karlm/herd
-window-save-state = always
+# Top and Bottom
+window-padding-y = 0,0
+# Left and Right
+window-padding-x = 10,10
 window-width = 160
 window-height = 50
+
+window-save-state = always
+
+working-directory = /Users/karlm/herd
+
 cursor-style = bar
 confirm-close-surface = false
 macos-option-as-alt = true
 shell-integration-features = sudo
 auto-update-channel = tip
-title = "  "
-keybind = shift+enter=text:\x1b\r
-keybind = super+comma=text:nvim ~/.config/ghostty/config\x0d
-keybind = super+s=text:\x1b:w\x0d

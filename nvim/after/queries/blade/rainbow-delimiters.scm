@@ -55,3 +55,13 @@
     "</" @delimiter
     (tag_name) @delimiter
     ">" @delimiter @sentinel)) @container
+
+;; Blade echo {{ }}
+(php_statement
+  "{{" @delimiter
+  "}}" @delimiter @sentinel) @container
+
+;; Blade raw echo {!! !!}
+(php_statement
+  "{!!" @delimiter
+  "!!}" @delimiter @sentinel) @container

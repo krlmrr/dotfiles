@@ -11,7 +11,7 @@ return {
         json = { "prettier" },
         xml = { "xmlformat" },
         php = { "pint" },
-        blade = { "blade-formatter" },
+        blade = { "blade-formatter", "pint", stop_after_first = true },
       },
       formatters = {
         pint = {
@@ -27,6 +27,16 @@ return {
             end
             return "prettier"
           end,
+        },
+        ["blade-formatter"] = {
+          command = function()
+            local local_blade = vim.fn.getcwd() .. "/node_modules/.bin/blade-formatter"
+            if vim.fn.executable(local_blade) == 1 then
+              return local_blade
+            end
+            return "blade-formatter"
+          end,
+          args = { "--stdin", "--wrap-attributes", "force-expand-multiline", "--indent-size", "4", "--indent-inner-html" },
         },
       },
       format_on_save = {

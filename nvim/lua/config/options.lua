@@ -82,6 +82,18 @@ vim.api.nvim_create_autocmd("BufDelete", {
 vim.o.mouse = 'a'
 vim.o.clipboard = 'unnamedplus'
 
+-- Prevent scrolling past end of file with mouse
+vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', function()
+  local win_height = vim.api.nvim_win_get_height(0)
+  local last_line = vim.fn.line('$')
+  local top_line = vim.fn.line('w0')
+  -- Only scroll if there's more content below
+  if top_line + win_height <= last_line then
+    return '<ScrollWheelDown>'
+  end
+  return ''
+end, { expr = true, silent = true })
+
 -- Performance (updatetime also controls CursorHold delay)
 vim.o.updatetime = 250
 

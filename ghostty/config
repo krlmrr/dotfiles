@@ -30,3 +30,4 @@ confirm-close-surface = false
 macos-option-as-alt = true
 shell-integration-features = sudo
 auto-update-channel = tip
+keybind = shift+enter=text:\x1b\r

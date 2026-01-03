@@ -24,6 +24,17 @@ return {
       completion = {
         completeopt = 'menu,menuone,noinsert',
       },
+      formatting = {
+        format = function(entry, vim_item)
+          -- Show where the completion is coming from (LSP, snippet, etc.)
+          vim_item.menu = ({
+            nvim_lsp = '[LSP]',
+            luasnip = '[Snippet]',
+            path = '[Path]',
+          })[entry.source.name]
+          return vim_item
+        end,
+      },
       mapping = cmp.mapping.preset.insert {
         ['<C-n>'] = cmp.mapping.select_next_item(),
         ['<C-p>'] = cmp.mapping.select_prev_item(),

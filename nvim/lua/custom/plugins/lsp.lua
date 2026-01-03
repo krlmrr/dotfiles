@@ -147,6 +147,14 @@ return {
         plugins = {
           { name = '@vue/typescript-plugin', location = vue_language_server_path, languages = { 'vue' } },
         },
+        preferences = {
+          -- Enable auto-imports
+          includeCompletionsForModuleExports = true,
+          includeCompletionsWithInsertText = true,
+          -- Auto-import suggestions
+          includeCompletionsForImportStatements = true,
+          includeAutomaticOptionalChainCompletions = true,
+        },
       },
       filetypes = { 'typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'vue' },
     }

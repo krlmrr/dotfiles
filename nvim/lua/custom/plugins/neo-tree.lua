@@ -128,6 +128,8 @@ return {
           ["i"] = "file_details_float",
         },
       },
+      -- Prevent Neo-tree from appearing in the middle of splits
+      open_files_do_not_replace_types = { "terminal", "trouble", "qf", "toggleterm" },
       default_component_configs = {
         indent = {
           with_markers = false,
@@ -162,6 +164,13 @@ return {
         },
       },
       event_handlers = {
+        {
+          event = "neo_tree_window_before_open",
+          handler = function()
+            -- Always open on the far right by moving there first
+            vim.cmd("wincmd l")
+          end,
+        },
         {
           event = "file_deleted",
           handler = function(args)

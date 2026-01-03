@@ -4,12 +4,11 @@ return {
   dependencies = { 'HiPhish/rainbow-delimiters.nvim' },
   config = function()
     local highlight = {
-      "RainbowRed",
-      "RainbowYellow",
-      "RainbowBlue",
-      "RainbowOrange",
       "RainbowGreen",
+      "RainbowBlue",
       "RainbowViolet",
+      "RainbowYellow",
+      "RainbowRed",
       "RainbowCyan",
     }
 
@@ -22,14 +21,6 @@ return {
       vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
       vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
       vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#7aa2f7" })
-      vim.api.nvim_set_hl(0, "@tag", {})
-      vim.api.nvim_set_hl(0, "@tag.html", {})
-      vim.api.nvim_set_hl(0, "@tag.vue", {})
-      vim.api.nvim_set_hl(0, "@tag.delimiter", {})
-      vim.api.nvim_set_hl(0, "@tag.delimiter.html", {})
-      vim.api.nvim_set_hl(0, "@tag.delimiter.vue", {})
-      vim.api.nvim_set_hl(0, "@punctuation.bracket", {})
-      vim.api.nvim_set_hl(0, "@punctuation.bracket.vue", {})
     end)
 
     local rainbow = require('rainbow-delimiters')
@@ -38,13 +29,19 @@ return {
         [''] = rainbow.strategy['global'],
         html = rainbow.strategy['global'],
         vue = rainbow.strategy['global'],
+        blade = rainbow.strategy['global'],
         javascript = rainbow.strategy['global'],
         typescript = rainbow.strategy['global'],
         php = rainbow.strategy['global'],
+        php_only = rainbow.strategy['global'],
       },
       query = {
         [''] = 'rainbow-delimiters',
         lua = 'rainbow-blocks',
+        html = 'rainbow-delimiters',
+        vue = 'rainbow-delimiters',
+        blade = 'rainbow-delimiters',
+        php_only = 'rainbow-delimiters',
       },
       highlight = highlight,
     }

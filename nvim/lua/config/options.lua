@@ -94,6 +94,24 @@ vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', function()
   return ''
 end, { expr = true, silent = true })
 
+-- Keep cursor centered after window resize
+vim.api.nvim_create_autocmd('WinResized', {
+  callback = function()
+    for _, win in ipairs(vim.v.event.windows) do
+      if vim.api.nvim_win_is_valid(win) then
+        local buf = vim.api.nvim_win_get_buf(win)
+        local ft = vim.bo[buf].filetype
+        -- Skip special buffers
+        if ft ~= 'neo-tree' and ft ~= 'dashboard' and ft ~= '' then
+          vim.api.nvim_win_call(win, function()
+            vim.cmd('normal! zz')
+          end)
+        end
+      end
+    end
+  end,
+})
+
 -- Performance (updatetime also controls CursorHold delay)
 vim.o.updatetime = 250
 

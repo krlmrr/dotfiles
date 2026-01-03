@@ -52,8 +52,19 @@ return {
                 vim.keymap.set('n', '<leader>e', '<Nop>', { buffer = true, silent = true })
 
                 vim.defer_fn(function()
-                    vim.cmd('highlight Cursor blend=100')
-                    vim.opt.guicursor:append('a:Cursor/lCursor')
+                    -- Hide cursor function (also used when returning from dialogs)
+                    local function hide_cursor()
+                        vim.cmd('highlight Cursor blend=100')
+                        vim.opt.guicursor:append('a:Cursor/lCursor')
+                    end
+                    hide_cursor()
+
+                    -- Re-hide cursor when returning from popups/dialogs
+                    vim.api.nvim_create_autocmd('WinEnter', {
+                        buffer = 0,
+                        callback = hide_cursor,
+                    })
+
                     vim.cmd('highlight CursorLine guibg=#3e4452')
                     vim.opt_local.cursorline = true
                     vim.wo.cursorlineopt = 'line'

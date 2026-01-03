@@ -199,8 +199,6 @@ return {
             vim.opt_local.statuscolumn = ""
             vim.opt_local.cursorline = true
             vim.wo.cursorlineopt = "line"
-            vim.cmd("highlight Cursor blend=100")
-            vim.opt.guicursor:append("a:Cursor/lCursor")
             -- Make q and :q quit Neovim when neo-tree is focused
             vim.keymap.set("n", "q", "<cmd>qa<cr>", { buffer = true, silent = true })
             vim.cmd("cnoreabbrev <buffer> q qa")
@@ -209,12 +207,26 @@ return {
             if vim.g.neovide then
               vim.g.neovide_scroll_animation_length = 0
             end
+
+            -- Hide cursor in neo-tree (also handles returning from dialogs)
+            local function hide_cursor()
+              vim.cmd("highlight Cursor blend=100")
+              vim.opt.guicursor:append("a:Cursor/lCursor")
+            end
+            hide_cursor()
+
+            -- Re-hide cursor when returning to neo-tree from popups/dialogs
+            vim.api.nvim_create_autocmd("WinEnter", {
+              buffer = 0,
+              callback = hide_cursor,
+            })
           end,
         },
         {
           event = "neo_tree_buffer_leave",
           handler = function()
             vim.cmd("highlight Cursor blend=0")
+            vim.opt.guicursor = vim.opt.guicursor - "a:Cursor/lCursor"
             -- Neovide: restore scroll animation
             if vim.g.neovide then
               vim.g.neovide_scroll_animation_length = 0.3

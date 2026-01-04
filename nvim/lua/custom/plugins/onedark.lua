@@ -51,6 +51,14 @@ return {
         ["@punctuation.bracket.php"] = { fg = '$yellow' },
         ["@punctuation.bracket.php_only"] = { fg = '$yellow' },
 
+        -- Variables (red like PHP)
+        ["@variable"] = { fg = '$red' },
+        ["@lsp.type.variable"] = { fg = '$red' },
+        ["@lsp.type.variable.javascript"] = { fg = '$red' },
+        ["@lsp.type.variable.typescript"] = { fg = '$red' },
+        ["@lsp.type.variable.typescriptreact"] = { fg = '$red' },
+        ["@lsp.type.variable.javascriptreact"] = { fg = '$red' },
+
         -- Additional HTML element highlights
         ["@text.html"] = { fg = '$fg' },
         ["@constant.blade"] = { fg = '$cyan' },

@@ -122,6 +122,32 @@ vim.api.nvim_create_autocmd('WinResized', {
   end,
 })
 
+-- Equalize splits on terminal resize (excluding neo-tree)
+vim.api.nvim_create_autocmd('VimResized', {
+  callback = function()
+    -- Get neo-tree width if it exists
+    local neotree_width = 0
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      if vim.bo[buf].filetype == 'neo-tree' then
+        neotree_width = vim.api.nvim_win_get_width(win)
+        break
+      end
+    end
+    -- Equalize all windows then restore neo-tree width
+    vim.cmd('wincmd =')
+    if neotree_width > 0 then
+      for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].filetype == 'neo-tree' then
+          vim.api.nvim_win_set_width(win, neotree_width)
+          break
+        end
+      end
+    end
+  end,
+})
+
 -- Performance (updatetime also controls CursorHold delay)
 vim.o.updatetime = 250
 

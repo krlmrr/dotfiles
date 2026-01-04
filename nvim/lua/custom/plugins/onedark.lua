@@ -19,7 +19,7 @@ return {
         ["@comment.lua"] = { fg = '#61AEEF' },
         ["@lsp.type.comment"] = { fg = '#61AEEF' },
         ["@lsp.type.comment.lua"] = { fg = '#61AEEF' },
-        ["@lsp.type.function"] = { fmt = 'none' },
+        ["@lsp.type.function"] = { fg = '$blue', fmt = 'none' },
         ["@lsp.type.method"] = { fmt = 'none' },
         ["@lsp.type.class"] = { fmt = 'none' },
         ["@lsp.type.namespace"] = { fmt = 'none' },
@@ -62,6 +62,10 @@ return {
         -- Builtin variables (console, window, document, etc.)
         ["@variable.builtin"] = { fg = '$yellow' },
         ["@lsp.typemod.variable.defaultLibrary"] = { fg = '$yellow' },
+
+        -- Function calls (blue)
+        ["@function.call"] = { fg = '$blue' },
+        ["@lsp.type.function.php"] = { fg = '$blue', fmt = 'none' },
 
         -- Operators (!, +, -, =, ??, ?: etc.)
         ["@operator"] = { fg = '$cyan' },

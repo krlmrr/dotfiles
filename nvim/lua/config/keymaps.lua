@@ -135,3 +135,11 @@ vim.keymap.set('n', 'j', 'j_', { noremap = true, silent = true, desc = "Down and
 vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true, desc = "Up and first non-blank" })
 vim.keymap.set('n', '<Down>', 'j_', { noremap = true, silent = true, desc = "Down and first non-blank" })
 vim.keymap.set('n', '<Up>', 'k_', { noremap = true, silent = true, desc = "Up and first non-blank" })
+
+-- PHP dd() wrapper
+vim.keymap.set('n', '<leader>dd', function()
+  local line = vim.api.nvim_get_current_line()
+  local indent = line:match('^(%s*)')
+  local content = line:gsub('^%s*', ''):gsub(';%s*$', '')
+  vim.api.nvim_set_current_line(indent .. 'dd(' .. content .. ');')
+end, { desc = "Wrap line with dd()" })

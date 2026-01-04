@@ -41,11 +41,34 @@ return {
       },
       format_on_save = {
         lsp_fallback = true,
-        timeout_ms = 500,
+        timeout_ms = 3000,
       },
       format_after_save = {
         lsp_fallback = true,
       },
+    })
+
+    -- Run eslint --fix on Vue files after save
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      pattern = "*.vue",
+      callback = function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local file = vim.fn.expand("%:p")
+        local eslint = vim.fn.getcwd() .. "/node_modules/.bin/eslint"
+        if vim.fn.executable(eslint) == 1 then
+          vim.fn.jobstart({ eslint, "--fix", file }, {
+            on_exit = function(_, exit_code)
+              vim.schedule(function()
+                if exit_code == 0 and vim.api.nvim_buf_is_valid(bufnr) then
+                  vim.api.nvim_buf_call(bufnr, function()
+                    vim.cmd("e!")
+                  end)
+                end
+              end)
+            end,
+          })
+        end
+      end,
     })
   end
 }

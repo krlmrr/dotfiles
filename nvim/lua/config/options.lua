@@ -11,7 +11,17 @@ vim.g.loaded_netrwPlugin = 1
 vim.wo.number = true
 vim.wo.relativenumber = true
 vim.o.numberwidth = 1
-vim.opt.statuscolumn = "%=%{v:relnum?v:relnum:v:lnum}   "
+
+function _G.StatusColumn()
+  local lnum = vim.v.lnum
+  local relnum = vim.v.relnum
+  if relnum == 0 then
+    return "%#CursorLineNr#" .. lnum .. "%*   "
+  else
+    return relnum .. "   "
+  end
+end
+vim.opt.statuscolumn = "%=%{%v:lua.StatusColumn()%}"
 
 -- Tabs and indentation
 vim.o.tabstop = 4

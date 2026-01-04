@@ -89,5 +89,7 @@ return {
     vim.api.nvim_set_hl(0, "WinBarNC", { fg = "#5c6370", bg = "NONE" })
     vim.api.nvim_set_hl(0, "LspInlayHint", { fg = "#848B98", bg = "NONE" })
     vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#5c6370", bg = "NONE" })
+    vim.api.nvim_set_hl(0, "FloatTitle", { fg = "#abb2bf", bg = "NONE" })
   end,
 }

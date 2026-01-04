@@ -63,6 +63,16 @@ return {
         ["@variable.builtin"] = { fg = '$yellow' },
         ["@lsp.typemod.variable.defaultLibrary"] = { fg = '$yellow' },
 
+        -- Operators (!, +, -, =, ??, ?: etc.)
+        ["@operator"] = { fg = '$cyan' },
+        ["@keyword.conditional.ternary"] = { fg = '$cyan' },
+        ["@lsp.type.operator"] = { fg = '$cyan' },
+        ["@lsp.type.operator.typescript"] = { fg = '$cyan' },
+        ["@lsp.type.operator.typescriptreact"] = { fg = '$cyan' },
+        ["@punctuation.delimiter"] = { fg = '$cyan' },
+        ["@punctuation.delimiter.typescript"] = { fg = '$cyan' },
+        ["@punctuation.delimiter.typescriptreact"] = { fg = '$cyan' },
+
         -- Additional HTML element highlights
         ["@text.html"] = { fg = '$fg' },
         ["@constant.blade"] = { fg = '$cyan' },
@@ -72,6 +82,7 @@ return {
     require('onedark').load()
 
     -- Custom highlights
+    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#abb2bf", bg = "NONE" })
     vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "WinBar", { fg = "#5c6370", bg = "NONE" })

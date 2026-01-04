@@ -59,6 +59,10 @@ return {
         ["@lsp.type.variable.typescriptreact"] = { fg = '$red' },
         ["@lsp.type.variable.javascriptreact"] = { fg = '$red' },
 
+        -- Builtin variables (console, window, document, etc.)
+        ["@variable.builtin"] = { fg = '$yellow' },
+        ["@lsp.typemod.variable.defaultLibrary"] = { fg = '$yellow' },
+
         -- Additional HTML element highlights
         ["@text.html"] = { fg = '$fg' },
         ["@constant.blade"] = { fg = '$cyan' },

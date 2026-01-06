@@ -11,15 +11,13 @@ font-style-bold = Medium
 font-style-bold-italic = Medium Italic
 font-size = 18
 
-adjust-cell-height = 70%
+adjust-cell-height = 65%
 
 window-padding-balance = true
 # Top and Bottom
 window-padding-y = 0,0
 # Left and Right
 window-padding-x = 10,10
-window-width = 160
-window-height = 50
 
 window-save-state = always
 
@@ -31,3 +29,5 @@ macos-option-as-alt = true
 shell-integration-features = sudo
 auto-update-channel = tip
 keybind = shift+enter=text:\x1b\r
+
+shell-integration-features = sudo

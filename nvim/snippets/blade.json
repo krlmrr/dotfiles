@@ -1,0 +1,352 @@
+{
+  "@if": {
+    "prefix": "@if",
+    "body": ["@if (${1:condition})", "\t$0", "@endif"],
+    "description": "Blade @if statement"
+  },
+  "@if-else": {
+    "prefix": "@ifelse",
+    "body": ["@if (${1:condition})", "\t$2", "@else", "\t$0", "@endif"],
+    "description": "Blade @if-else statement"
+  },
+  "@if-elseif": {
+    "prefix": "@ifelseif",
+    "body": ["@if (${1:condition})", "\t$2", "@elseif (${3:condition})", "\t$0", "@endif"],
+    "description": "Blade @if-elseif statement"
+  },
+  "@unless": {
+    "prefix": "@unless",
+    "body": ["@unless (${1:condition})", "\t$0", "@endunless"],
+    "description": "Blade @unless statement"
+  },
+  "@isset": {
+    "prefix": "@isset",
+    "body": ["@isset(${1:\\$variable})", "\t$0", "@endisset"],
+    "description": "Blade @isset statement"
+  },
+  "@empty": {
+    "prefix": "@empty",
+    "body": ["@empty(${1:\\$variable})", "\t$0", "@endempty"],
+    "description": "Blade @empty statement"
+  },
+  "@foreach": {
+    "prefix": "@foreach",
+    "body": ["@foreach (${1:\\$items} as ${2:\\$item})", "\t$0", "@endforeach"],
+    "description": "Blade @foreach loop"
+  },
+  "@forelse": {
+    "prefix": "@forelse",
+    "body": ["@forelse (${1:\\$items} as ${2:\\$item})", "\t$3", "@empty", "\t$0", "@endforelse"],
+    "description": "Blade @forelse loop with empty fallback"
+  },
+  "@for": {
+    "prefix": "@for",
+    "body": ["@for (${1:\\$i = 0}; ${2:\\$i < 10}; ${3:\\$i++})", "\t$0", "@endfor"],
+    "description": "Blade @for loop"
+  },
+  "@while": {
+    "prefix": "@while",
+    "body": ["@while (${1:condition})", "\t$0", "@endwhile"],
+    "description": "Blade @while loop"
+  },
+  "@switch": {
+    "prefix": "@switch",
+    "body": ["@switch(${1:\\$variable})", "\t@case(${2:value})", "\t\t$3", "\t\t@break", "\t@default", "\t\t$0", "@endswitch"],
+    "description": "Blade @switch statement"
+  },
+  "@extends": {
+    "prefix": "@extends",
+    "body": "@extends('${1:layout}')",
+    "description": "Blade @extends directive"
+  },
+  "@section": {
+    "prefix": "@section",
+    "body": ["@section('${1:name}')", "\t$0", "@endsection"],
+    "description": "Blade @section block"
+  },
+  "@section-inline": {
+    "prefix": "@sectioninline",
+    "body": "@section('${1:name}', '${2:content}')",
+    "description": "Blade @section inline"
+  },
+  "@yield": {
+    "prefix": "@yield",
+    "body": "@yield('${1:name}')",
+    "description": "Blade @yield directive"
+  },
+  "@include": {
+    "prefix": "@include",
+    "body": "@include('${1:view}')",
+    "description": "Blade @include directive"
+  },
+  "@includeIf": {
+    "prefix": "@includeIf",
+    "body": "@includeIf('${1:view}')",
+    "description": "Blade @includeIf directive"
+  },
+  "@includeWhen": {
+    "prefix": "@includeWhen",
+    "body": "@includeWhen(${1:condition}, '${2:view}')",
+    "description": "Blade @includeWhen directive"
+  },
+  "@includeUnless": {
+    "prefix": "@includeUnless",
+    "body": "@includeUnless(${1:condition}, '${2:view}')",
+    "description": "Blade @includeUnless directive"
+  },
+  "@each": {
+    "prefix": "@each",
+    "body": "@each('${1:view}', ${2:\\$items}, '${3:item}')",
+    "description": "Blade @each directive"
+  },
+  "@component": {
+    "prefix": "@component",
+    "body": ["@component('${1:component}')", "\t$0", "@endcomponent"],
+    "description": "Blade @component block"
+  },
+  "@slot": {
+    "prefix": "@slot",
+    "body": ["@slot('${1:name}')", "\t$0", "@endslot"],
+    "description": "Blade @slot block"
+  },
+  "@push": {
+    "prefix": "@push",
+    "body": ["@push('${1:stack}')", "\t$0", "@endpush"],
+    "description": "Blade @push directive"
+  },
+  "@prepend": {
+    "prefix": "@prepend",
+    "body": ["@prepend('${1:stack}')", "\t$0", "@endprepend"],
+    "description": "Blade @prepend directive"
+  },
+  "@stack": {
+    "prefix": "@stack",
+    "body": "@stack('${1:name}')",
+    "description": "Blade @stack directive"
+  },
+  "@auth": {
+    "prefix": "@auth",
+    "body": ["@auth", "\t$0", "@endauth"],
+    "description": "Blade @auth directive"
+  },
+  "@guest": {
+    "prefix": "@guest",
+    "body": ["@guest", "\t$0", "@endguest"],
+    "description": "Blade @guest directive"
+  },
+  "@can": {
+    "prefix": "@can",
+    "body": ["@can('${1:ability}')", "\t$0", "@endcan"],
+    "description": "Blade @can authorization directive"
+  },
+  "@cannot": {
+    "prefix": "@cannot",
+    "body": ["@cannot('${1:ability}')", "\t$0", "@endcannot"],
+    "description": "Blade @cannot authorization directive"
+  },
+  "@canany": {
+    "prefix": "@canany",
+    "body": ["@canany(['${1:ability1}', '${2:ability2}'])", "\t$0", "@endcanany"],
+    "description": "Blade @canany authorization directive"
+  },
+  "@env": {
+    "prefix": "@env",
+    "body": ["@env('${1:local}')", "\t$0", "@endenv"],
+    "description": "Blade @env directive"
+  },
+  "@production": {
+    "prefix": "@production",
+    "body": ["@production", "\t$0", "@endproduction"],
+    "description": "Blade @production directive"
+  },
+  "@props": {
+    "prefix": "@props",
+    "body": "@props(['${1:prop}' => ${2:default}])",
+    "description": "Blade @props directive"
+  },
+  "@aware": {
+    "prefix": "@aware",
+    "body": "@aware(['${1:prop}'])",
+    "description": "Blade @aware directive"
+  },
+  "@error": {
+    "prefix": "@error",
+    "body": ["@error('${1:field}')", "\t$0", "@enderror"],
+    "description": "Blade @error directive"
+  },
+  "@csrf": {
+    "prefix": "@csrf",
+    "body": "@csrf",
+    "description": "Blade CSRF token field"
+  },
+  "@method": {
+    "prefix": "@method",
+    "body": "@method('${1|PUT,PATCH,DELETE|}')",
+    "description": "Blade form method spoofing"
+  },
+  "@class": {
+    "prefix": "@class",
+    "body": "@class(['${1:class}' => ${2:condition}])",
+    "description": "Blade conditional classes"
+  },
+  "@style": {
+    "prefix": "@style",
+    "body": "@style(['${1:property}: ${2:value}' => ${3:condition}])",
+    "description": "Blade conditional styles"
+  },
+  "@checked": {
+    "prefix": "@checked",
+    "body": "@checked(${1:condition})",
+    "description": "Blade @checked directive"
+  },
+  "@selected": {
+    "prefix": "@selected",
+    "body": "@selected(${1:condition})",
+    "description": "Blade @selected directive"
+  },
+  "@disabled": {
+    "prefix": "@disabled",
+    "body": "@disabled(${1:condition})",
+    "description": "Blade @disabled directive"
+  },
+  "@readonly": {
+    "prefix": "@readonly",
+    "body": "@readonly(${1:condition})",
+    "description": "Blade @readonly directive"
+  },
+  "@required": {
+    "prefix": "@required",
+    "body": "@required(${1:condition})",
+    "description": "Blade @required directive"
+  },
+  "@php": {
+    "prefix": "@php",
+    "body": ["@php", "\t$0", "@endphp"],
+    "description": "Blade @php block"
+  },
+  "@verbatim": {
+    "prefix": "@verbatim",
+    "body": ["@verbatim", "\t$0", "@endverbatim"],
+    "description": "Blade @verbatim block (disable blade parsing)"
+  },
+  "@json": {
+    "prefix": "@json",
+    "body": "@json(${1:\\$data})",
+    "description": "Blade @json directive"
+  },
+  "@js": {
+    "prefix": "@js",
+    "body": "@js(${1:\\$data})",
+    "description": "Blade @js directive (Livewire)"
+  },
+  "@once": {
+    "prefix": "@once",
+    "body": ["@once", "\t$0", "@endonce"],
+    "description": "Blade @once directive"
+  },
+  "@fragment": {
+    "prefix": "@fragment",
+    "body": ["@fragment('${1:name}')", "\t$0", "@endfragment"],
+    "description": "Blade @fragment directive"
+  },
+  "echo": {
+    "prefix": "{{",
+    "body": "{{ ${1:\\$variable} }}",
+    "description": "Blade echo"
+  },
+  "echo-raw": {
+    "prefix": "{!!",
+    "body": "{!! ${1:\\$variable} !!}",
+    "description": "Blade raw/unescaped echo"
+  },
+  "@livewire": {
+    "prefix": "@livewire",
+    "body": "@livewire('${1:component}')",
+    "description": "Livewire component directive"
+  },
+  "@this": {
+    "prefix": "@this",
+    "body": "@this",
+    "description": "Livewire @this directive"
+  },
+  "@entangle": {
+    "prefix": "@entangle",
+    "body": "@entangle('${1:property}')",
+    "description": "Livewire @entangle directive"
+  },
+  "@persist": {
+    "prefix": "@persist",
+    "body": ["@persist('${1:name}')", "\t$0", "@endpersist"],
+    "description": "Livewire @persist directive"
+  },
+  "@teleport": {
+    "prefix": "@teleport",
+    "body": ["@teleport('${1:selector}')", "\t$0", "@endteleport"],
+    "description": "Livewire @teleport directive"
+  },
+  "@volt": {
+    "prefix": "@volt",
+    "body": ["@volt", "\t$0", "@endvolt"],
+    "description": "Livewire Volt directive"
+  },
+  "@vite": {
+    "prefix": "@vite",
+    "body": "@vite(['${1:resources/css/app.css}', '${2:resources/js/app.js}'])",
+    "description": "Vite assets directive"
+  },
+  "@viteReactRefresh": {
+    "prefix": "@viteReactRefresh",
+    "body": "@viteReactRefresh",
+    "description": "Vite React refresh directive"
+  },
+  "flux:button": {
+    "prefix": "flux:button",
+    "body": "<flux:button${1: variant=\"${2|primary,filled,outline,ghost,subtle,danger|}\"}>${3:Label}</flux:button>",
+    "description": "Flux UI button component"
+  },
+  "flux:input": {
+    "prefix": "flux:input",
+    "body": "<flux:input${1: wire:model=\"${2:property}\"}${3: label=\"${4:Label}\"}${5: placeholder=\"${6:Placeholder}\"} />",
+    "description": "Flux UI input component"
+  },
+  "flux:modal": {
+    "prefix": "flux:modal",
+    "body": ["<flux:modal name=\"${1:modal-name}\">", "\t$0", "</flux:modal>"],
+    "description": "Flux UI modal component"
+  },
+  "flux:dropdown": {
+    "prefix": "flux:dropdown",
+    "body": ["<flux:dropdown>", "\t<flux:button>${1:Trigger}</flux:button>", "\t<flux:menu>", "\t\t$0", "\t</flux:menu>", "</flux:dropdown>"],
+    "description": "Flux UI dropdown component"
+  },
+  "flux:card": {
+    "prefix": "flux:card",
+    "body": ["<flux:card>", "\t$0", "</flux:card>"],
+    "description": "Flux UI card component"
+  },
+  "flux:heading": {
+    "prefix": "flux:heading",
+    "body": "<flux:heading${1: size=\"${2|xl,lg,base,sm,xs|}\"}>${3:Heading}</flux:heading>",
+    "description": "Flux UI heading component"
+  },
+  "flux:text": {
+    "prefix": "flux:text",
+    "body": "<flux:text>${1:Text content}</flux:text>",
+    "description": "Flux UI text component"
+  },
+  "flux:icon": {
+    "prefix": "flux:icon",
+    "body": "<flux:icon.${1:name}${2: class=\"${3:size-5}\"} />",
+    "description": "Flux UI icon component"
+  },
+  "flux:tooltip": {
+    "prefix": "flux:tooltip",
+    "body": ["<flux:tooltip content=\"${1:Tooltip text}\">", "\t$0", "</flux:tooltip>"],
+    "description": "Flux UI tooltip component"
+  },
+  "flux:badge": {
+    "prefix": "flux:badge",
+    "body": "<flux:badge${1: color=\"${2|zinc,red,orange,amber,yellow,lime,green,emerald,teal,cyan,sky,blue,indigo,violet,purple,fuchsia,pink,rose|}\"}>${3:Badge}</flux:badge>",
+    "description": "Flux UI badge component"
+  }
+}

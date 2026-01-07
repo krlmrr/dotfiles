@@ -5,6 +5,10 @@
       {
         "language": "vue",
         "path": "./vue.json"
+      },
+      {
+        "language": "blade",
+        "path": "./blade.json"
       }
     ]
   }

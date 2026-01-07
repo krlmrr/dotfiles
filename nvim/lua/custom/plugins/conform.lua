@@ -7,7 +7,10 @@ return {
         lua = { "stylua" },
         javascript = { "prettier" },
         typescript = { "prettier" },
-        vue = { "prettier" },
+        -- Vue uses eslint_d which runs Prettier through ESLint (via eslint-plugin-prettier)
+        -- This gives you: Prettier formatting + Tailwind class sorting + Vue template rules
+        -- All in a single pass - no more cursor jumping!
+        vue = { "eslint_d" },
         json = { "prettier" },
         xml = { "xmlformat" },
         php = { "pint" },
@@ -38,6 +41,23 @@ return {
           end,
           args = { "--stdin", "--wrap-attributes", "force-expand-multiline", "--indent-size", "4", "--indent-inner-html" },
         },
+        eslint_d = {
+          command = "eslint_d",
+          args = { "--fix-to-stdout", "--stdin", "--stdin-filename", "$FILENAME" },
+          stdin = true,
+          -- Use local eslint config
+          cwd = require("conform.util").root_file({
+            "eslint.config.js",
+            "eslint.config.mjs",
+            "eslint.config.cjs",
+            ".eslintrc.js",
+            ".eslintrc.json",
+            ".eslintrc.yml",
+            ".eslintrc.yaml",
+            ".eslintrc",
+            "package.json",
+          }),
+        },
       },
       format_on_save = {
         lsp_fallback = true,
@@ -48,27 +68,8 @@ return {
       },
     })
 
-    -- Run eslint --fix on Vue files after save
-    vim.api.nvim_create_autocmd("BufWritePost", {
-      pattern = "*.vue",
-      callback = function()
-        local bufnr = vim.api.nvim_get_current_buf()
-        local file = vim.fn.expand("%:p")
-        local eslint = vim.fn.getcwd() .. "/node_modules/.bin/eslint"
-        if vim.fn.executable(eslint) == 1 then
-          vim.fn.jobstart({ eslint, "--fix", file }, {
-            on_exit = function(_, exit_code)
-              vim.schedule(function()
-                if exit_code == 0 and vim.api.nvim_buf_is_valid(bufnr) then
-                  vim.api.nvim_buf_call(bufnr, function()
-                    vim.cmd("e!")
-                  end)
-                end
-              end)
-            end,
-          })
-        end
-      end,
-    })
+    -- NOTE: The old BufWritePost autocmd for eslint --fix has been removed.
+    -- ESLint now runs through conform via eslint_d, which includes Prettier
+    -- via eslint-plugin-prettier. This eliminates the double-format and cursor jumping.
   end
 }

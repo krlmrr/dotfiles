@@ -51,6 +51,10 @@ return {
       pattern = "blade",
       callback = function()
         pcall(vim.treesitter.start)
+
+        -- Add matchadd() for custom directives that treesitter doesn't recognize
+        -- This works alongside treesitter highlighting
+        vim.fn.matchadd("Keyword", "@[a-zA-Z_][a-zA-Z0-9_:.]*")
       end,
     })
   end,

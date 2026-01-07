@@ -2,22 +2,8 @@ return {
   "stevearc/dressing.nvim",
   lazy = false, -- Load immediately to override vim.ui.input before neo-tree
   config = function()
-    -- Custom highlights for dressing (solid background to prevent show-through)
-    vim.api.nvim_set_hl(0, "DressingInputBorder", { fg = "#61AFEF", bg = "#282c34" })
-    vim.api.nvim_set_hl(0, "DressingInputTitle", { fg = "#282c34", bg = "#61AFEF", bold = true })
-    vim.api.nvim_set_hl(0, "DressingInputText", { fg = "#abb2bf", bg = "#282c34" })
-    vim.api.nvim_set_hl(0, "DressingInputNormalFloat", { bg = "#282c34" })
-    vim.api.nvim_set_hl(0, "DressingSelectCursorLine", { bg = "#3e4452" })
-
-    -- Helper to hide cursor (used in select dialogs)
-    local function hide_cursor()
-      vim.cmd("highlight Cursor blend=100")
-      vim.opt.guicursor:append("a:Cursor/lCursor")
-    end
-    local function show_cursor()
-      vim.cmd("highlight Cursor blend=0")
-      vim.opt.guicursor:remove("a:Cursor/lCursor")
-    end
+    -- Highlights are set by config.theme module
+    local cursor = require("config.cursor")
 
     -- Wrap vim.ui.select to customize confirmation dialogs
     local original_ui_select = vim.ui.select
@@ -25,7 +11,7 @@ return {
       opts = opts or {}
       -- Only customize confirmation dialogs
       if opts.kind == "confirmation" then
-        vim.defer_fn(hide_cursor, 10)
+        vim.defer_fn(cursor.hide, 10)
         local hints = { Yes = "y", No = "n" }
         opts.format_item = function(item)
           local hint = hints[item] or item:sub(1, 1):lower()
@@ -46,13 +32,13 @@ return {
             local key = hints[item] or item:sub(1, 1):lower()
             vim.keymap.set("n", key, function()
               vim.api.nvim_win_close(0, true)
-              show_cursor()
+              cursor.show()
               if on_choice then on_choice(item, i) end
             end, { buffer = buf, nowait = true })
           end
         end, 10)
         original_ui_select(items, opts, function(...)
-          show_cursor()
+          cursor.show()
           if on_choice then on_choice(...) end
         end)
       else

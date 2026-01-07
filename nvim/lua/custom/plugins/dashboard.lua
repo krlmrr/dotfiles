@@ -3,14 +3,7 @@ return {
     event = 'VimEnter',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
-        -- Set highlights before dashboard loads
-        vim.cmd('highlight DashboardShortCut guifg=#61afef guibg=NONE')
-        vim.cmd('highlight DashboardShortCutCursor guifg=#61afef guibg=#3e4452')
-        vim.cmd('highlight DashboardHeader guifg=#abb2bf guibg=NONE')
-        vim.cmd('highlight DashboardMruTitle guifg=#abb2bf guibg=NONE')
-        vim.cmd('highlight DashboardMruIcon guifg=#abb2bf guibg=NONE')
-        vim.cmd('highlight DashboardFiles guifg=#abb2bf guibg=NONE')
-        vim.cmd('highlight DashboardFooter guifg=#abb2bf guibg=NONE')
+        -- Highlights are set by config.theme module
 
         require('dashboard').setup({
             theme = 'hyper',
@@ -51,21 +44,17 @@ return {
                 -- Disable <leader>e on dashboard
                 vim.keymap.set('n', '<leader>e', '<Nop>', { buffer = true, silent = true })
 
+                local cursor = require("config.cursor")
                 vim.defer_fn(function()
-                    -- Hide cursor function (also used when returning from dialogs)
-                    local function hide_cursor()
-                        vim.cmd('highlight Cursor blend=100')
-                        vim.opt.guicursor:append('a:Cursor/lCursor')
-                    end
-                    hide_cursor()
+                    cursor.hide()
 
                     -- Re-hide cursor when returning from popups/dialogs
                     vim.api.nvim_create_autocmd('WinEnter', {
                         buffer = 0,
-                        callback = hide_cursor,
+                        callback = cursor.hide,
                     })
 
-                    vim.cmd('highlight CursorLine guibg=#3e4452')
+                    -- CursorLine color is set by config.theme module
                     vim.opt_local.cursorline = true
                     vim.wo.cursorlineopt = 'line'
 
@@ -133,10 +122,6 @@ return {
                         return
                     end
 
-                    -- Highlight groups for shortcut keys
-                    vim.cmd('highlight DashboardShortCut guifg=#61afef guibg=NONE')
-                    vim.cmd('highlight DashboardShortCutCursor guifg=#61afef guibg=#3e4452')
-
                     local function update_shortcuts()
                         local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
                         -- Clamp cursor
@@ -199,7 +184,7 @@ return {
             pattern = '*',
             callback = function()
                 if vim.bo.filetype ~= 'dashboard' and vim.bo.filetype ~= 'neo-tree' then
-                    vim.cmd('highlight Cursor blend=0')
+                    require("config.cursor").show()
                 end
             end,
         })

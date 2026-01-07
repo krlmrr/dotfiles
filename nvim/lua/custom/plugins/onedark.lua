@@ -1,99 +1,21 @@
 return {
   'navarasu/onedark.nvim',
   priority = 1000,
+  dependencies = { "catppuccin/nvim" },
   config = function()
-    require('onedark').setup {
-      style = 'dark',
-      colors = {
-        cyan = "#7aa2f7",
-        orange = "#e5c07b",
-      },
-      highlights = {
-        ["@keyword"] = { fg = '$purple' },
-        ["@function.builtin"] = { fg = '$blue' },
-        ["@type.builtin"] = { fg = '$yellow' },
-        ["String"] = { fg = '$green' },
-        ["@string"] = { fg = '$green' },
-        ["Comment"] = { fg = '#61AEEF' },
-        ["@comment"] = { fg = '#61AEEF' },
-        ["@comment.lua"] = { fg = '#61AEEF' },
-        ["@lsp.type.comment"] = { fg = '#61AEEF' },
-        ["@lsp.type.comment.lua"] = { fg = '#61AEEF' },
-        ["@lsp.type.function"] = { fg = '$blue', fmt = 'none' },
-        ["@lsp.type.method"] = { fmt = 'none' },
-        ["@lsp.type.class"] = { fmt = 'none' },
-        ["@lsp.type.namespace"] = { fmt = 'none' },
-        ["@lsp.typemod.function.declaration"] = { fmt = 'none' },
-        ["@lsp.typemod.method.declaration"] = { fmt = 'none' },
+    -- Apply theme based on system appearance
+    require('config.theme').apply()
 
-        -- HTML/Blade tag colors (match Vue)
-        ["@tag"] = { fg = '$red' },
-        ["@tag.delimiter"] = { fg = '$fg' },
-        ["@tag.attribute"] = { fg = '$yellow' },
-        ["@tag.builtin"] = { fg = '$red' },
+    -- Sync theme when Neovim gains focus (detects system theme changes)
+    vim.api.nvim_create_autocmd("FocusGained", {
+      callback = function()
+        require('config.theme').sync()
+      end,
+    })
 
-        -- Vue tag colors
-        ["@tag.vue"] = { fg = '$red' },
-        ["@tag.delimiter.vue"] = { fg = '$fg' },
-        ["@tag.attribute.vue"] = { fg = '$yellow' },
-
-        -- Blade-specific highlights (match Vue exactly)
-        ["@tag.blade"] = { fg = '$red' },
-        ["@tag.delimiter.blade"] = { fg = '$fg' },
-        ["@tag.attribute.blade"] = { fg = '$yellow' },
-
-        -- Blade brackets {{ }} {!! !!} ()
-        ["@punctuation.bracket.blade"] = { fg = '$yellow' },
-
-        -- PHP variables and brackets
-        ["@variable.php"] = { fg = '$red' },
-        ["@variable.php_only"] = { fg = '$red' },
-        ["@punctuation.bracket.php"] = { fg = '$yellow' },
-        ["@punctuation.bracket.php_only"] = { fg = '$yellow' },
-
-        -- Variables (red like PHP)
-        ["@variable"] = { fg = '$red' },
-        ["@lsp.type.variable"] = { fg = '$red' },
-        ["@lsp.type.variable.javascript"] = { fg = '$red' },
-        ["@lsp.type.variable.typescript"] = { fg = '$red' },
-        ["@lsp.type.variable.typescriptreact"] = { fg = '$red' },
-        ["@lsp.type.variable.javascriptreact"] = { fg = '$red' },
-
-        -- Builtin variables (console, window, document, etc.)
-        ["@variable.builtin"] = { fg = '$yellow' },
-        ["@lsp.typemod.variable.defaultLibrary"] = { fg = '$yellow' },
-
-        -- Function calls (blue)
-        ["@function.call"] = { fg = '$blue' },
-        ["@lsp.type.function.php"] = { fg = '$blue', fmt = 'none' },
-
-        -- Operators (!, +, -, =, ??, ?: etc.)
-        ["@operator"] = { fg = '$cyan' },
-        ["@keyword.conditional.ternary"] = { fg = '$cyan' },
-        ["@lsp.type.operator"] = { fg = '$cyan' },
-        ["@lsp.type.operator.typescript"] = { fg = '$cyan' },
-        ["@lsp.type.operator.typescriptreact"] = { fg = '$cyan' },
-        ["@punctuation.delimiter"] = { fg = '$cyan' },
-        ["@punctuation.delimiter.typescript"] = { fg = '$cyan' },
-        ["@punctuation.delimiter.typescriptreact"] = { fg = '$cyan' },
-
-        -- Additional HTML element highlights
-        ["@text.html"] = { fg = '$fg' },
-        ["@constant.blade"] = { fg = '$cyan' },
-        ["@variable.blade"] = { fg = '$cyan' },
-      },
-    }
-    require('onedark').load()
-
-    -- Custom highlights
-    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#abb2bf", bg = "NONE" })
-    vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "WinBar", { fg = "#5c6370", bg = "NONE" })
-    vim.api.nvim_set_hl(0, "WinBarNC", { fg = "#5c6370", bg = "NONE" })
-    vim.api.nvim_set_hl(0, "LspInlayHint", { fg = "#848B98", bg = "NONE" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#5c6370", bg = "NONE" })
-    vim.api.nvim_set_hl(0, "FloatTitle", { fg = "#abb2bf", bg = "NONE" })
+    -- Add command to manually toggle theme
+    vim.api.nvim_create_user_command("ToggleTheme", function()
+      require('config.theme').toggle()
+    end, { desc = "Toggle between light and dark theme" })
   end,
 }

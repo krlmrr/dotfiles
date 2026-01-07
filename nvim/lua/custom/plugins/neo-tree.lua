@@ -16,14 +16,8 @@ return {
     "MunifTanjim/nui.nvim",
   },
   config = function()
-    local muted = "#abb2bf"
-    vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { bg = "NONE" })
-    vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = muted, bold = false })
-    vim.api.nvim_set_hl(0, "NeoTreeFileName", { fg = muted, bold = false })
-    vim.api.nvim_set_hl(0, "NeoTreeRootName", { fg = muted, bold = false })
-    vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { bg = "#3e4452" })
+    -- Highlights are set by config.theme module
+    local cursor = require("config.cursor")
 
     -- Override neo-tree's confirm to use vim.ui.select (dressing.nvim)
     local inputs = require("neo-tree.ui.inputs")
@@ -62,8 +56,8 @@ return {
       return original_fn_confirm(msg, choices, default, type)
     end
 
-    -- Auto-refresh neo-tree on focus/idle
-    vim.api.nvim_create_autocmd({ "FocusGained", "CursorHold" }, {
+    -- Auto-refresh neo-tree on window focus (libuv watcher handles file changes)
+    vim.api.nvim_create_autocmd("FocusGained", {
       callback = function()
         if package.loaded["neo-tree.sources.manager"] then
           require("neo-tree.sources.manager").refresh("filesystem")
@@ -209,24 +203,19 @@ return {
             end
 
             -- Hide cursor in neo-tree (also handles returning from dialogs)
-            local function hide_cursor()
-              vim.cmd("highlight Cursor blend=100")
-              vim.opt.guicursor:append("a:Cursor/lCursor")
-            end
-            hide_cursor()
+            cursor.hide()
 
             -- Re-hide cursor when returning to neo-tree from popups/dialogs
             vim.api.nvim_create_autocmd("WinEnter", {
               buffer = 0,
-              callback = hide_cursor,
+              callback = cursor.hide,
             })
           end,
         },
         {
           event = "neo_tree_buffer_leave",
           handler = function()
-            vim.cmd("highlight Cursor blend=0")
-            vim.opt.guicursor = vim.opt.guicursor - "a:Cursor/lCursor"
+            cursor.show()
             -- Neovide: restore scroll animation
             if vim.g.neovide then
               vim.g.neovide_scroll_animation_length = 0.3

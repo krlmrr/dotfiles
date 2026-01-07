@@ -1,6 +1,6 @@
 return {
   'mfussenegger/nvim-lint',
-  event = { 'BufReadPre', 'BufNewFile' },
+  ft = { 'php' }, -- Only load for filetypes with configured linters
   config = function()
     local lint = require('lint')
 

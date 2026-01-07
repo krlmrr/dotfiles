@@ -5,8 +5,7 @@ return {
   },
   build = ':TSUpdate',
   config = function()
-    vim.defer_fn(function()
-      require('nvim-treesitter.configs').setup {
+    require('nvim-treesitter.configs').setup {
         ensure_installed = {
           'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript',
           'vimdoc', 'vim', 'bash', 'php', 'html', 'css', 'json', 'yaml', 'markdown',
@@ -68,6 +67,5 @@ return {
           },
         },
       }
-    end, 0)
   end,
 }

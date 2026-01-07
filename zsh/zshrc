@@ -1,18 +1,5 @@
 setopt histignorespace
 
-# Auto-attach to tmux (skip if NVIM_RESTART is set)
-# if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [ -z "$NVIM_RESTART" ]; then
-#     cd ~/herd
-#     while true; do
-#         if [ "$(tmux list-sessions 2>/dev/null | wc -l)" -gt 1 ]; then
-#             # Multiple sessions - show picker
-#             tmux attach \; choose-tree -s
-#         else
-#             tmux attach 2>/dev/null || tmux new -s main
-#         fi
-#     done
-# fi
-
 export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"
@@ -41,7 +28,8 @@ export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/Users/karlm/Library/Python/3.13/bin:$PATH"
 
 # OS
-alias nv="clear && nvim ."
+unalias nv 2>/dev/null
+nv() { clear && nvim "${1:-.}"; }
 alias nz="nv ~/.zshrc"
 alias lz="lazygit"
 alias yeet="sudo rm -rf"

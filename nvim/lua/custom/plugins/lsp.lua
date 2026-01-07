@@ -53,40 +53,35 @@ return {
     require('mason').setup()
     require('mason-lspconfig').setup()
 
-    local servers = {
+    -- Intelephense settings (license key loaded from file below)
+    local intelephense_settings = {
       intelephense = {
-        filetypes = { 'php' },
-        init_options = {
-          licenceKey = "00EQQ3RLLHSB4FE",
-          globalStoragePath = vim.fn.expand("~/Library/Application Support/intelephense"),
+        stubs = {
+          "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl",
+          "date", "dba", "dom", "enchant", "exif", "FFI", "fileinfo", "filter", "fpm",
+          "ftp", "gd", "gettext", "gmp", "hash", "iconv", "imap", "intl", "json",
+          "ldap", "libxml", "mbstring", "meta", "mysqli", "oci8", "odbc", "openssl",
+          "pcntl", "pcre", "PDO", "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite",
+          "pgsql", "Phar", "posix", "pspell", "readline", "Reflection", "session",
+          "shmop", "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
+          "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy", "tokenizer",
+          "xml", "xmlreader", "xmlrpc", "xmlwriter", "xsl", "Zend OPcache", "zip", "zlib",
+          "wordpress", "phpunit",
         },
-        settings = {
-          intelephense = {
-            stubs = {
-              "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl",
-              "date", "dba", "dom", "enchant", "exif", "FFI", "fileinfo", "filter", "fpm",
-              "ftp", "gd", "gettext", "gmp", "hash", "iconv", "imap", "intl", "json",
-              "ldap", "libxml", "mbstring", "meta", "mysqli", "oci8", "odbc", "openssl",
-              "pcntl", "pcre", "PDO", "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite",
-              "pgsql", "Phar", "posix", "pspell", "readline", "Reflection", "session",
-              "shmop", "SimpleXML", "snmp", "soap", "sockets", "sodium", "SPL", "sqlite3",
-              "standard", "superglobals", "sysvmsg", "sysvsem", "sysvshm", "tidy", "tokenizer",
-              "xml", "xmlreader", "xmlrpc", "xmlwriter", "xsl", "Zend OPcache", "zip", "zlib",
-              "wordpress", "phpunit",
-            },
-            files = { maxSize = 5000000 },
-            environment = { includePaths = {} },
-            licenceKey = "00EQQ3RLLHSB4FE",
-            inlayHints = {
-              parameterNames = { enabled = "all" },
-              parameterTypes = { enabled = true },
-              variableTypes = { enabled = true },
-              propertyDeclarationTypes = { enabled = true },
-              functionReturnTypes = { enabled = true },
-            },
-          },
+        files = { maxSize = 5000000 },
+        environment = { includePaths = {} },
+        inlayHints = {
+          parameterNames = { enabled = "all" },
+          parameterTypes = { enabled = true },
+          variableTypes = { enabled = true },
+          propertyDeclarationTypes = { enabled = true },
+          functionReturnTypes = { enabled = true },
         },
       },
+    }
+
+    local servers = {
+      intelephense = {}, -- Configured separately below with vim.lsp.config
       lua_ls = {
         settings = {
           Lua = {
@@ -134,7 +129,7 @@ return {
         licenceKey = intelephense_licence_key,
         globalStoragePath = vim.fn.expand("~/Library/Application Support/intelephense"),
       },
-      settings = servers.intelephense.settings,
+      settings = intelephense_settings,
     }
     vim.lsp.enable('intelephense')
 

@@ -46,13 +46,20 @@ return {
       highlight = highlight,
     }
 
+    -- Debounced rainbow-delimiters refresh (prevents excessive updates on every keystroke)
+    local refresh_timer = nil
     vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
       callback = function(args)
-        local rd = require('rainbow-delimiters')
-        if rd.is_enabled(args.buf) then
-          rd.disable(args.buf)
-          rd.enable(args.buf)
+        if refresh_timer then
+          refresh_timer:stop()
         end
+        refresh_timer = vim.defer_fn(function()
+          local rd = require('rainbow-delimiters')
+          if rd.is_enabled(args.buf) then
+            rd.disable(args.buf)
+            rd.enable(args.buf)
+          end
+        end, 100)
       end,
     })
 
@@ -61,8 +68,7 @@ return {
       scope = { enabled = true, highlight = highlight, show_start = false, show_end = false },
       exclude = { filetypes = { 'dashboard', 'alpha', 'starter' } },
     }
-
-    vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3e4452" })
+    -- IblIndent color is set by config.theme module
     hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
   end,
 }

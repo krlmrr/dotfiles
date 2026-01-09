@@ -572,6 +572,24 @@
       "FileStatus.Unknown": "#e06c75",
       "FileStatus.UP_TO_DATE": "#abb2bf"
     },
+    "Terminal": {
+      "background": "#282c34",
+      "foreground": "#abb2bf",
+      "borderColor": "#282c34",
+      "inactiveBackground": "#282c34"
+    },
+    "TerminalToolWindowPanel": {
+      "background": "#282c34"
+    },
+    "TerminalContainer": {
+      "background": "#282c34"
+    },
+    "JBTerminal": {
+      "background": "#282c34"
+    },
+    "Console": {
+      "background": "#282c34"
+    },
     "WelcomeScreen": {
       "background": "#282c34",
       "foreground": "#abb2bf",

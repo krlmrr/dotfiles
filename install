@@ -41,6 +41,25 @@ fi
 rm -rf $HOME/.config/nvim
 ln -s $DOTFILES/nvim $HOME/.config/nvim
 
+# IdeaVim
+ln -sf $DOTFILES/.ideavimrc $HOME/.ideavimrc
+
+# PHPStorm
+PHPSTORM_DIR="$HOME/Library/Application Support/JetBrains/PhpStorm2025.3"
+if [ -d "$PHPSTORM_DIR" ]; then
+    # Color scheme
+    ln -sf "$DOTFILES/phpstorm/OneDark.icls" "$PHPSTORM_DIR/colors/OneDark.icls"
+    # Keymaps
+    mkdir -p "$PHPSTORM_DIR/keymaps"
+    ln -sf "$DOTFILES/phpstorm/keymaps/KarlM.xml" "$PHPSTORM_DIR/keymaps/KarlM.xml"
+    # Theme plugin (must be copied, not symlinked)
+    cp "$DOTFILES/phpstorm/OneDarkTheme/OneDarkTheme.jar" "$PHPSTORM_DIR/plugins/OneDarkTheme.jar"
+    # Options
+    mkdir -p "$PHPSTORM_DIR/options"
+    ln -sf "$DOTFILES/phpstorm/options/ide.general.xml" "$PHPSTORM_DIR/options/ide.general.xml"
+    ln -sf "$DOTFILES/phpstorm/options/advancedSettings.xml" "$PHPSTORM_DIR/options/advancedSettings.xml"
+fi
+
 if ! command -v nvim >/dev/null 2>&1
 then
     echo "Nvim is not installed"

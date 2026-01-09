@@ -1,0 +1,11 @@
+<application>
+  <component name="AdvancedSettings">
+    <option name="settings">
+      <map>
+        <entry key="ide.suppress.double.click.handler" value="true" />
+        <entry key="show.diff.as.editor.tab" value="false" />
+        <entry key="terminal.use.1.0.line.spacing.for.alternative.screen.buffer" value="false" />
+      </map>
+    </option>
+  </component>
+</application>

@@ -1,0 +1,12 @@
+<idea-plugin>
+    <id>com.karlm.onedark</id>
+    <name>OneDark Theme</name>
+    <version>1.0.0</version>
+    <vendor>karlm</vendor>
+    <description>A proper OneDark theme with consistent colors</description>
+    <idea-version since-build="233"/>
+    <depends>com.intellij.modules.platform</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <themeProvider id="com.karlm.onedark" path="/OneDark.theme.json"/>
+    </extensions>
+</idea-plugin>

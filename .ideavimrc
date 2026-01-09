@@ -1,0 +1,305 @@
+let mapleader=" "
+
+" ============================================================================
+" PLUGINS
+" ============================================================================
+set surround
+set commentary
+set highlightedyank
+set nerdtree
+set easymotion
+set argtextobj
+set textobj-entire
+set textobj-indent
+set matchit
+set multiple-cursors
+set which-key
+
+" ============================================================================
+" SETTINGS
+" ============================================================================
+set scrolloff=8
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set showmode
+set number
+set relativenumber
+set ideajoin
+set idearefactormode=keep
+
+" Which-key settings
+set notimeout
+let g:WhichKey_ShowVimActions = "true"
+
+" ============================================================================
+" BASIC EDITING CONVENIENCES
+" ============================================================================
+" Exit insert mode with jj
+inoremap jj <Esc>
+
+" Add semicolon/comma at end of line in insert mode
+inoremap ;; <Esc>A;<Esc>
+inoremap ,, <Esc>A,<Esc>
+
+" Use ; for command mode
+nnoremap ; :
+
+" Clear search highlight with Escape
+nnoremap <Esc> :nohlsearch<CR>
+
+" Disable space in normal/visual mode (leader key)
+nnoremap <Space> <Nop>
+vnoremap <Space> <Nop>
+
+" Y yanks to end of line (consistent with D and C)
+nnoremap Y y$
+
+" Keep cursor centered when scrolling
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap n nzz
+nnoremap N Nzz
+
+" Better indenting (stay in visual mode)
+vnoremap < <gv
+vnoremap > >gv
+
+" Move lines up/down in visual mode
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+" Join lines without moving cursor
+nnoremap J mzJ`z
+
+" ============================================================================
+" WINDOW NAVIGATION
+" ============================================================================
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Split management
+nnoremap <C-v> :action OpenInRightSplit<CR>
+nnoremap <leader>ws :action SplitHorizontally<CR>
+nnoremap <leader>wu :action Unsplit<CR>
+nnoremap <leader>wm :action MoveEditorToOppositeTabGroup<CR>
+
+" ============================================================================
+" FILE & BUFFER MANAGEMENT
+" ============================================================================
+" Save file
+nnoremap <leader>s :w<CR>
+
+" Close buffer/tab
+nnoremap <leader>x :action CloseContent<CR>
+nnoremap <leader>w :action CloseContent<CR>
+
+" Toggle file explorer (NERDTree)
+nnoremap <leader>e :NERDTreeToggle<CR>
+nnoremap <leader>E :NERDTreeFind<CR>
+
+" Recent files
+nnoremap <leader>? :action RecentFiles<CR>
+
+" Switch between buffers
+nnoremap <S-h> :action PreviousTab<CR>
+nnoremap <S-l> :action NextTab<CR>
+
+" ============================================================================
+" SEARCH & FIND (Telescope equivalents)
+" ============================================================================
+" Find files
+nnoremap <leader>sf :action GotoFile<CR>
+nnoremap <leader>gf :action GotoFile<CR>
+
+" Search by grep (live grep)
+nnoremap <leader>sg :action FindInPath<CR>
+
+" Search current word
+nnoremap <leader>sw :action FindWordAtCaret<CR>
+
+" Search in current buffer
+nnoremap <leader>/ :action Find<CR>
+
+" Search and replace (Spectre equivalent)
+nnoremap <leader>S :action ReplaceInPath<CR>
+nnoremap <leader>sr :action Replace<CR>
+
+" Search help/actions
+nnoremap <leader>sh :action HelpTopics<CR>
+nnoremap <leader>sk :action GotoAction<CR>
+nnoremap <leader>ss :action GotoSymbol<CR>
+
+" Resume last search
+nnoremap <leader>sR :action FindNext<CR>
+
+" ============================================================================
+" LSP / CODE ACTIONS
+" ============================================================================
+" Go to definition
+nnoremap gd :action GotoDeclaration<CR>
+
+" Go to references
+nnoremap gr :action FindUsages<CR>
+
+" Go to implementation
+nnoremap gI :action GotoImplementation<CR>
+
+" Go to declaration
+nnoremap gD :action GotoDeclaration<CR>
+
+" Go to type definition
+nnoremap <leader>D :action GotoTypeDeclaration<CR>
+
+" Hover documentation
+nnoremap K :action QuickJavaDoc<CR>
+
+" Signature help
+nnoremap <C-k> :action ParameterInfo<CR>
+inoremap <C-k> <C-o>:action ParameterInfo<CR>
+
+" Rename symbol
+nnoremap <leader>rn :action RenameElement<CR>
+
+" Code action
+nnoremap <leader>ca :action ShowIntentionActions<CR>
+
+" Document symbols
+nnoremap <leader>ds :action FileStructurePopup<CR>
+
+" Format
+nnoremap <leader>cf :action ReformatCode<CR>
+
+" Organize imports
+nnoremap <leader>co :action OptimizeImports<CR>
+
+" Quick fix
+nnoremap <leader>qf :action ShowIntentionActions<CR>
+
+" ============================================================================
+" DIAGNOSTICS
+" ============================================================================
+" Navigate diagnostics/errors
+nnoremap [d :action GotoPreviousError<CR>
+nnoremap ]d :action GotoNextError<CR>
+
+" Show error description
+nnoremap <leader>cd :action ShowErrorDescription<CR>
+
+" Open problems/diagnostics list
+nnoremap <leader>q :action ActivateProblemsViewToolWindow<CR>
+
+" ============================================================================
+" GIT INTEGRATION
+" ============================================================================
+" Navigate git changes (hunks)
+nnoremap [c :action VcsShowPrevChangeMarker<CR>
+nnoremap ]c :action VcsShowNextChangeMarker<CR>
+
+" Stage/unstage hunk
+nnoremap <leader>hs :action Vcs.RollbackChangedLines<CR>
+nnoremap <leader>hr :action Vcs.RollbackChangedLines<CR>
+
+" Git blame
+nnoremap <leader>hb :action Annotate<CR>
+
+" Show diff
+nnoremap <leader>hd :action Compare.SameVersion<CR>
+nnoremap <leader>hp :action VcsShowCurrentChangeMarker<CR>
+
+" Git tool window / log
+nnoremap <leader>gg :action ActivateVersionControlToolWindow<CR>
+nnoremap <leader>gl :action Vcs.Show.Log<CR>
+
+" Git operations
+nnoremap <leader>gc :action CheckinProject<CR>
+nnoremap <leader>gp :action Vcs.Push<CR>
+nnoremap <leader>gu :action Vcs.UpdateProject<CR>
+
+" ============================================================================
+" HARPOON-STYLE BOOKMARKS
+" ============================================================================
+" Mark current file (add to bookmarks)
+nnoremap <leader>m :action ToggleBookmarkWithMnemonic<CR>
+
+" Show bookmarks (harpoon menu equivalent)
+nnoremap <leader>h :action ShowBookmarks<CR>
+
+" Jump to numbered bookmarks
+nnoremap <leader>1 :action GotoBookmark1<CR>
+nnoremap <leader>2 :action GotoBookmark2<CR>
+nnoremap <leader>3 :action GotoBookmark3<CR>
+nnoremap <leader>4 :action GotoBookmark4<CR>
+nnoremap <leader>5 :action GotoBookmark5<CR>
+
+" ============================================================================
+" REFACTORING
+" ============================================================================
+nnoremap <leader>rm :action ExtractMethod<CR>
+vnoremap <leader>rm :action ExtractMethod<CR>
+nnoremap <leader>rv :action IntroduceVariable<CR>
+vnoremap <leader>rv :action IntroduceVariable<CR>
+nnoremap <leader>rf :action IntroduceField<CR>
+nnoremap <leader>rs :action ChangeSignature<CR>
+nnoremap <leader>ri :action Inline<CR>
+
+" ============================================================================
+" RUNNING & DEBUGGING
+" ============================================================================
+nnoremap <leader>rc :action RunClass<CR>
+nnoremap <leader>rr :action Run<CR>
+nnoremap <leader>rd :action Debug<CR>
+nnoremap <leader>rs :action Stop<CR>
+
+" Debug actions
+nnoremap <leader>db :action ToggleLineBreakpoint<CR>
+nnoremap <leader>dc :action Resume<CR>
+nnoremap <leader>di :action StepInto<CR>
+nnoremap <leader>do :action StepOver<CR>
+nnoremap <leader>dO :action StepOut<CR>
+
+" ============================================================================
+" TERMINAL
+" ============================================================================
+nnoremap <leader>tt :action ActivateTerminalToolWindow<CR>
+
+" ============================================================================
+" CODE OUTLINE
+" ============================================================================
+nnoremap <leader>o :action FileStructurePopup<CR>
+
+" ============================================================================
+" MULTIPLE CURSORS
+" ============================================================================
+" Add selection for next occurrence
+nnoremap <C-n> :action SelectNextOccurrence<CR>
+xnoremap <C-n> :action SelectNextOccurrence<CR>
+nnoremap <C-S-n> :action SelectAllOccurrences<CR>
+
+" ============================================================================
+" EASYMOTION
+" ============================================================================
+map <leader>j <Plug>(easymotion-j)
+map <leader>k <Plug>(easymotion-k)
+map <leader>f <Plug>(easymotion-f)
+map <leader>F <Plug>(easymotion-F)
+
+" ============================================================================
+" MISC
+" ============================================================================
+" Select all
+nnoremap <leader>a ggVG
+
+" Copy to system clipboard
+vnoremap <leader>y "+y
+nnoremap <leader>Y "+yg_
+
+" Paste from system clipboard
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
+
+" Zen mode / distraction free
+nnoremap <leader>z :action ToggleDistractionFreeMode<CR>

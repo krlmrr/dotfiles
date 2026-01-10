@@ -40,6 +40,7 @@ vim.o.smartcase = true
 vim.o.wrap = false
 vim.o.cursorline = false
 vim.o.scrolloff = 10
+vim.o.sidescrolloff = 0
 vim.o.termguicolors = true
 vim.wo.signcolumn = 'no'
 vim.wo.foldcolumn = '0'
@@ -100,6 +101,31 @@ vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', function()
   -- Only scroll if there's more content below
   if top_line + win_height <= last_line then
     return '<ScrollWheelDown>'
+  end
+  return ''
+end, { expr = true, silent = true })
+
+-- Only allow horizontal scrolling when content is wider than window
+vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelLeft>', function()
+  local win_width = vim.api.nvim_win_get_width(0)
+  local longest = 0
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line('w0') - 1, vim.fn.line('w$'), false)) do
+    longest = math.max(longest, vim.fn.strdisplaywidth(line))
+  end
+  if longest > win_width then
+    return '<ScrollWheelLeft>'
+  end
+  return ''
+end, { expr = true, silent = true })
+
+vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelRight>', function()
+  local win_width = vim.api.nvim_win_get_width(0)
+  local longest = 0
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line('w0') - 1, vim.fn.line('w$'), false)) do
+    longest = math.max(longest, vim.fn.strdisplaywidth(line))
+  end
+  if longest > win_width then
+    return '<ScrollWheelRight>'
   end
   return ''
 end, { expr = true, silent = true })

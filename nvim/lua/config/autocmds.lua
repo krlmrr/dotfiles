@@ -57,15 +57,14 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "WinNew", "WinClosed" }
   end,
 })
 
--- Force 4-space indentation for Vue files
+-- Force 4-space indentation for all filetypes
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "vue",
+  pattern = "*",
   callback = function()
     vim.opt_local.tabstop = 4
     vim.opt_local.shiftwidth = 4
     vim.opt_local.softtabstop = 4
     vim.opt_local.expandtab = true
-    vim.opt_local.indentexpr = ""
   end,
 })
 

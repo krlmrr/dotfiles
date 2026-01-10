@@ -5,6 +5,7 @@ return {
     require('conform').setup({
       formatters_by_ft = {
         lua = { "stylua" },
+        html = { "prettier" },
         javascript = { "prettier" },
         typescript = { "prettier" },
         -- Vue uses eslint_d which runs Prettier through ESLint (via eslint-plugin-prettier)
@@ -21,6 +22,9 @@ return {
           command = "vendor/bin/pint",
           args = { "$FILENAME" },
           stdin = false,
+          condition = function()
+            return vim.fn.executable(vim.fn.getcwd() .. "/vendor/bin/pint") == 1
+          end,
         },
         prettier = {
           command = function()
@@ -30,6 +34,7 @@ return {
             end
             return "prettier"
           end,
+          prepend_args = { "--tab-width", "4" },
         },
         ["blade-formatter"] = {
           command = function()

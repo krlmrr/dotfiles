@@ -11,9 +11,12 @@ return {
           'vimdoc', 'vim', 'bash', 'php', 'html', 'css', 'json', 'yaml', 'markdown',
           'phpdoc', 'regex', 'vue'
         },
-        auto_install = false,
+        auto_install = true,
         highlight = { enable = true },
-        indent = { enable = true },
+        indent = {
+          enable = true,
+          disable = { "html" },
+        },
         incremental_selection = {
           enable = true,
           keymaps = {

@@ -1,4 +1,4 @@
-<scheme name="OneDark" version="142" parent_scheme="Darcula">
+<scheme name="OneDark" version="142">
   <option name="FONT_SCALE" value="1.0" />
   <metaInfo>
     <property name="ide">PhpStorm</property>
@@ -11,12 +11,13 @@
   <option name="EDITOR_LIGATURES" value="true" />
   <console-font>
     <option name="EDITOR_FONT_NAME" value="MonoLisa" />
-    <option name="EDITOR_FONT_SIZE" value="13" />
+    <option name="EDITOR_FONT_SIZE" value="18" />
   </console-font>
   <console-font>
     <option name="EDITOR_FONT_NAME" value="JetBrains Mono" />
-    <option name="EDITOR_FONT_SIZE" value="13" />
+    <option name="EDITOR_FONT_SIZE" value="16" />
   </console-font>
+  <option name="CONSOLE_LIGATURES" value="true" />
   <option name="CONSOLE_LINE_SPACING" value="1.4" />
   <colors>
     <option name="BLOCK_TERMINAL_DEFAULT_BACKGROUND" value="282C34" />
@@ -33,6 +34,7 @@
     <option name="INDENT_GUIDE" value="" />
     <option name="LINE_NUMBERS_COLOR" value="4B5263" />
     <option name="LINE_NUMBER_ON_CARET_ROW_COLOR" value="ABB2BF" />
+    <option name="LOOKUP_COLOR" value="" />
     <option name="RIGHT_MARGIN_COLOR" value="" />
     <option name="SELECTED_INDENT_GUIDE" value="" />
     <option name="SELECTION_BACKGROUND" value="3E4451" />
@@ -388,7 +390,9 @@
       </value>
     </option>
     <option name="DEFAULT_TEMPLATE_LANGUAGE_COLOR">
-      <value />
+      <value>
+        <option name="BACKGROUND" value="282c34" />
+      </value>
     </option>
     <option name="DEFAULT_VALID_STRING_ESCAPE">
       <value>
@@ -443,7 +447,9 @@
       </value>
     </option>
     <option name="INJECTED_LANGUAGE_FRAGMENT">
-      <value />
+      <value>
+        <option name="BACKGROUND" value="282c34" />
+      </value>
     </option>
     <option name="INLAY_DEFAULT">
       <value>
@@ -672,7 +678,9 @@
       </value>
     </option>
     <option name="TEMPLATE_LANGUAGE_COLOR">
-      <value />
+      <value>
+        <option name="BACKGROUND" value="282c34" />
+      </value>
     </option>
     <option name="TEXT">
       <value>
@@ -716,6 +724,9 @@
       <value>
         <option name="FOREGROUND" value="e5c07b" />
       </value>
+    </option>
+    <option name="TS.TYPE_GUARD">
+      <value />
     </option>
     <option name="WARNING_ATTRIBUTES">
       <value>

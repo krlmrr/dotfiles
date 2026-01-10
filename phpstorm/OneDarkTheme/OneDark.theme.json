@@ -24,6 +24,30 @@
     "orange": "#d19a66"
   },
   "ui": {
+    "CompletionPopup.selectionBackground": "#3e4451",
+    "CompletionPopup.selectionInactiveBackground": "#3e4451",
+    "CompletionPopup.background": "#282c34",
+    "CompletionPopup.foreground": "#abb2bf",
+    "CompletionPopup.matchForeground": "#61afef",
+    "CompletionPopup.Advertiser.background": "#282c34",
+    "CompletionPopup.Advertiser.foreground": "#5c6370",
+    "List.background": "#282c34",
+    "List.foreground": "#abb2bf",
+    "List.selectionBackground": "#3e4451",
+    "List.selectionForeground": "#abb2bf",
+    "List.selectionInactiveBackground": "#3e4451",
+    "List.selectionInactiveForeground": "#abb2bf",
+    "Popup.Selection.background": "#3e4451",
+    "PopupMenu.background": "#282c34",
+    "PopupMenu.foreground": "#abb2bf",
+    "PopupMenu.selectionBackground": "#3e4451",
+    "PopupMenu.selectionForeground": "#abb2bf",
+    "PopupMenuBorder.borderColor": "#181a1f",
+    "Popup.Header.activeBackground": "#282c34",
+    "Popup.Header.inactiveBackground": "#282c34",
+    "PopupMenu.Header.background": "#282c34",
+    "ComplexPopup.Header.background": "#282c34",
+    "Group.separatorColor": "#3e4451",
     "Button.paintBorder": false,
     "Button.background": "#282c34",
     "Button.foreground": "#282c34",
@@ -109,12 +133,6 @@
       "selectionBackground": "#3e4451",
       "ArrowButton.iconColor": "#abb2bf",
       "ArrowButton.disabledIconColor": "#5c6370"
-    },
-    "CompletionPopup": {
-      "background": "#282c34",
-      "foreground": "#abb2bf",
-      "selectionBackground": "#3e4451",
-      "matchForeground": "#61afef"
     },
     "Component": {
       "focusColor": "#61afef",
@@ -312,13 +330,14 @@
     },
     "Popup": {
       "background": "#282c34",
-      "Header.activeBackground": "#3e4451",
+      "Header.activeBackground": "#282c34",
       "Header.inactiveBackground": "#282c34",
       "paintBorder": true,
       "borderColor": "#181a1f",
       "Toolbar.borderColor": "#181a1f",
       "Advertiser.background": "#282c34",
-      "Advertiser.foreground": "#5c6370"
+      "Advertiser.foreground": "#5c6370",
+      "Selection.arc": 0
     },
     "ProgressBar": {
       "background": "#3e4451",
@@ -593,18 +612,18 @@
     "WelcomeScreen": {
       "background": "#282c34",
       "foreground": "#abb2bf",
-      "borderColor": "#181a1f",
+      "borderColor": "#282c34",
       "Caption.background": "#282c34",
       "Caption.foreground": "#abb2bf",
       "Details.background": "#282c34",
       "footerBackground": "#282c34",
       "footerForeground": "#5c6370",
-      "groupIconBorderColor": "#3e4451",
+      "groupIconBorderColor": "#282c34",
       "headerBackground": "#282c34",
       "headerForeground": "#abb2bf",
       "Projects.background": "#282c34",
       "Projects.selectionBackground": "#3e4451",
-      "separatorColor": "#181a1f",
+      "separatorColor": "#282c34",
       "SidePanel.background": "#282c34"
     }
   },

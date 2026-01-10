@@ -5,6 +5,15 @@
   <action id="$Cut">
     <keyboard-shortcut first-keystroke="meta x" />
   </action>
+  <action id="$Paste">
+    <keyboard-shortcut first-keystroke="meta v" />
+  </action>
+  <action id="$Redo">
+    <keyboard-shortcut first-keystroke="shift meta z" />
+  </action>
+  <action id="$Undo">
+    <keyboard-shortcut first-keystroke="meta z" />
+  </action>
   <action id="ActivateCommitToolWindow">
     <keyboard-shortcut first-keystroke="meta g" />
   </action>
@@ -18,6 +27,9 @@
   <action id="CloseContent">
     <keyboard-shortcut first-keystroke="meta w" />
   </action>
+  <action id="CommentByLineComment">
+    <keyboard-shortcut first-keystroke="meta slash" />
+  </action>
   <action id="EditSource">
     <keyboard-shortcut first-keystroke="shift enter" />
   </action>
@@ -27,8 +39,21 @@
   <action id="Editor Cut">
     <keyboard-shortcut first-keystroke="meta x" />
   </action>
+  <action id="Editor Paste">
+    <keyboard-shortcut first-keystroke="meta v" />
+  </action>
+  <action id="Editor Redo">
+    <keyboard-shortcut first-keystroke="shift meta z" />
+  </action>
+  <action id="Editor Undo">
+    <keyboard-shortcut first-keystroke="meta z" />
+  </action>
   <action id="EditorBackSpace">
     <keyboard-shortcut first-keystroke="back_space" />
+  </action>
+  <action id="EditorCompleteStatement">
+    <keyboard-shortcut first-keystroke="tab" />
+    <keyboard-shortcut first-keystroke="enter" />
   </action>
   <action id="EditorDown">
     <keyboard-shortcut first-keystroke="down" />
@@ -54,12 +79,27 @@
   <action id="EditorRight">
     <keyboard-shortcut first-keystroke="right" />
   </action>
+  <action id="EditorToggleInsertState">
+    <keyboard-shortcut first-keystroke="enter" />
+  </action>
   <action id="EditorUp">
     <keyboard-shortcut first-keystroke="up" />
   </action>
   <action id="Git.Commit.Stage" />
+  <action id="GotoDeclaration">
+    <mouse-shortcut keystroke="meta button1" />
+  </action>
   <action id="GotoFile">
     <keyboard-shortcut first-keystroke="meta p" />
+  </action>
+  <action id="InsertInlineCompletionAction">
+    <keyboard-shortcut first-keystroke="shift right" />
+  </action>
+  <action id="InsertInlineCompletionLineAction">
+    <keyboard-shortcut first-keystroke="tab" />
+  </action>
+  <action id="JumpToColorsAndFonts">
+    <keyboard-shortcut first-keystroke="shift meta a" />
   </action>
   <action id="OpenInRightSplit">
     <keyboard-shortcut first-keystroke="enter" />
@@ -81,7 +121,13 @@
   <action id="Terminal.CloseTab">
     <keyboard-shortcut first-keystroke="ctrl w" />
   </action>
+  <action id="Terminal.CopySelectedText">
+    <keyboard-shortcut first-keystroke="meta c" />
+  </action>
   <action id="Terminal.ExpandBlockSelectionAbove">
     <keyboard-shortcut first-keystroke="shift meta up" />
+  </action>
+  <action id="Terminal.Paste">
+    <keyboard-shortcut first-keystroke="meta v" />
   </action>
 </keymap>

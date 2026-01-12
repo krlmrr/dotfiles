@@ -44,6 +44,7 @@
     <option name="ScrollBar.Mac.hoverThumbColor" value="4B5263" />
     <option name="ScrollBar.Mac.thumbBorderColor" value="282C34" />
     <option name="ScrollBar.Mac.thumbColor" value="3B4048" />
+    <option name="TAB_UNDERLINE" value="" />
     <option name="VISUAL_INDENT_GUIDE" value="" />
     <option name="WHITESPACES" value="3B4048" />
   </colors>
@@ -732,6 +733,7 @@
     <option name="WARNING_ATTRIBUTES">
       <value>
         <option name="EFFECT_COLOR" value="e5c07b" />
+        <option name="ERROR_STRIPE_COLOR" value="282c34" />
         <option name="EFFECT_TYPE" value="2" />
       </value>
     </option>

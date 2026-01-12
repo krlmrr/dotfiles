@@ -30,9 +30,9 @@
   <action id="CommentByLineComment">
     <keyboard-shortcut first-keystroke="meta slash" />
   </action>
-  <action id="EditSource">
-    <keyboard-shortcut first-keystroke="shift enter" />
-  </action>
+  <action id="Console.TableResult.OpenLocalFileAction" />
+  <action id="Console.TableResult.OpenWebUrlAction" />
+  <action id="DatabaseView.OpenFamilyAction" />
   <action id="Editor Copy">
     <keyboard-shortcut first-keystroke="meta c" />
   </action>
@@ -53,7 +53,6 @@
   </action>
   <action id="EditorCompleteStatement">
     <keyboard-shortcut first-keystroke="tab" />
-    <keyboard-shortcut first-keystroke="enter" />
   </action>
   <action id="EditorDown">
     <keyboard-shortcut first-keystroke="down" />
@@ -79,12 +78,12 @@
   <action id="EditorRight">
     <keyboard-shortcut first-keystroke="right" />
   </action>
-  <action id="EditorToggleInsertState">
-    <keyboard-shortcut first-keystroke="enter" />
-  </action>
+  <action id="EditorToggleInsertState" />
   <action id="EditorUp">
     <keyboard-shortcut first-keystroke="up" />
   </action>
+  <action id="ExternalSystem.OpenConfig" />
+  <action id="Frontend.EditSource" />
   <action id="Git.Commit.Stage" />
   <action id="GotoDeclaration">
     <mouse-shortcut keystroke="meta button1" />
@@ -98,13 +97,18 @@
   <action id="InsertInlineCompletionLineAction">
     <keyboard-shortcut first-keystroke="tab" />
   </action>
+  <action id="Jdbc.OpenEditor.Data" />
   <action id="JumpToColorsAndFonts">
     <keyboard-shortcut first-keystroke="shift meta a" />
   </action>
+  <action id="OpenBookmarkGroup" />
   <action id="OpenInRightSplit">
-    <keyboard-shortcut first-keystroke="enter" />
+    <keyboard-shortcut first-keystroke="shift enter" />
   </action>
+  <action id="ProfilerJumpToSource" />
+  <action id="ProjectViewEditSource" />
   <action id="RecentFiles" />
+  <action id="RemoteHostView.EditSource" />
   <action id="RenameElement">
     <keyboard-shortcut first-keystroke="meta r" />
   </action>
@@ -117,6 +121,10 @@
   <action id="SearchEverywhere">
     <keyboard-shortcut first-keystroke="shift meta p" />
   </action>
+  <action id="SplitChooser.SplitRight">
+    <keyboard-shortcut first-keystroke="shift enter" />
+  </action>
+  <action id="Sql.EditParameter" />
   <action id="Switcher" />
   <action id="Terminal.CloseTab">
     <keyboard-shortcut first-keystroke="ctrl w" />

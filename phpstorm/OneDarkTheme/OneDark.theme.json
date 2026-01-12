@@ -509,7 +509,7 @@
       "FullScreeControl.Background": "#282c34"
     },
     "Window": {
-      "border": "1,1,1,1,282c34"
+      "border": "0,0,0,0,000000"
     },
     "ToggleButton": {
       "onBackground": "#61afef",

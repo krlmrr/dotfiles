@@ -1,7 +1,3 @@
--- Leader keys
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 -- Disable built-in plugins
 vim.g.loaded_matchparen = 1
 vim.g.loaded_netrw = 1
@@ -16,12 +12,12 @@ function _G.StatusColumn()
   local lnum = vim.v.lnum
   local relnum = vim.v.relnum
   if relnum == 0 then
-    return "%#CursorLineNr#" .. lnum .. "%*   "
+    return '%#CursorLineNr#' .. lnum .. '%*   '
   else
-    return relnum .. "   "
+    return relnum .. '   '
   end
 end
-vim.opt.statuscolumn = "%=%{%v:lua.StatusColumn()%}"
+vim.opt.statuscolumn = '%=%{%v:lua.StatusColumn()%}'
 
 -- Tabs and indentation
 vim.o.tabstop = 4
@@ -54,11 +50,13 @@ vim.o.autoread = true
 
 -- Auto-reload files when changed externally (real-time with libuv)
 local watch_handles = {}
-vim.api.nvim_create_autocmd("BufReadPost", {
+vim.api.nvim_create_autocmd('BufReadPost', {
   callback = function(args)
     local bufnr = args.buf
     local filepath = vim.api.nvim_buf_get_name(bufnr)
-    if filepath == "" or not vim.uv.fs_stat(filepath) then return end
+    if filepath == '' or not vim.uv.fs_stat(filepath) then
+      return
+    end
 
     -- Clean up existing watcher for this buffer
     if watch_handles[bufnr] then
@@ -69,17 +67,19 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     local handle = vim.uv.new_fs_event()
     watch_handles[bufnr] = handle
     handle:start(filepath, {}, function(err)
-      if err then return end
+      if err then
+        return
+      end
       vim.schedule(function()
         if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].modified then
-          vim.cmd("checktime " .. bufnr)
+          vim.cmd('checktime ' .. bufnr)
         end
       end)
     end)
   end,
 })
 
-vim.api.nvim_create_autocmd("BufDelete", {
+vim.api.nvim_create_autocmd('BufDelete', {
   callback = function(args)
     local handle = watch_handles[args.buf]
     if handle then
@@ -94,10 +94,10 @@ vim.o.mouse = 'a'
 vim.o.clipboard = 'unnamedplus'
 
 -- Prevent scrolling past end of file with mouse
-vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', function()
+vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelDown>', function()
   local win_height = vim.api.nvim_win_get_height(0)
-  local last_line = vim.fn.line('$')
-  local top_line = vim.fn.line('w0')
+  local last_line = vim.fn.line '$'
+  local top_line = vim.fn.line 'w0'
   -- Only scroll if there's more content below
   if top_line + win_height <= last_line then
     return '<ScrollWheelDown>'
@@ -106,10 +106,10 @@ vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelDown>', function()
 end, { expr = true, silent = true })
 
 -- Only allow horizontal scrolling when content is wider than window
-vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelLeft>', function()
+vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelLeft>', function()
   local win_width = vim.api.nvim_win_get_width(0)
   local longest = 0
-  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line('w0') - 1, vim.fn.line('w$'), false)) do
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line 'w0' - 1, vim.fn.line 'w$', false)) do
     longest = math.max(longest, vim.fn.strdisplaywidth(line))
   end
   if longest > win_width then
@@ -118,10 +118,10 @@ vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelLeft>', function()
   return ''
 end, { expr = true, silent = true })
 
-vim.keymap.set({'n', 'v', 'i'}, '<ScrollWheelRight>', function()
+vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelRight>', function()
   local win_width = vim.api.nvim_win_get_width(0)
   local longest = 0
-  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line('w0') - 1, vim.fn.line('w$'), false)) do
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line 'w0' - 1, vim.fn.line 'w$', false)) do
     longest = math.max(longest, vim.fn.strdisplaywidth(line))
   end
   if longest > win_width then
@@ -140,7 +140,7 @@ vim.api.nvim_create_autocmd('WinResized', {
         -- Skip special buffers
         if ft ~= 'neo-tree' and ft ~= 'dashboard' and ft ~= '' then
           vim.api.nvim_win_call(win, function()
-            vim.cmd('normal! zz')
+            vim.cmd 'normal! zz'
           end)
         end
       end
@@ -161,7 +161,7 @@ vim.api.nvim_create_autocmd('VimResized', {
       end
     end
     -- Equalize all windows then restore neo-tree width
-    vim.cmd('wincmd =')
+    vim.cmd 'wincmd ='
     if neotree_width > 0 then
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
@@ -178,10 +178,12 @@ vim.api.nvim_create_autocmd('VimResized', {
 vim.o.updatetime = 250
 
 -- Auto-reload on cursor idle (skip special windows)
-vim.api.nvim_create_autocmd("CursorHold", {
+vim.api.nvim_create_autocmd('CursorHold', {
   callback = function()
-    if vim.fn.getcmdwintype() ~= "" then return end
-    vim.cmd("checktime")
+    if vim.fn.getcmdwintype() ~= '' then
+      return
+    end
+    vim.cmd 'checktime'
   end,
 })
 vim.o.timeoutlen = 300
@@ -190,19 +192,19 @@ vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect'
 
 -- Misc
-vim.opt.shortmess:append('s')
+vim.opt.shortmess:append 's'
 
 -- Diagnostics
-vim.diagnostic.config({
+vim.diagnostic.config {
   underline = false,
-})
+}
 
 -- Inlay hints
 vim.lsp.inlay_hint.enable(false)
 
 -- Remove underline styling
-vim.api.nvim_set_hl(0, "@lsp.type.function", {})
-vim.api.nvim_set_hl(0, "@lsp.type.method", {})
-vim.api.nvim_set_hl(0, "LspReferenceText", {})
-vim.api.nvim_set_hl(0, "LspReferenceRead", {})
-vim.api.nvim_set_hl(0, "LspReferenceWrite", {})
+vim.api.nvim_set_hl(0, '@lsp.type.function', {})
+vim.api.nvim_set_hl(0, '@lsp.type.method', {})
+vim.api.nvim_set_hl(0, 'LspReferenceText', {})
+vim.api.nvim_set_hl(0, 'LspReferenceRead', {})
+vim.api.nvim_set_hl(0, 'LspReferenceWrite', {})

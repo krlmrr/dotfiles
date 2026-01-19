@@ -339,10 +339,16 @@
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
     },
+    "php.inlayHints.parameters.enabled": true,
+    "php.inlayHints.parameters.suppressNameMatchingValue": true,
     "php.inlayHints.parameters.byReference": false,
+    "php.inlayHints.types.return": true,
     "php.inlayHints.insertOnDoubleClick": false,
     "php.inlayHints.types.lambdaParameter": false,
     "php.inlayHints.types.suppressVariableFromLiteral": false,
+    "[php]": {
+        "editor.defaultFormatter": "laravel.vscode-laravel"
+    },
     "window.commandCenter": false,
     "chat.disableAIFeatures": true,
     "chat.viewWelcome.enabled": false,
@@ -353,9 +359,4 @@
         "file:///Users/karlm/code/dotfiles/vscode/custom.js"
     ],
     "workbench.statusBar.visible": false,
-    "php.inlayHints.parameters.enabled": true,
-    "php.inlayHints.types.return": true,
-    "[php]": {
-        "editor.defaultFormatter": "laravel.vscode-laravel"
-    },
 }

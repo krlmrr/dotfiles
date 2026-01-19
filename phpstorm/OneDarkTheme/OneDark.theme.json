@@ -156,8 +156,8 @@
     },
     "DefaultTabs": {
       "background": "#282c34",
-      "underlineColor": "#5c6370",
-      "inactiveUnderlineColor": "#61afef",
+      "underlineColor": "#282c34",
+      "inactiveUnderlineColor": "#282c34",
       "hoverBackground": "#3e4451",
       "underlinedTabBackground": "#282c34",
       "underlinedTabForeground": "#abb2bf"    },
@@ -178,10 +178,10 @@
       "underTabsBorderColor": "#282c34",
       "borderColor": "#282c34",
       "underlinedTabForeground": "#abb2bf",
-      "underlineColor": "#5c6370",
+      "underlineColor": "#282c34",
       "underlineHeight": 0,
       "hoverBackground": "#2c313a",
-      "inactiveUnderlineColor": "#5c6370"
+      "inactiveUnderlineColor": "#282c34"
     },
     "FileColor": {
       "Yellow": "#3e4451",
@@ -454,7 +454,7 @@
       "contentAreaColor": "#282c34",
       "hoverColor": "#3e4451",
       "focusColor": "#61afef",
-      "underlineColor": "#5c6370"
+      "underlineColor": "#282c34"
     },
     "Table": {
       "background": "#282c34",
@@ -538,8 +538,8 @@
       "Header.background": "#282c34",
       "Header.inactiveBackground": "#282c34",
       "Header.borderColor": "#282c34",
-      "HeaderTab.underlineColor": "#5c6370",
-      "HeaderTab.inactiveUnderlineColor": "#5c6370",
+      "HeaderTab.underlineColor": "#282c34",
+      "HeaderTab.inactiveUnderlineColor": "#282c34",
       "HeaderTab.underlineHeight": 2,
       "HeaderTab.hoverBackground": "#2c313a",
       "HeaderTab.selectedBackground": "#282c34"

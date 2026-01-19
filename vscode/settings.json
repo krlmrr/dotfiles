@@ -1,4 +1,6 @@
 {
+    // BAD MICROSOFT
+    "telemetry.telemetryLevel": "off",
     // Better Defaults
     "editor.copyWithSyntaxHighlighting": false,
     "diffEditor.ignoreTrimWhitespace": false,
@@ -358,5 +360,4 @@
         "file:///Users/karlm/code/dotfiles/vscode/custom.css",
         "file:///Users/karlm/code/dotfiles/vscode/custom.js"
     ],
-    "workbench.statusBar.visible": false,
 }

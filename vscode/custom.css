@@ -38,3 +38,12 @@
     width: 6px !important;
     transform: translateX(-6px) !important;
 }
+
+/* Status bar tweaks */
+.statusbar-item-label {
+    background-color: transparent !important;
+}
+
+.part.statusbar {
+    padding-left: 18px !important;
+}

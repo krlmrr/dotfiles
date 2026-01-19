@@ -25,7 +25,7 @@
         attributeFilter: ['class']
     });
 
-    // Use wheel event instead of scroll event
+    // Show scrollbars on wheel, hide after 1s of inactivity
     document.addEventListener('wheel', (e) => {
         const scrollable = e.target.closest('.monaco-scrollable-element.editor-scrollable');
         if (!scrollable) return;

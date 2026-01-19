@@ -23,8 +23,3 @@
 .__CUSTOM_CSS_JS_INDICATOR_CLS {
     display: none !important;
 }
-
-/* Fading scrollbars for editor instances */
-.editor-container .scrollbar {
-    transition: opacity 0.3s ease-out !important;
-}

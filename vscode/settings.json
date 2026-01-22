@@ -42,7 +42,7 @@
     "editor.suggestFontSize": 17,
     "editor.suggestLineHeight": 28,
     "terminal.integrated.fontSize": 15,
-    "terminal.integrated.lineHeight": 2,
+    "terminal.integrated.lineHeight": 1.4,
     // Find
     "search.useIgnoreFiles": false,
     "search.exclude": {
@@ -112,7 +112,7 @@
     "workbench.editor.editorActionsLocation": "hidden",
     "git.autofetch": true,
     "editor.unicodeHighlight.ambiguousCharacters": false,
-    "editor.cursorBlinking": "smooth",
+    "editor.cursorBlinking": "solid",
     "editor.glyphMargin": false,
     "workbench.tree.indent": 14,
     "workbench.tree.renderIndentGuides": "none",
@@ -121,7 +121,7 @@
     "git.confirmSync": false,
     "window.titleSeparator": "/",
     "workbench.preferredDarkColorTheme": "One Dark Pro Flat",
-    "workbench.preferredLightColorTheme": "GitHub Light",
+    "workbench.preferredLightColorTheme": "Beggars",
     "workbench.colorCustomizations": {
         "[One Dark Pro Flat*]": {
             "dropdown.background": "#2C3139",
@@ -160,7 +160,7 @@
     "git.ignoreRebaseWarning": true,
     "editor.lineDecorationsWidth": 25,
     "security.promptForRemoteFileProtocolHandling": false,
-    "workbench.activityBar.location": "top",
+    "workbench.activityBar.location": "hidden",
     "workbench.editor.limit.enabled": true,
     "editor.linkedEditing": true,
     "javascript.suggest.autoImports": true,
@@ -184,11 +184,6 @@
     "workbench.editor.tabActionLocation": "left",
     "workbench.editor.tabActionCloseVisibility": false,
     "workbench.editor.showTabs": "none",
-    // VIM
-    "vim.leader": "<space>",
-    "vim.easymotion": true,
-    "vim.hlsearch": true,
-    "vim.useSystemClipboard": true,
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
@@ -200,18 +195,10 @@
     "outline.showFunctions": false,
     "security.workspace.trust.enabled": false,
     "git.blame.editorDecoration.enabled": false,
-    "vim.vimrc.enable": true,
-    "vim.sneak": true,
-    "vim.sneakReplacesF": true,
     "explorer.confirmPasteNative": false,
     "files.saveConflictResolution": "overwriteFileOnDisk",
     "php.format.rules.catchOnNewLine": true,
     "php.format.rules.elseOnNewLine": true,
-    "remote.SSH.remotePlatform": {
-        "coder-vscode.workspace.canyongbs.com--karl-canyon--karlmurray-main": "linux",
-        "coder-vscode.workspace.canyongbs.com--karl-canyon--karlmurray-main.main": "linux"
-    },
-    "remote.SSH.connectTimeout": 1800,
     "extensions.ignoreRecommendations": true,
     "editor.fontLigatures": "'calt', 'ss01'",
     "editor.tokenColorCustomizations": {
@@ -310,7 +297,6 @@
     "editor.scrollbar.verticalScrollbarSize": 8,
     "editor.foldingHighlight": false,
     "window.openFoldersInNewWindow": "off",
-    "betterFolding.showOnlyRegionsDescriptions": true,
     "settingsSync.ignoredExtensions": [
         "coder.coder-remote",
         "ms-vscode-remote.remote-ssh",
@@ -318,7 +304,6 @@
     ],
     "catppuccin-icons.hidesExplorerArrows": true,
     "terminal.integrated.fontLigatures.enabled": true,
-    "githubPullRequests.pullBranch": "never",
     "workbench.layoutControl.enabled": false,
     "workbench.navigationControl.enabled": false,
     "editor.autoClosingComments": "always",
@@ -360,4 +345,5 @@
         "file:///Users/karlm/code/dotfiles/vscode/custom.css",
         "file:///Users/karlm/code/dotfiles/vscode/custom.js"
     ],
+    "claudeCode.preferredLocation": "sidebar",
 }

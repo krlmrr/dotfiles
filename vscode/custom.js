@@ -1,56 +1,53 @@
 // Fading scrollbars for editor instances
 (function() {
-    const scrollTimeouts = new WeakMap();
-    const activeScrollables = new WeakSet();
+    // Defer setup to not block initial render
+    const init = () => {
+        const scrollTimeouts = new WeakMap();
+        const activeScrollables = new WeakSet();
 
-    // Watch for VS Code adding .visible class and remove it unless actively scrolling
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        const observer = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
                 const el = mutation.target;
-                if (el.classList.contains('scrollbar') && el.classList.contains('visible')) {
-                    const scrollable = el.closest('.monaco-scrollable-element');
-                    if (scrollable && !activeScrollables.has(scrollable)) {
-                        el.classList.remove('visible');
-                        el.classList.add('invisible');
-                    }
+                // Fast path: skip if not a scrollbar with visible class
+                if (!el.classList?.contains('scrollbar') || !el.classList.contains('visible')) continue;
+
+                const scrollable = el.closest('.monaco-scrollable-element');
+                if (scrollable && !activeScrollables.has(scrollable)) {
+                    el.classList.replace('visible', 'invisible');
                 }
             }
         });
-    });
 
-    observer.observe(document.body, {
-        attributes: true,
-        subtree: true,
-        attributeFilter: ['class']
-    });
-
-    // Show scrollbars on wheel, hide after 1s of inactivity
-    document.addEventListener('wheel', (e) => {
-        const scrollable = e.target.closest('.monaco-scrollable-element.editor-scrollable');
-        if (!scrollable) return;
-
-        activeScrollables.add(scrollable);
-
-        // Show scrollbars
-        scrollable.querySelectorAll('.scrollbar').forEach(sb => {
-            sb.classList.remove('invisible');
-            sb.classList.add('visible');
+        observer.observe(document.body, {
+            attributes: true,
+            subtree: true,
+            attributeFilter: ['class']
         });
 
-        // Clear existing timeout
-        const existingTimeout = scrollTimeouts.get(scrollable);
-        if (existingTimeout) clearTimeout(existingTimeout);
+        // Show scrollbars on wheel, hide after 1s of inactivity
+        document.addEventListener('wheel', (e) => {
+            const scrollable = e.target.closest('.monaco-scrollable-element.editor-scrollable');
+            if (!scrollable) return;
 
-        // Hide after scrolling stops
-        const timeout = setTimeout(() => {
-            activeScrollables.delete(scrollable);
-            scrollable.querySelectorAll('.scrollbar').forEach(sb => {
-                sb.classList.remove('visible');
-                sb.classList.add('invisible');
-            });
-        }, 1000);
+            activeScrollables.add(scrollable);
 
-        scrollTimeouts.set(scrollable, timeout);
-    }, true);
+            const scrollbars = scrollable.querySelectorAll('.scrollbar');
+            scrollbars.forEach(sb => sb.classList.replace('invisible', 'visible'));
+
+            const existingTimeout = scrollTimeouts.get(scrollable);
+            if (existingTimeout) clearTimeout(existingTimeout);
+
+            scrollTimeouts.set(scrollable, setTimeout(() => {
+                activeScrollables.delete(scrollable);
+                scrollbars.forEach(sb => sb.classList.replace('visible', 'invisible'));
+            }, 1000));
+        }, { passive: true, capture: true });
+    };
+
+    // Wait for idle time to set up, don't block boot
+    if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(init, { timeout: 2000 });
+    } else {
+        setTimeout(init, 100);
+    }
 })();

@@ -30,6 +30,7 @@ export PATH="/Users/karlm/Library/Python/3.13/bin:$PATH"
 # OS
 unalias nv 2>/dev/null
 nv() { clear && nvim "${1:-.}"; }
+
 alias nz="nv ~/.zshrc"
 alias lz="lazygit"
 alias yeet="sudo rm -rf"
@@ -39,6 +40,7 @@ alias mkd="mkdir -p"
 alias sourcez="source ~/.zshrc"
 alias code.="code ."
 alias ps.="phpstorm ."
+alias love="/Applications/love.app/Contents/MacOS/love"
 
 # Laravel
 alias a="php artisan"

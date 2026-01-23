@@ -346,4 +346,5 @@
         "file:///Users/karlm/code/dotfiles/vscode/custom.js"
     ],
     "claudeCode.preferredLocation": "sidebar",
+    "workbench.tree.enableStickyScroll": false,
 }

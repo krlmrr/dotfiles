@@ -6139,9 +6139,21 @@
         "command": "-editor.detectLanguage",
         "when": "editorTextFocus && !notebookEditable"
     },
-
     // 3+ modifier contortionist shortcuts
-    { "key": "ctrl+alt+cmd+n", "command": "-list.focusAnyDown" },
-    { "key": "ctrl+alt+cmd+p", "command": "-list.focusAnyUp" },
-    { "key": "shift+alt+cmd+g", "command": "-editor.action.announceCursorPosition" }
+    {
+        "key": "ctrl+alt+cmd+n",
+        "command": "-list.focusAnyDown"
+    },
+    {
+        "key": "ctrl+alt+cmd+p",
+        "command": "-list.focusAnyUp"
+    },
+    {
+        "key": "shift+alt+cmd+g",
+        "command": "-editor.action.announceCursorPosition"
+    },
+    {
+        "key": "cmd+k cmd+e",
+        "command": "workbench.view.extensions"
+    }
 ]

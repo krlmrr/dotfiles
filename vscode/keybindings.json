@@ -28,7 +28,7 @@
         "command": "list.focusFirst",
         "when": "inputFocus && sideBarFocus && !editorFocus"
     },
-    // Leader e - explorer toggle (works everywhere, except input boxes)
+    // Leader e - explorer toggle (works everywhere, except input boxes and Claude Code)
     {
         "key": "space e",
         "command": "workbench.action.toggleSidebarVisibility",
@@ -37,18 +37,18 @@
     {
         "key": "space e",
         "command": "workbench.view.explorer",
-        "when": "!editorFocus && !inputFocus && !(sideBarFocus && activeViewlet == 'workbench.view.explorer')"
+        "when": "!editorFocus && !inputFocus && !claude-vscode.sideBarActive && !(sideBarFocus && activeViewlet == 'workbench.view.explorer')"
     },
-    // Leader gg - git source control toggle (works everywhere, except input boxes)
+    // Leader gg - git source control toggle (works everywhere, except input boxes and Claude Code)
     {
         "key": "space g g",
         "command": "workbench.action.toggleSidebarVisibility",
-        "when": "sideBarFocus && activeViewlet == 'workbench.view.scm' && !inputFocus"
+        "when": "sideBarFocus && activeViewlet == 'workbench.view.scm' && !inputFocus && !claude-vscode.sideBarActive"
     },
     {
         "key": "space g g",
         "command": "workbench.view.scm",
-        "when": "!editorFocus && !inputFocus && !(sideBarFocus && activeViewlet == 'workbench.view.scm')"
+        "when": "!editorFocus && !inputFocus && !claude-vscode.sideBarActive && !(sideBarFocus && activeViewlet == 'workbench.view.scm')"
     },
     // Import PHP class (replaces namespace resolver)
     {

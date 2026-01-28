@@ -1,4 +1,5 @@
 {
+    "editor.guides.bracketPairs": false,
     // BAD MICROSOFT
     "telemetry.telemetryLevel": "off",
     // Better Defaults
@@ -83,7 +84,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[vue]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.semanticHighlighting.enabled": false
     },
     "[html]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -347,4 +349,12 @@
     ],
     "claudeCode.preferredLocation": "sidebar",
     "workbench.tree.enableStickyScroll": false,
+    "editor.bracketPairColorization.enabled": false,
+    "vue.format.script.initialIndent": true,
+    "vue.format.style.initialIndent": true,
+    "vue.autoInsert.dotValue": true,
+    "prettier.vueIndentScriptAndStyle": true,
+    "vue.editor.templateInterpolationDecorators": false,
+    "terminal.integrated.shellIntegration.decorationsEnabled": "never",
+    "terminal.integrated.smoothScrolling": true,
 }

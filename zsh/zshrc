@@ -45,6 +45,7 @@ alias love="/Applications/love.app/Contents/MacOS/love"
 # Laravel
 alias a="php artisan"
 alias solo="a solo"
+alias sail="./vendor/bin/sail" 
 alias pam="a migrate"
 alias pamf="a migrate:fresh"
 alias pamfs="a migrate:fresh --seed"

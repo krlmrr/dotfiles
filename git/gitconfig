@@ -1,6 +1,6 @@
 [user]
 	name = Karl Murray
-	email = karl@karlm.dev
+	email = karl@vheissulabs.com
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

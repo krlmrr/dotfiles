@@ -348,6 +348,7 @@
         "file:///Users/karlm/code/dotfiles/vscode/custom.js"
     ],
     "claudeCode.preferredLocation": "sidebar",
+    "claudeCode.diffEnabled": false,
     "workbench.tree.enableStickyScroll": false,
     "editor.bracketPairColorization.enabled": false,
     "vue.format.script.initialIndent": true,
@@ -357,4 +358,6 @@
     "vue.editor.templateInterpolationDecorators": false,
     "terminal.integrated.shellIntegration.decorationsEnabled": "never",
     "terminal.integrated.smoothScrolling": true,
+    "claudeCode.respectGitIgnore": false,
+    "chat.useAgentSkills": true,
 }

@@ -42,6 +42,34 @@
         "command": "list.focusFirst",
         "when": "inputFocus && sideBarFocus && !editorFocus"
     },
+    // Escape in sidebar - refocus editor
+    {
+        "key": "escape",
+        "command": "workbench.action.focusActiveEditorGroup",
+        "when": "sideBarFocus && !inputFocus"
+    },
+    // Move lines up/down
+    {
+        "key": "alt+up",
+        "command": "editor.action.moveLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "alt+down",
+        "command": "editor.action.moveLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    // Copy lines up/down
+    {
+        "key": "shift+alt+up",
+        "command": "editor.action.copyLinesUpAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "editor.action.copyLinesDownAction",
+        "when": "editorTextFocus && !editorReadonly"
+    },
     // Leader e - explorer toggle (works everywhere, except input boxes and Claude Code)
     {
         "key": "space e",

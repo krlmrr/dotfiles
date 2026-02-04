@@ -56,6 +56,10 @@ vim.keymap.set('n', 'k', 'k_', { noremap = true, silent = true, desc = "Up and f
 vim.keymap.set('n', '<Down>', 'j_', { noremap = true, silent = true, desc = "Down and first non-blank" })
 vim.keymap.set('n', '<Up>', 'k_', { noremap = true, silent = true, desc = "Up and first non-blank" })
 
+-- Move selected lines up/down in visual mode
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+
 -- Yank to end of line (consistent with D and C)
 vim.keymap.set('n', 'Y', 'y$', { desc = "Yank to end of line" })
 

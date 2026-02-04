@@ -328,6 +328,11 @@
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
     },
+    "vscode-neovim.compositeKeys": {
+        "jj": {
+            "command": "vscode-neovim.escape"
+        }
+    },
     "php.inlayHints.parameters.enabled": true,
     "php.inlayHints.parameters.suppressNameMatchingValue": true,
     "php.inlayHints.parameters.byReference": false,

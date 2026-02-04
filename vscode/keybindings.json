@@ -2,6 +2,20 @@
     // =====================================================
     // ACTIVE KEYBINDINGS
     // =====================================================
+    // Add semicolon at end of line (;; in normal mode)
+    {
+        "key": "; ;",
+        "command": "vscode-neovim.send",
+        "args": "A;<Esc>",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
+    // Add comma at end of line (,, in normal mode)
+    {
+        "key": ", ,",
+        "command": "vscode-neovim.send",
+        "args": "A,<Esc>",
+        "when": "editorTextFocus && neovim.mode == normal"
+    },
     // Multi-cursor - select and enter insert mode (use ctrl+g instead of cmd+d)
     {
         "key": "ctrl+g",

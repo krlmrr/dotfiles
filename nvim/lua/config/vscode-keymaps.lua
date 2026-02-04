@@ -13,8 +13,6 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highl
 -- Exit insert mode
 vim.keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode" })
 
--- Command mode shortcut
-vim.keymap.set('n', ';', ':', { noremap = true, desc = "Command mode" })
 
 -- Add punctuation at end of line
 vim.keymap.set("i", ";;", "<Esc>A;<Esc>", { desc = "Add semicolon at end" })

@@ -27,6 +27,10 @@ VS Code has been heavily customized to feel more like Neovim:
 - `<leader>pt` - Run Pest tests in parallel
 - Config in `nvim/` directory
 
+## Hammerspoon
+
+Caps Lock dual-role remap: tap for Escape, hold for Control. Uses `hidutil` (called from Lua on startup) to remap Caps Lock to F18, then Hammerspoon intercepts F18 and adds ctrl flags to key events or sends Escape on solo tap. Config in `hammerspoon/init.lua`.
+
 ## Ghostty
 
 Terminal emulator config in `ghostty/config`. Uses custom themes.

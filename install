@@ -23,9 +23,9 @@ then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# Karabiner -- Keyboard settings for macOS
-rm -rf $HOME/.config/karabiner
-ln -s $DOTFILES/karabiner $HOME/.config/karabiner
+# Hammerspoon -- Caps Lock to Esc/Ctrl
+rm -rf $HOME/.hammerspoon
+ln -s $DOTFILES/hammerspoon $HOME/.hammerspoon
 
 # Ghostty
 rm -rf $HOME/.config/ghostty

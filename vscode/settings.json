@@ -1,5 +1,4 @@
 {
-    "editor.guides.bracketPairs": false,
     // BAD MICROSOFT
     "telemetry.telemetryLevel": "off",
     // Better Defaults
@@ -16,6 +15,7 @@
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     // Hide Everything
+    "editor.guides.bracketPairs": false,
     "editor.stickyScroll.enabled": false,
     "workbench.sideBar.location": "right",
     "editor.minimap.enabled": false,
@@ -85,7 +85,7 @@
     },
     "[vue]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.semanticHighlighting.enabled": false
+        "editor.semanticHighlighting.enabled": false,
     },
     "[html]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -123,8 +123,12 @@
     "git.confirmSync": false,
     "window.titleSeparator": "/",
     "workbench.preferredDarkColorTheme": "One Dark Pro Flat",
-    "workbench.preferredLightColorTheme": "Beggars",
+    "workbench.preferredLightColorTheme": "Artisan Theme",
     "workbench.colorCustomizations": {
+        // Overrides Theme Default Colors for InlayHints feature
+        "editorInlayHint.background": "#00000000",
+        "editorInlayHint.parameterBackground": "#00000000",
+        "editorInlayHint.typeBackground": "#00000000",
         "[One Dark Pro Flat*]": {
             "dropdown.background": "#2C3139",
             "input.background": "#323741",
@@ -136,8 +140,6 @@
             "editorBracketHighlight.foreground6": "#56b6c2",
             "editorOverviewRuler.errorForeground": "#0000",
             "editorOverviewRuler.warningForeground": "#0000",
-            "editorInlayHint.foreground": "#7F8288",
-            "editorInlayHint.background": "#0000",
             // Consistent visible borders for resizing
             "sideBar.border": "#3e4451",
             "activityBar.border": "#3e4451",
@@ -384,4 +386,12 @@
     "terminal.integrated.smoothScrolling": true,
     "claudeCode.respectGitIgnore": false,
     "chat.useAgentSkills": true,
+    "supermaven.enableFixWithSupermaven": false,
+    "php.problems.exclude": {
+        "**/*": [
+            "PHP0413"
+        ]
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "tailwindCSS.colorDecorators": false,
 }

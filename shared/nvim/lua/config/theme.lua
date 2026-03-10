@@ -23,17 +23,33 @@ function M.get_colors()
   return M.colors[vim.o.background] or M.colors.dark
 end
 
--- Detect macOS appearance (returns "dark" or "light")
+-- Detect system appearance (returns "dark" or "light")
 function M.get_system_appearance()
-  local handle = io.popen("defaults read -g AppleInterfaceStyle 2>/dev/null")
+  if vim.fn.has('mac') == 1 then
+    local handle = io.popen("defaults read -g AppleInterfaceStyle 2>/dev/null")
+    if handle then
+      local result = handle:read("*a")
+      handle:close()
+      if result:match("Dark") then
+        return "dark"
+      end
+    end
+    return "light"
+  end
+
+  -- Linux: check freedesktop/GNOME/COSMIC dark mode
+  local handle = io.popen("gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null")
   if handle then
     local result = handle:read("*a")
     handle:close()
-    if result:match("Dark") then
+    if result:match("prefer%-dark") then
       return "dark"
+    elseif result:match("prefer%-light") or result:match("default") then
+      return "light"
     end
   end
-  return "light"
+
+  return "dark"
 end
 
 -- Apply plugin-specific highlights (called after colorscheme loads)

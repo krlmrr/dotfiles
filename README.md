@@ -5,7 +5,14 @@ Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch).
 ## Quick Start
 
 ```bash
-unzip dotfiles-main.zip && cd dotfiles-main && bash setup.sh
+curl -fsSL https://raw.githubusercontent.com/krlmrr/dotfiles/main/install.sh | bash
+```
+
+Or manually:
+
+```bash
+git clone https://github.com/krlmrr/dotfiles.git ~/Code/dotfiles
+cd ~/Code/dotfiles && bash setup.sh
 ```
 
 ## What It Does
@@ -13,14 +20,16 @@ unzip dotfiles-main.zip && cd dotfiles-main && bash setup.sh
 `setup.sh` detects the OS and runs the appropriate setup chain:
 
 1. Installs system packages (Linux only)
-2. Installs [Homebrew](https://brew.sh) + shared formulae (gh, neovim, lazygit, ripgrep, fd)
+2. Installs [Homebrew](https://brew.sh) + shared formulae (gcc, gh, neovim, lazygit, ripgrep, fd)
 3. Installs [Oh My Zsh](https://ohmyz.sh) + plugins (autosuggestions, syntax-highlighting)
 4. Sets zsh as default shell
 5. Builds `.zshrc` from shared + OS-specific aliases
 6. Runs OS-specific setup (mac or linux)
-7. Symlinks shared configs (nvim, ghostty, lazygit, zed)
-8. Configures git (prompts for name/email on first run)
-9. Installs fonts (FiraCode, FiraMono, MonoLisa)
+7. Installs [Claude Code](https://claude.ai)
+8. Symlinks shared configs (nvim, ghostty, lazygit, zed)
+9. Configures git (prompts for name/email on first run)
+10. Installs fonts (FiraCode, FiraMono, MonoLisa)
+11. Configures COSMIC desktop (if detected)
 
 ## Structure
 
@@ -51,7 +60,8 @@ dotfiles/
     ├── shared/
     │   └── zsh/
     ├── deb/
-    │   └── setup.sh      # Docker, keyd, DDEV, Ghostty, Chromium, PHP
+    │   ├── setup.sh      # Docker, keyd, DDEV, Ghostty, Chromium, Zen, 1Password, PHP
+    │   └── cleanup.sh    # Remove unwanted default apps
     └── arch/
         ├── setup.sh      # Docker, keyd, Hyprland, SDDM
         ├── hypr/
@@ -71,9 +81,9 @@ Configures Hammerspoon for caps lock remapping (ctrl/esc).
 
 ### Linux (Debian/Ubuntu)
 
-Installs Docker, DDEV, Ghostty (PPA), Ungoogled Chromium (PPA), keyd, and PHP/Laravel CLI.
+Installs Docker, DDEV, Ghostty (PPA), Ungoogled Chromium (PPA), Zen Browser, 1Password, keyd, and PHP/Laravel CLI.
 
-Configures keyd for caps lock remapping (ctrl/esc) and udev rules for Keychron Q8 (Via).
+Configures keyd for caps lock remapping (ctrl/esc), udev rules for Keychron Q8 (Via), and COSMIC desktop (dock, panel, theme, mouse, shortcuts).
 
 ### Linux (Arch)
 

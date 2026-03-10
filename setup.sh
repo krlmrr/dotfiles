@@ -30,6 +30,13 @@ if [ -z "$GIT_EMAIL" ]; then
     read -p "Git email: " GIT_EMAIL
 fi
 
+# Git config
+cp "$DOTFILES_DIR/shared/git/gitconfig" ~/.gitconfig
+link "$DOTFILES_DIR/shared/git/gitignore_global" ~/.gitignore_global
+git config --global core.excludesfile ~/.gitignore_global
+git config --global user.name "$GIT_NAME"
+git config --global user.email "$GIT_EMAIL"
+
 # Homebrew
 if ! command -v brew &> /dev/null; then
     echo "Installing Homebrew..."
@@ -96,13 +103,6 @@ link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
 link "$DOTFILES_DIR/shared/ghostty" ~/.config/ghostty
 link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
 link "$DOTFILES_DIR/shared/zed" ~/.config/zed
-
-# Git
-cp "$DOTFILES_DIR/shared/git/gitconfig" ~/.gitconfig
-link "$DOTFILES_DIR/shared/git/gitignore_global" ~/.gitignore_global
-git config --global core.excludesfile ~/.gitignore_global
-git config --global user.name "$GIT_NAME"
-git config --global user.email "$GIT_EMAIL"
 
 # Fonts
 echo "Installing fonts..."

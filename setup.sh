@@ -18,7 +18,8 @@ if [ "$OS" = "linux" ]; then
     fi
     echo "Installing system packages..."
     if [ "$DISTRO" = "arch" ]; then
-        pacman_install git curl wget unzip zsh base-devel wl-clipboard
+        sudo pacman -S --needed --noconfirm base-devel
+        pacman_install git curl wget unzip zsh wl-clipboard
     else
         apt_install git curl wget unzip zsh build-essential wl-clipboard
     fi

@@ -4,7 +4,11 @@ set -e
 # Install git if needed
 if ! command -v git &> /dev/null; then
     echo "Installing git..."
-    sudo apt update && sudo apt install -y git
+    if command -v pacman &> /dev/null; then
+        sudo pacman -S --noconfirm git
+    elif command -v apt &> /dev/null; then
+        sudo apt update && sudo apt install -y git
+    fi
 fi
 
 # Clone dotfiles

@@ -2,27 +2,9 @@ echo "=== Mac Setup ==="
 
 # Mac casks
 echo "Installing Mac casks..."
-brew install --cask \
-    appcleaner \
-    arc \
-    balenaetcher \
-    bambu-studio \
-    blender \
-    discord \
-    fantastical \
-    figma \
-    ghostty \
-    hammerspoon \
-    herd \
-    logi-options+ \
-    orbstack \
-    raycast \
-    slack \
-    tableplus \
-    telegram \
-    visual-studio-code \
-    zed \
-    zen
+brew_install_cask appcleaner arc balenaetcher bambu-studio blender discord \
+    fantastical figma ghostty hammerspoon herd logi-options+ orbstack \
+    raycast slack tableplus telegram visual-studio-code zed zen
 
 # Hammerspoon
 link "$DOTFILES_DIR/mac/hammerspoon" ~/.hammerspoon

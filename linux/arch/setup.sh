@@ -2,32 +2,18 @@ echo "=== Arch (CachyOS) Setup ==="
 
 # Docker
 if ! command -v docker &> /dev/null; then
-    echo "Installing Docker..."
-    sudo pacman -S --noconfirm docker
+    pacman_install docker
     sudo usermod -aG docker "$USER"
 fi
 
-# keyd
-if ! command -v keyd &> /dev/null; then
-    echo "Installing keyd..."
-    sudo pacman -S --noconfirm keyd
-fi
-
 # Arch-specific packages
-echo "Installing Arch packages..."
-sudo $PKG \
-    hyprland \
-    hyprlock \
-    hypridle \
-    waybar \
-    rofi-wayland \
-    mako \
-    sddm
+pacman_install keyd hyprland hyprlock hypridle waybar rofi-wayland mako sddm
 
 # AUR packages
 if command -v yay &> /dev/null; then
-    yay -S --noconfirm \
-        ddev-bin
+    if ! pacman -Q ddev-bin &>/dev/null; then
+        yay -S --noconfirm ddev-bin
+    fi
 fi
 
 # DDEV global config

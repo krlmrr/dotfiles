@@ -8,7 +8,7 @@ mkdir -p ~/Sites ~/Code
 
 # Linux-only brew formulae
 echo "Installing Linux brew formulae..."
-brew install lazydocker
+brew_install lazydocker
 
 # Distro-specific setup (docker, keyd, ddev, ghostty, etc.)
 if [ "$DISTRO" = "deb" ]; then

@@ -17,7 +17,11 @@ if [ "$OS" = "linux" ]; then
         sudo $PKG_UPGRADE
     fi
     echo "Installing system packages..."
-    sudo $PKG git curl wget unzip zsh build-essential wl-clipboard
+    if [ "$DISTRO" = "arch" ]; then
+        pacman_install git curl wget unzip zsh base-devel wl-clipboard
+    else
+        apt_install git curl wget unzip zsh build-essential wl-clipboard
+    fi
 fi
 
 # Git user info (only prompt if not already set)
@@ -48,13 +52,7 @@ fi
 
 # Shared formulae
 echo "Installing shared brew formulae..."
-brew install \
-    gcc \
-    gh \
-    neovim \
-    lazygit \
-    ripgrep \
-    fd
+brew_install gcc gh neovim lazygit ripgrep fd
 
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then

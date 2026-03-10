@@ -3,6 +3,9 @@ set -e
 
 echo "=== Linux Setup ==="
 
+# Create project directories
+mkdir -p ~/Sites ~/Code
+
 # Linux-only brew formulae
 echo "Installing Linux brew formulae..."
 brew install lazydocker

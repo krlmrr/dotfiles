@@ -53,6 +53,23 @@ if ! command -v 1password &> /dev/null; then
     sudo apt install -y 1password
 fi
 
+# Discord
+if ! command -v discord &> /dev/null; then
+    echo "Installing Discord..."
+    wget -O /tmp/discord.deb "https://discord.com/api/download?platform=linux&format=deb"
+    sudo apt install -y /tmp/discord.deb
+    rm /tmp/discord.deb
+fi
+
+# Slack
+if ! command -v slack &> /dev/null; then
+    echo "Installing Slack..."
+    curl -fsSL https://packagecloud.io/slacktechnologies/slack/gpgkey | sudo gpg --dearmor --output /usr/share/keyrings/slack.gpg
+    echo 'deb [signed-by=/usr/share/keyrings/slack.gpg] https://packagecloud.io/slacktechnologies/slack/debian/ jessie main' | sudo tee /etc/apt/sources.list.d/slack.list
+    sudo apt update
+    sudo apt install -y slack-desktop
+fi
+
 # Zen Browser
 if ! command -v zen-browser &> /dev/null; then
     echo "Installing Zen Browser..."

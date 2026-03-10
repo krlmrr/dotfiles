@@ -1,0 +1,221 @@
+/* OneDark Waybar Theme - inspired by ML4W */
+
+* {
+    font-family: "FiraCode Nerd Font", "Font Awesome 6 Free", sans-serif;
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+/* Workspaces */
+#workspaces {
+    background: rgba(40, 44, 52, 0.9);
+    margin: 5px;
+    padding: 0px 8px;
+    border-radius: 15px;
+    border: 2px solid #61afef;
+}
+
+#workspaces button {
+    padding: 0px 6px;
+    margin: 4px 3px;
+    border-radius: 10px;
+    color: #3e4451;
+    background: #3e4451;
+    transition: all 0.3s ease-in-out;
+    opacity: 0.4;
+    min-width: 20px;
+}
+
+#workspaces button label {
+    margin: 0;
+    padding: 0;
+}
+
+
+#workspaces button.visible {
+    color: #61afef;
+    background: #61afef;
+    border-radius: 10px;
+    padding: 0px 12px;
+    transition: all 0.3s ease-in-out;
+    opacity: 0.7;
+}
+
+#workspaces button.active {
+    color: #61afef;
+    background: #61afef;
+    border-radius: 10px;
+    padding: 0px 12px;
+    transition: all 0.3s ease-in-out;
+    opacity: 1.0;
+}
+
+#workspaces button:hover {
+    color: #abb2bf;
+    opacity: 0.8;
+    padding: 0px 8px;
+}
+
+#workspaces button.active:hover {
+    color: #282c34;
+}
+
+/* Window Title */
+#window {
+    background: rgba(40, 44, 52, 0.9);
+    color: #e5c07b;
+    padding: 5px 15px;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid #e5c07b;
+}
+
+window#waybar.empty #window {
+    background: transparent;
+    border: none;
+}
+
+/* Right side modules */
+#backlight,
+#pulseaudio,
+#battery {
+    background: rgba(40, 44, 52, 0.9);
+    color: #98c379;
+    padding: 5px 15px;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid #98c379;
+}
+
+/* Icon-only modules */
+#network {
+    background: rgba(40, 44, 52, 0.9);
+    color: #98c379;
+    padding: 5px 14px 5px 10px;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid #98c379;
+    min-width: 16px;
+}
+
+#bluetooth {
+    background: rgba(40, 44, 52, 0.9);
+    color: #98c379;
+    padding: 5px 12px 5px 14px;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid #98c379;
+    min-width: 16px;
+}
+
+#custom-apps {
+    background: rgba(40, 44, 52, 0.9);
+    color: #98c379;
+    padding: 5px 12px;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid #98c379;
+}
+
+#custom-apps.empty {
+    color: #5c6370;
+    border-color: #5c6370;
+}
+
+#backlight:hover,
+#pulseaudio:hover,
+#bluetooth:hover,
+#network:hover,
+#battery:hover {
+    background: rgba(62, 68, 81, 0.9);
+}
+
+/* Clock */
+#clock {
+    background: rgba(40, 44, 52, 0.9);
+    color: #c678dd;
+    padding: 5px 15px;
+    margin: 5px;
+    border-radius: 15px;
+    border: 2px solid #c678dd;
+}
+
+/* Power Button */
+#custom-power {
+    background: rgba(224, 108, 117, 0.9);
+    color: #282c34;
+    font-weight: bold;
+    padding: 5px 15px;
+    margin: 5px 10px 5px 5px;
+    border-radius: 15px;
+    border: 2px solid #e06c75;
+}
+
+#custom-power:hover {
+    background: #e06c75;
+}
+
+/* Tray */
+#tray {
+    margin: 3px 5px;
+    padding: 0 10px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+/* Battery states */
+#battery.warning {
+    color: #e5c07b;
+    border-color: #e5c07b;
+}
+
+#battery.critical {
+    color: #e06c75;
+    border-color: #e06c75;
+    animation: blink 0.5s linear infinite alternate;
+}
+
+#battery.charging {
+    color: #98c379;
+    border-color: #98c379;
+}
+
+@keyframes blink {
+    to {
+        background: rgba(224, 108, 117, 0.3);
+    }
+}
+
+/* Pulseaudio muted */
+#pulseaudio.muted {
+    color: #5c6370;
+}
+
+/* Network disconnected */
+#network.disconnected {
+    color: #e06c75;
+}
+
+/* Tooltip */
+tooltip {
+    background: rgba(40, 44, 52, 0.95);
+    border: 2px solid #98c379;
+    border-radius: 10px;
+}
+
+tooltip label {
+    color: #abb2bf;
+    padding: 5px;
+}

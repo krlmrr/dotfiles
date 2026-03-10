@@ -1,0 +1,112 @@
+{
+    "layer": "top",
+    "position": "top",
+    "margin-top": 10,
+    "margin-left": 6,
+    "margin-right": 6,
+    "spacing": 0,
+
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+
+    "modules-center": [
+        "clock"
+    ],
+
+    "modules-right": [
+        "custom/apps",
+        "backlight",
+        "pulseaudio",
+        "bluetooth",
+        "network",
+        "battery",
+        "custom/power"
+    ],
+
+    "hyprland/workspaces": {
+        "on-click": "activate",
+        "on-scroll-up": "hyprctl dispatch workspace r-1",
+        "on-scroll-down": "hyprctl dispatch workspace r+1",
+        "format": "{name}",
+        "all-outputs": false,
+        "active-only": false,
+        "persistent-workspaces": {
+            "DP-1": [1, 2, 3, 4, 5],
+            "eDP-1": [1, 2, 3, 4, 5]
+        }
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "custom/apps": {
+        "exec": "~/.config/waybar/scripts/tray-apps.sh status",
+        "return-type": "json",
+        "interval": 5,
+        "on-click": "~/.config/waybar/scripts/tray-apps.sh menu"
+    },
+
+    "backlight": {
+        "format": "󰃟 {percent}%",
+        "tooltip-format": "Brightness - Scroll to adjust",
+        "scroll-step": 5,
+        "on-scroll-up": "brightnessctl set +5%",
+        "on-scroll-down": "brightnessctl set 5%-"
+    },
+
+    "pulseaudio": {
+        "format": "󰕾 {volume}%",
+        "format-muted": "󰖁 muted",
+        "on-click": "pavucontrol"
+    },
+
+    "bluetooth": {
+        "format": "󰂯",
+        "format-connected": "󰂯",
+        "format-connected-battery": "󰂯",
+        "tooltip-format": "No devices connected",
+        "tooltip-format-connected": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}  {device_battery_percentage}%",
+        "on-click": "blueman-manager"
+    },
+
+    "network": {
+        "interface": "wlan0",
+        "format": "󰤨",
+        "format-wifi": "󰤨",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰤮",
+        "tooltip-format-wifi": "{essid}  {signalStrength}%\n{ipaddr}",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}",
+        "tooltip-format-disconnected": "Disconnected",
+        "on-click": "~/.config/waybar/wifi-menu.sh"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰚥 {capacity}%",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    },
+
+    "clock": {
+        "format": "󰥔 {:%b %d  %I:%M %p}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "custom/power": {
+        "format": "󰐥",
+        "on-click": "~/.config/waybar/power-menu.sh",
+        "tooltip": false
+    }
+}

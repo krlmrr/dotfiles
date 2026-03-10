@@ -1,0 +1,243 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+    "tab_size": 4,
+    "indent_guides": {
+        "enabled": true,
+    },
+    "diff_view_style": "unified",
+    "title_bar": {
+        "show_user_menu": false,
+        "show_sign_in": true,
+    },
+    "inline_code_actions": true,
+    "edit_predictions": {
+        "provider": "zed",
+    },
+    "session": {
+        "trust_all_worktrees": true,
+    },
+    "sticky_scroll": {
+        "enabled": false,
+    },
+    "minimap": {
+        "show": "never",
+    },
+    "base_keymap": "VSCode",
+    "debugger": {
+        "button": false,
+    },
+    "diagnostics": {
+        "button": false,
+    },
+    "status_bar": {
+        "cursor_position_button": false,
+        "active_language_button": false,
+    },
+    "current_line_highlight": "none",
+    "scroll_beyond_last_line": "off",
+    "gutter": {
+        "runnables": false,
+        "breakpoints": false,
+        "folds": false,
+        "min_line_number_digits": 1,
+    },
+    "buffer_font_features": {
+        "calt": true,
+        "liga": true,
+    },
+    "notification_panel": {
+        "dock": "left",
+    },
+    "buffer_line_height": {
+        "custom": 3,
+    },
+    "git": {
+        "inline_blame": {
+            "enabled": false,
+            "min_column": 80,
+        },
+        "git_gutter": "hide",
+    },
+    "search": {
+        "button": false,
+    },
+    "scrollbar": {
+        "show": "system",
+        "cursors": false,
+        "git_diff": false,
+        "search_results": true,
+        "selected_text": true,
+        "selected_symbol": false,
+        "diagnostics": "none",
+        "axes": {
+            "horizontal": true,
+            "vertical": true,
+        },
+    },
+    "terminal": {
+        "line_height": { "custom": 2.2 },
+        "font_weight": 300.0,
+        "button": false,
+    },
+    "collaboration_panel": {
+        "dock": "right",
+        "button": false,
+    },
+    "outline_panel": {
+        "dock": "right",
+        "button": false,
+    },
+    "git_panel": {
+        "dock": "right",
+        "button": false,
+    },
+    "project_panel": {
+        "indent_guides": {
+            "show": "never",
+        },
+        "hide_root": true,
+        "starts_open": false,
+        "auto_fold_dirs": false,
+        "scrollbar": {
+            "show": "auto",
+        },
+        "entry_spacing": "comfortable",
+        "sticky_scroll": false,
+        "dock": "right",
+        "button": false,
+    },
+    "agent": {
+        "default_model": {
+            "provider": "anthropic",
+            "model": "claude-opus-4-6-thinking-latest",
+            "enable_thinking": true
+        },
+        "model_parameters": [],
+        "dock": "bottom",
+        "enabled": true,
+        "button": false,
+    },
+    "icon_theme": {
+        "mode": "system",
+        "light": "Catppuccin Frappé",
+        "dark": "Catppuccin Frappé",
+    },
+    "vim_mode": true,
+    "ui_font_size": 16,
+    "buffer_font_family": "MonoLisa",
+    "buffer_font_size": 18.0,
+    "theme": {
+        "mode": "system",
+        "light": "Artisan Theme",
+        "dark": "One Dark Flat",
+    },
+    "tab_bar": {
+        "show": false,
+        "show_nav_history_buttons": false,
+        "show_tab_bar_buttons": false,
+    },
+    "toolbar": {
+        "agent_review": false,
+        "breadcrumbs": false,
+        "quick_actions": false,
+    },
+    "tabs": {
+        "close_position": "left",
+        "show_close_button": "hidden",
+    },
+    "relative_line_numbers": "enabled",
+    // Vim-specific settings
+    "vim": {
+        "use_system_clipboard": "always",
+        "toggle_relative_line_numbers": true,
+    },
+    "languages": {
+        "PHP": {
+            "formatter": {
+                "external": {
+                    "command": "bash",
+                    "arguments": [
+                        "-c",
+                        "cat > {buffer_path} && ./vendor/bin/pint --quiet {buffer_path} && cat {buffer_path}",
+                    ],
+                },
+            },
+            "language_servers": ["intelephense", "!phpactor", "!phptools", "..."],
+            "format_on_save": "on",
+        },
+        "JavaScript": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "TypeScript": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "TSX": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "JSX": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "CSS": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "HTML": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "JSON": {
+            "tab_size": 4,
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "Markdown": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+        "YAML": {
+            "formatter": "prettier",
+            "format_on_save": "on",
+        },
+    },
+    "file_types": {
+        "JSON": [".prettierrc", ".eslintrc", ".babelrc", ".stylelintrc"],
+    },
+    // LSP settings (like Neovim)
+    "lsp": {
+        "rust-analyzer": {
+            "initialization_options": {
+                "check": {
+                    "command": "clippy",
+                },
+            },
+        },
+        "intelephense": {
+            "settings": {
+                "inlayHint": {
+                    "parameterNames": true,
+                    "parameterTypes": true,
+                    "returnTypes": true,
+                },
+            },
+        },
+    },
+    "inlay_hints": {
+        "enabled": true,
+    },
+    // Scrolloff equivalent
+    "vertical_scroll_margin": 1,
+    "format_on_save": "on",
+    // Auto-save (optional, but handy)
+    "autosave": "off", // Set to "on_focus_change" if you want auto-save
+}

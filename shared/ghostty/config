@@ -1,0 +1,27 @@
+title = "  "
+theme = dark:one half dark,light:artisan
+palette = 6=#7aa2f7
+palette = 14=#7aa2f7
+macos-titlebar-proxy-icon = hidden
+
+font-family = MonoLisa
+font-style = Medium
+font-style-italic = Medium Italic
+font-style-bold = Medium
+font-style-bold-italic = Medium Italic
+font-size = 18
+
+adjust-cell-height = 65%
+
+window-padding-balance = true
+window-padding-y = 0,0
+window-padding-x = 10,10
+window-decoration = false
+
+window-save-state = always
+
+cursor-style = bar
+confirm-close-surface = false
+macos-option-as-alt = true
+shell-integration-features = sudo
+keybind = shift+enter=text:\x1b\r

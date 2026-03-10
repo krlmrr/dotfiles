@@ -1,0 +1,55 @@
+/* Change the cyan color to use the blue instead */
+.mtk10 {
+    color: #61AFEF !important;
+}
+
+/* Fixes alignment issues with relative line numbers */
+.relative-current-line-number{
+    text-align: center !important;
+    padding-left: 8px;
+}
+
+/* Gets rid of the Gear Icon and Action Icon */
+.action-toolbar-container {
+    display: none !important;
+}
+
+/* Hides the VSCode logo when the editor is empty. */
+.letterpress {
+    display: none !important;
+}
+
+/* Hide the Custom CSS Icon in the Status Bar */
+.__CUSTOM_CSS_JS_INDICATOR_CLS {
+    display: none !important;
+}
+
+/* Scrollbar customization */
+.editor-scrollable .scrollbar.horizontal {
+    display: none !important;
+}
+
+.scrollbar.vertical {
+    width: 12px !important;
+}
+
+.scrollbar.vertical > .slider {
+    border-radius: 4px !important;
+    width: 6px !important;
+    transform: translateX(-6px) !important;
+}
+
+/* Status bar tweaks */
+.statusbar-item-label {
+    background-color: transparent !important;
+}
+
+.part.statusbar {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+
+.codicon-git-branch-changes {
+    display: none !important;
+}
+

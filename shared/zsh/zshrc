@@ -1,0 +1,23 @@
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#757575'
+ZSH_AUTOSUGGEST_HISTORY_IGNORE="nvr *"
+
+plugins=(
+    git
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+)
+
+source $ZSH/oh-my-zsh.sh
+
+setopt HIST_IGNORE_SPACE
+
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+export PATH="$PATH:$HOME/.local/bin"
+
+# Homebrew (Linux)
+if [ -d /home/linuxbrew/.linuxbrew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi

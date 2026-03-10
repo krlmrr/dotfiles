@@ -23,6 +23,7 @@ if [ "$OS" = "linux" ]; then
         readonly DISTRO="deb"
         readonly PKG="apt install -y"
         readonly PKG_UPDATE="apt update"
+        readonly PKG_UPGRADE="apt upgrade -y"
     else
         echo "Unsupported distro"
         exit 1

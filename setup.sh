@@ -11,8 +11,12 @@ echo "Setting up dotfiles from $DOTFILES_DIR"
 
 # Install core system packages (Linux)
 if [ "$OS" = "linux" ]; then
-    echo "Installing system packages..."
+    echo "Updating system..."
     sudo $PKG_UPDATE
+    if [ -n "$PKG_UPGRADE" ]; then
+        sudo $PKG_UPGRADE
+    fi
+    echo "Installing system packages..."
     sudo $PKG git curl wget unzip zsh build-essential wl-clipboard
 fi
 

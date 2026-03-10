@@ -3,19 +3,6 @@ set -e
 
 echo "=== Linux Setup ==="
 
-# Update package manager
-echo "Updating packages..."
-sudo $PKG_UPDATE
-
-# Install core packages
-echo "Installing system packages..."
-sudo $PKG \
-    git \
-    curl \
-    wget \
-    unzip \
-    zsh
-
 # Linux-only brew formulae
 echo "Installing Linux brew formulae..."
 brew install lazydocker

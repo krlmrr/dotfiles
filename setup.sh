@@ -9,6 +9,13 @@ source "$DOTFILES_DIR/shared/functions.sh"
 
 echo "Setting up dotfiles from $DOTFILES_DIR"
 
+# Install core system packages (Linux)
+if [ "$OS" = "linux" ]; then
+    echo "Installing system packages..."
+    sudo $PKG_UPDATE
+    sudo $PKG git curl wget unzip zsh build-essential
+fi
+
 # Git user info (only prompt if not already set)
 GIT_NAME="$(git config --global user.name 2>/dev/null || true)"
 GIT_EMAIL="$(git config --global user.email 2>/dev/null || true)"

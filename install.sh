@@ -13,5 +13,5 @@ if [ ! -d "$HOME/Code/dotfiles" ]; then
     git clone https://github.com/krlmrr/dotfiles.git ~/Code/dotfiles
 fi
 
-# Run setup
-cd ~/Code/dotfiles && bash setup.sh
+# Run setup (< /dev/tty restores terminal input for interactive prompts)
+cd ~/Code/dotfiles && bash setup.sh < /dev/tty

@@ -42,6 +42,7 @@ fi
 # Shared formulae
 echo "Installing shared brew formulae..."
 brew install \
+    gcc \
     gh \
     neovim \
     lazygit \

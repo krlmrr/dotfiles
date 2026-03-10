@@ -70,6 +70,12 @@ if ! command -v slack &> /dev/null; then
     sudo apt install -y slack-desktop
 fi
 
+# Zed
+if ! flatpak list 2>/dev/null | grep -q dev.zed.Zed; then
+    echo "Installing Zed..."
+    flatpak install -y flathub dev.zed.Zed
+fi
+
 # Zen Browser
 if ! command -v zen-browser &> /dev/null; then
     echo "Installing Zen Browser..."

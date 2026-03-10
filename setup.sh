@@ -101,7 +101,12 @@ mkdir -p ~/.config
 link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
 link "$DOTFILES_DIR/shared/ghostty" ~/.config/ghostty
 link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
-link "$DOTFILES_DIR/shared/zed" ~/.config/zed
+if [ -d "$HOME/.var/app/dev.zed.Zed" ]; then
+    link "$DOTFILES_DIR/shared/zed/settings.json" ~/.var/app/dev.zed.Zed/config/zed/settings.json
+    link "$DOTFILES_DIR/shared/zed/themes" ~/.var/app/dev.zed.Zed/config/zed/themes
+else
+    link "$DOTFILES_DIR/shared/zed" ~/.config/zed
+fi
 
 # Fonts
 echo "Installing fonts..."

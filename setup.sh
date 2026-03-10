@@ -13,7 +13,7 @@ echo "Setting up dotfiles from $DOTFILES_DIR"
 if [ "$OS" = "linux" ]; then
     echo "Installing system packages..."
     sudo $PKG_UPDATE
-    sudo $PKG git curl wget unzip zsh build-essential
+    sudo $PKG git curl wget unzip zsh build-essential wl-clipboard
 fi
 
 # Git user info (only prompt if not already set)
@@ -75,6 +75,12 @@ if [ "$OS" = "mac" ]; then
 else
     echo "Running Linux setup..."
     source "$DOTFILES_DIR/linux/setup.sh"
+fi
+
+# Claude Code
+if ! command -v claude &> /dev/null; then
+    echo "Installing Claude Code..."
+    curl -fsSL https://claude.ai/install.sh | bash
 fi
 
 # Symlink shared configs

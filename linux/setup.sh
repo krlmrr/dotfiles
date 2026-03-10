@@ -35,4 +35,14 @@ EOF
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
+# COSMIC desktop config
+if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
+    echo "Configuring COSMIC desktop..."
+    mkdir -p ~/.config/cosmic
+    for dir in "$DOTFILES_DIR/linux/shared/cosmic/"*/; do
+        name=$(basename "$dir")
+        link "$dir" "$HOME/.config/cosmic/$name"
+    done
+fi
+
 echo "=== Linux setup complete ==="

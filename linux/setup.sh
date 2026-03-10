@@ -44,7 +44,8 @@ if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
     mkdir -p ~/.config/cosmic
     for dir in "$DOTFILES_DIR/linux/shared/cosmic/"*/; do
         name=$(basename "$dir")
-        link "$dir" "$HOME/.config/cosmic/$name"
+        rm -rf "$HOME/.config/cosmic/$name"
+        cp -r "$dir" "$HOME/.config/cosmic/$name"
     done
 fi
 

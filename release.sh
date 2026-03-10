@@ -13,6 +13,5 @@ echo "Creating release $VERSION..."
 
 git tag -a "$VERSION" -m "$VERSION"
 git push origin "$VERSION"
-gh release create "$VERSION" --title "$VERSION" --generate-notes
 
-echo "Release $VERSION created!"
+echo "Tag $VERSION pushed! GitHub Action will create the release."

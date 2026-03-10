@@ -53,6 +53,13 @@ if ! command -v 1password &> /dev/null; then
     sudo apt install -y 1password
 fi
 
+# Zen Browser
+if ! command -v zen-browser &> /dev/null; then
+    echo "Installing Zen Browser..."
+    curl -sSL https://raw.githubusercontent.com/upciti/wakemeops/main/assets/install_repository | sudo bash
+    sudo apt install -y zen-browser
+fi
+
 # PHP / Laravel CLI
 if ! command -v php &> /dev/null; then
     echo "Installing PHP / Laravel CLI..."

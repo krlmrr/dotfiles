@@ -47,6 +47,8 @@ if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
         rm -rf "$HOME/.config/cosmic/$name"
         cp -r "$dir" "$HOME/.config/cosmic/$name"
     done
+    # Restart cosmic-bg to apply wallpaper
+    pkill cosmic-bg 2>/dev/null || true
 fi
 
 echo "=== Linux setup complete ==="

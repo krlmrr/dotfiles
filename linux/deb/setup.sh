@@ -60,7 +60,7 @@ if ! command -v php &> /dev/null; then
 fi
 
 # DDEV global config
-ddev config global --project-tld=test
+sg docker -c "ddev config global --project-tld=test"
 
 # Remove unwanted default apps
 source "$DOTFILES_DIR/linux/deb/cleanup.sh"

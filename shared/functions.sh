@@ -3,7 +3,7 @@
 # Remove existing and symlink
 link() {
     rm -rf "$2"
-    ln -sf "$1" "$2"
+    ln -snf "$1" "$2"
 }
 
 # Detect OS

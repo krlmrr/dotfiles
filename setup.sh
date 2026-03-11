@@ -121,7 +121,7 @@ else
     fc-cache -fv
 fi
 
-kill "$SUDO_PID" 2>/dev/null
+kill "$SUDO_PID" 2>/dev/null || true
 echo "Done!"
 
 if [ "$OS" = "linux" ]; then

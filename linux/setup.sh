@@ -19,17 +19,6 @@ elif [ "$DISTRO" = "arch" ]; then
     source "$DOTFILES_DIR/linux/arch/setup.sh"
 fi
 
-# keyd config (caps lock -> ctrl/esc)
-sudo mkdir -p /etc/keyd
-sudo tee /etc/keyd/default.conf > /dev/null <<'EOF'
-[ids]
-*
-
-[main]
-capslock = overload(control, esc)
-EOF
-sudo systemctl enable --now keyd
-
 # Udev rule for Keychron Q8 (Via)
 echo "Setting up Keychron Q8 udev rule..."
 sudo tee /etc/udev/rules.d/99-keychron-via.rules > /dev/null <<'EOF'
@@ -44,8 +33,7 @@ if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
     mkdir -p ~/.config/cosmic
     for dir in "$DOTFILES_DIR/linux/shared/cosmic/"*/; do
         name=$(basename "$dir")
-        rm -rf "$HOME/.config/cosmic/$name"
-        cp -r "$dir" "$HOME/.config/cosmic/$name"
+        cp -a --force "$dir"/. "$HOME/.config/cosmic/$name/"
     done
     # Restart cosmic-bg to apply wallpaper
     pkill cosmic-bg 2>/dev/null || true

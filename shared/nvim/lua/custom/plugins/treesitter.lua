@@ -7,12 +7,22 @@ return {
     config = function()
       require('nvim-treesitter').setup {}
 
-      -- Install parsers
-      require('nvim-treesitter').install {
+      -- Install missing parsers (only if .so not found, to avoid recompiling on every launch)
+      local parsers = {
         'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript',
         'vimdoc', 'vim', 'bash', 'php', 'html', 'css', 'json', 'yaml', 'markdown',
-        'phpdoc', 'regex', 'vue'
+        'phpdoc', 'regex', 'vue',
       }
+      local parser_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'parser')
+      local missing = {}
+      for _, lang in ipairs(parsers) do
+        if vim.fn.filereadable(vim.fs.joinpath(parser_dir, lang .. '.so')) == 0 then
+          table.insert(missing, lang)
+        end
+      end
+      if #missing > 0 then
+        require('nvim-treesitter').install(missing)
+      end
 
       -- Enable highlighting for all filetypes
       vim.api.nvim_create_autocmd('FileType', {

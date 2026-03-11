@@ -1,13 +1,8 @@
 echo "=== Mac Setup ==="
 
-# Mac formulae
-brew_install mole
-
-# Mac casks
-echo "Installing Mac casks..."
-brew_install_cask appcleaner arc balenaetcher bambu-studio blender discord \
-    fantastical figma ghostty hammerspoon herd logi-options+ orbstack \
-    raycast slack tableplus telegram visual-studio-code zed zen
+# Mac packages
+echo "Installing Mac packages..."
+brew bundle --file="$DOTFILES_DIR/mac/Brewfile"
 
 # Caps Lock → Control (at boot via LaunchDaemon, Hammerspoon adds tap-for-Escape)
 sudo cp "$DOTFILES_DIR/mac/CapsLockToControl.plist" /Library/LaunchDaemons/com.dotfiles.CapsLockToControl.plist

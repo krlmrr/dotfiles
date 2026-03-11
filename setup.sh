@@ -56,7 +56,7 @@ fi
 
 # Shared formulae
 echo "Installing shared brew formulae..."
-brew_install gcc gh neovim lazygit ripgrep fd node tree-sitter-cli
+brew bundle --file="$DOTFILES_DIR/shared/Brewfile"
 
 # SSH + GitHub auth
 source "$DOTFILES_DIR/ssh-setup.sh"

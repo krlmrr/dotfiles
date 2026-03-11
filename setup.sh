@@ -118,6 +118,8 @@ zen_launch() {
         flatpak run app.zen_browser.zen &>/dev/null &
     elif command -v zen-browser &>/dev/null; then
         zen-browser &>/dev/null &
+    elif command -v zen &>/dev/null; then
+        zen &>/dev/null &
     else
         return 1
     fi

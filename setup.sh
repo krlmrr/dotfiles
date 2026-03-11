@@ -111,6 +111,43 @@ else
     link "$DOTFILES_DIR/shared/zed" ~/.config/zed
 fi
 
+# Zen Browser user.js
+echo "Configuring Zen Browser..."
+zen_launch() {
+    if flatpak list 2>/dev/null | grep -q app.zen_browser.zen; then
+        flatpak run app.zen_browser.zen &>/dev/null &
+    elif command -v zen-browser &>/dev/null; then
+        zen-browser &>/dev/null &
+    else
+        return 1
+    fi
+    ZEN_PID=$!
+    sleep 5
+    kill "$ZEN_PID" 2>/dev/null || true
+    wait "$ZEN_PID" 2>/dev/null || true
+}
+
+zen_root() {
+    if [ -d "$HOME/.var/app/app.zen_browser.zen/.zen" ]; then
+        echo "$HOME/.var/app/app.zen_browser.zen/.zen"
+    elif [ -d "$HOME/.zen" ]; then
+        echo "$HOME/.zen"
+    fi
+}
+
+ZEN_ROOT="$(zen_root)"
+if [ -z "$ZEN_ROOT" ] || ! ls "$ZEN_ROOT"/*.*/ &>/dev/null; then
+    echo "Opening Zen to create profile..."
+    zen_launch || true
+    ZEN_ROOT="$(zen_root)"
+fi
+if [ -n "$ZEN_ROOT" ]; then
+    for profile_dir in "$ZEN_ROOT"/*.*/; do
+        [ -d "$profile_dir" ] || continue
+        cp "$DOTFILES_DIR/shared/zen/user.js" "$profile_dir/user.js"
+    done
+fi
+
 # Fonts
 echo "Installing fonts..."
 if [ "$OS" = "mac" ]; then

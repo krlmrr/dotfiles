@@ -9,6 +9,11 @@ fi
 # Arch-specific packages
 pacman_install keyd hyprland hyprlock hypridle waybar rofi-wayland mako sddm
 
+# keyd config (caps lock -> ctrl/esc)
+sudo mkdir -p /etc/keyd
+sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/default.conf" /etc/keyd/default.conf
+sudo systemctl enable --now keyd
+
 # AUR packages
 if command -v yay &> /dev/null; then
     if ! pacman -Q ddev-bin &>/dev/null; then

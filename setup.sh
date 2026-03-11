@@ -119,7 +119,7 @@ zen_launch() {
     elif command -v zen-browser &>/dev/null; then
         zen-browser &>/dev/null &
     elif command -v zen &>/dev/null; then
-        zen &>/dev/null &
+        zen &
     else
         return 1
     fi

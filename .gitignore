@@ -1,1 +1,3 @@
 shared/nvim/lazy-lock.json
+shared/zed/prompts/
+.claude/

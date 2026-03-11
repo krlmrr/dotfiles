@@ -123,3 +123,12 @@ fi
 
 kill "$SUDO_PID" 2>/dev/null
 echo "Done!"
+
+if [ "$OS" = "linux" ]; then
+    echo "A reboot is required to apply all changes."
+    read -p "Reboot now? [y/N] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        sudo reboot
+    fi
+fi

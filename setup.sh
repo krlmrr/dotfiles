@@ -57,6 +57,9 @@ fi
 echo "Installing shared brew formulae..."
 brew_install gcc gh neovim lazygit ripgrep fd node tree-sitter-cli
 
+# SSH + GitHub auth
+source "$DOTFILES_DIR/ssh-setup.sh"
+
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo "Installing Oh My Zsh..."

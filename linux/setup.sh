@@ -27,6 +27,12 @@ EOF
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
+# Default browser
+if command -v zen &>/dev/null; then
+    echo "Setting Zen Browser as default..."
+    xdg-settings set default-web-browser zen.desktop
+fi
+
 # COSMIC desktop config
 if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
     echo "Configuring COSMIC desktop..."

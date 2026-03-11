@@ -21,7 +21,7 @@ return {
         end
       end
       if #missing > 0 then
-        require('nvim-treesitter').install(missing)
+        vim.cmd('TSInstall ' .. table.concat(missing, ' '))
       end
 
       -- Enable highlighting for all filetypes

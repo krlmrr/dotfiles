@@ -43,7 +43,29 @@ local keyDownTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function
     return false
 end)
 
-controlTap:start()
-keyDownTap:start()
+local function startTaps()
+    controlTap:start()
+    keyDownTap:start()
+    log.i("Caps Lock → Control/Escape started")
+end
 
-log.i("Caps Lock → Control/Escape loaded")
+startTaps()
+
+-- Restart eventtaps after sleep/wake and USB changes (undocking)
+local watcher = hs.caffeinate.watcher.new(function(event)
+    if event == hs.caffeinate.watcher.systemDidWake then
+        log.i("Restarting eventtaps after wake")
+        controlTap:stop()
+        keyDownTap:stop()
+        startTaps()
+    end
+end)
+watcher:start()
+
+local usbWatcher = hs.usb.watcher.new(function(data)
+    log.i("USB change detected, restarting eventtaps")
+    controlTap:stop()
+    keyDownTap:stop()
+    startTaps()
+end)
+usbWatcher:start()

@@ -1,8 +1,14 @@
 #!/bin/bash
 set -e
 
-# Install git if needed
-if ! command -v git &> /dev/null; then
+# Install Xcode Command Line Tools (macOS) or git (Linux)
+if [[ "$(uname)" == "Darwin" ]]; then
+    if ! xcode-select -p &>/dev/null; then
+        echo "Installing Xcode Command Line Tools..."
+        xcode-select --install 2>/dev/null || true
+        until xcode-select -p &>/dev/null; do sleep 5; done
+    fi
+elif ! command -v git &> /dev/null; then
     echo "Installing git..."
     if command -v pacman &> /dev/null; then
         sudo pacman -S --noconfirm git

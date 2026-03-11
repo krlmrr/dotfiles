@@ -1,5 +1,8 @@
 echo "=== Mac Setup ==="
 
+# Mac formulae
+brew_install mole
+
 # Mac casks
 echo "Installing Mac casks..."
 brew_install_cask appcleaner arc balenaetcher bambu-studio blender discord \

@@ -38,6 +38,7 @@ if [ -z "$GIT_EMAIL" ]; then
 fi
 
 # Git config
+rm -f ~/.gitconfig
 cp "$DOTFILES_DIR/shared/git/gitconfig" ~/.gitconfig
 link "$DOTFILES_DIR/shared/git/gitignore_global" ~/.gitignore_global
 git config --global core.excludesfile ~/.gitignore_global
@@ -81,10 +82,7 @@ if [ "$SHELL" != "$(which zsh)" ]; then
     chsh -s "$(which zsh)"
 fi
 
-# Build .zshrc
-bash "$DOTFILES_DIR/buildzshrc.sh"
-
-# OS-specific setup
+# OS-specific setup (installs)
 if [ "$OS" = "mac" ]; then
     echo "Running Mac setup..."
     source "$DOTFILES_DIR/mac/setup.sh"
@@ -99,65 +97,6 @@ if ! command -v claude &> /dev/null; then
     curl -fsSL https://claude.ai/install.sh | bash
 fi
 
-# Symlink shared configs
-echo "Linking shared configs..."
-mkdir -p ~/.config
-
-link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
-link "$DOTFILES_DIR/shared/ghostty" ~/.config/ghostty
-link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
-if [ -d "$HOME/.var/app/dev.zed.Zed" ]; then
-    link "$DOTFILES_DIR/shared/zed/settings.json" ~/.var/app/dev.zed.Zed/config/zed/settings.json
-    link "$DOTFILES_DIR/shared/zed/themes" ~/.var/app/dev.zed.Zed/config/zed/themes
-    link "$DOTFILES_DIR/linux/shared/zed-keymap.json" ~/.var/app/dev.zed.Zed/config/zed/keymap.json
-else
-    link "$DOTFILES_DIR/shared/zed" ~/.config/zed
-fi
-
-# Zen Browser user.js
-echo "Configuring Zen Browser..."
-zen_launch() {
-    if flatpak list 2>/dev/null | grep -q app.zen_browser.zen; then
-        flatpak run app.zen_browser.zen &>/dev/null &
-    elif command -v zen-browser &>/dev/null; then
-        zen-browser &>/dev/null &
-    elif command -v zen &>/dev/null; then
-        zen &
-    else
-        return 1
-    fi
-    ZEN_PID=$!
-    # Wait for profile to be created (up to 15s)
-    for i in $(seq 1 15); do
-        [ -n "$(zen_root)" ] && find "$(zen_root)" -maxdepth 1 -type d -name "*.*" 2>/dev/null | grep -q . && break
-        sleep 1
-    done
-    kill "$ZEN_PID" 2>/dev/null || true
-    wait "$ZEN_PID" 2>/dev/null || true
-}
-
-zen_root() {
-    if [ -d "$HOME/.var/app/app.zen_browser.zen/.zen" ]; then
-        echo "$HOME/.var/app/app.zen_browser.zen/.zen"
-    elif [ -d "$HOME/.zen" ]; then
-        echo "$HOME/.zen"
-    elif [ -d "$HOME/.config/zen" ]; then
-        echo "$HOME/.config/zen"
-    fi
-}
-
-ZEN_ROOT="$(zen_root)"
-if [ -z "$ZEN_ROOT" ] || ! find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" 2>/dev/null | grep -q .; then
-    echo "Opening Zen to create profile..."
-    zen_launch || true
-    ZEN_ROOT="$(zen_root)"
-fi
-if [ -n "$ZEN_ROOT" ]; then
-    find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" | while read -r profile_dir; do
-        cp "$DOTFILES_DIR/shared/zen/user.js" "$profile_dir/user.js"
-    done
-fi
-
 # Fonts
 echo "Installing fonts..."
 if [ "$OS" = "mac" ]; then
@@ -167,6 +106,9 @@ else
     cp -r "$DOTFILES_DIR/shared/fonts/"* ~/.local/share/fonts/
     fc-cache -fv
 fi
+
+# Configure all configs and symlinks
+bash "$DOTFILES_DIR/configure.sh"
 
 kill "$SUDO_PID" 2>/dev/null || true
 echo "Done!"

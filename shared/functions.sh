@@ -10,6 +10,11 @@ link() {
     ln -snf "$1" "$2"
 }
 
+# Append a line to a file
+append() {
+    echo "$1" >> "$2"
+}
+
 # Install only missing brew formulae
 brew_install() {
     local missing=()

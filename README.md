@@ -77,7 +77,7 @@ dotfiles/
 
 Installs apps via Homebrew casks: Ghostty, Arc, Zed, VS Code, OrbStack, Raycast, Slack, Discord, Figma, TablePlus, and more.
 
-Configures Hammerspoon for caps lock remapping (ctrl/esc).
+Configures caps lock remapping (ctrl/esc) via a LaunchDaemon (hidutil) and Hammerspoon.
 
 ### Linux (Debian/Ubuntu)
 

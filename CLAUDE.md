@@ -53,8 +53,10 @@ setup.sh (entry point)
 
 Push a tag to trigger a GitHub Action that creates a release:
 ```bash
-bash release.sh 1.1.0
+bash release.sh 1.0.11
 ```
+
+Uses semver. Check the latest tag with `git tag --sort=-v:refname | head -1` and bump accordingly. Always run the release script after pushing commits.
 
 ## Testing
 

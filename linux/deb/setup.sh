@@ -97,6 +97,7 @@ fi
 # DDEV global config (sg runs command with docker group access in current session)
 if command -v ddev &> /dev/null; then
     sg docker -c "ddev config global --project-tld=test"
+    mkcert -install
 fi
 
 # Remove unwanted default apps

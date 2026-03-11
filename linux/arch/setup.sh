@@ -23,6 +23,7 @@ fi
 
 # DDEV global config
 ddev config global --project-tld=test
+mkcert -install
 
 # Hyprland
 mkdir -p ~/.config/hypr

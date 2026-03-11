@@ -3,10 +3,10 @@ unalias nv 2>/dev/null
 nv() { clear && nvim "${1:-.}"; }
 alias nz="nv ~/.zshrc"
 alias vim="nvim"
-alias sourcez="source ~/.zshrc"
+alias sourcez="bash ~/Code/dotfiles/buildzshrc.sh && source ~/.zshrc"
 
 # Tools
-alias lz="lazygit"
+alias lzg="lazygit"
 alias yeet="sudo rm -rf"
 alias mkd="mkdir -p"
 

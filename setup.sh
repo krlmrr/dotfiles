@@ -55,7 +55,7 @@ fi
 
 # Shared formulae
 echo "Installing shared brew formulae..."
-brew_install gcc gh neovim lazygit ripgrep fd
+brew_install gcc gh neovim lazygit ripgrep fd node
 
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then

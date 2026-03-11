@@ -11,6 +11,11 @@ rm -f ~/.config/lazygit
 rm -f ~/.config/zed
 rm -f ~/.gitignore_global
 
+# Remove Flatpak Zed symlinks
+rm -f ~/.var/app/dev.zed.Zed/config/zed/settings.json
+rm -f ~/.var/app/dev.zed.Zed/config/zed/themes
+rm -f ~/.var/app/dev.zed.Zed/config/zed/keymap.json
+
 # Remove mac-specific symlinks
 rm -f ~/.hammerspoon
 rm -f "$HOME/Library/Application Support/Code/User/settings.json" 2>/dev/null

@@ -1,0 +1,105 @@
+// Zed keymap (Linux)
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+    {
+        "bindings": {
+            "ctrl-j": "menu::SelectNext",
+            "ctrl-k": "menu::SelectPrevious",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-shift-b": "workspace::ToggleLeftDock",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-b": "workspace::ToggleRightDock",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-t": "terminal_panel::Toggle",
+            "ctrl-e": "project_panel::ToggleFocus",
+            "ctrl-g": "git_panel::ToggleFocus",
+        },
+    },
+    {
+        "context": "Editor && !menu",
+        "bindings": {
+            "ctrl-t": "terminal_panel::Toggle",
+        },
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-t": "terminal_panel::Toggle",
+        },
+    },
+    {
+        "context": "vim_mode == normal && !menu",
+        "bindings": {
+            "ctrl-e": "project_panel::ToggleFocus",
+            "ctrl-g": "git_panel::ToggleFocus",
+        },
+    },
+    {
+        "context": "ProjectPanel",
+        "bindings": {
+            "ctrl-e": "workspace::ToggleRightDock",
+        },
+    },
+    {
+        "context": "GitPanel",
+        "bindings": {
+            "ctrl-g": "workspace::ToggleRightDock",
+        },
+    },
+    {
+        "context": "Editor",
+        "bindings": {
+            "ctrl-;": [
+                "projects::OpenRecent",
+                {
+                    "create_new_window": false,
+                },
+            ],
+        },
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-;": [
+                "projects::OpenRecent",
+                {
+                    "create_new_window": false,
+                },
+            ],
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-;": [
+                "projects::OpenRecent",
+                {
+                    "create_new_window": false,
+                },
+            ],
+        },
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-n": "workspace::NewTerminal"
+        }
+    }
+]

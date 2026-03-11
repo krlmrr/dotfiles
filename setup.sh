@@ -104,6 +104,7 @@ link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
 if [ -d "$HOME/.var/app/dev.zed.Zed" ]; then
     link "$DOTFILES_DIR/shared/zed/settings.json" ~/.var/app/dev.zed.Zed/config/zed/settings.json
     link "$DOTFILES_DIR/shared/zed/themes" ~/.var/app/dev.zed.Zed/config/zed/themes
+    link "$DOTFILES_DIR/linux/shared/zed-keymap.json" ~/.var/app/dev.zed.Zed/config/zed/keymap.json
 else
     link "$DOTFILES_DIR/shared/zed" ~/.config/zed
 fi

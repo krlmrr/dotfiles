@@ -12,7 +12,7 @@ font-style-bold-italic = Medium Italic
 font-size = 12
 
 window-padding-balance = true
-window-padding-y = 4,4
+window-padding-y = 8,4
 window-padding-x = 4,4
 window-decoration = false
 

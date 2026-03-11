@@ -2,23 +2,19 @@ title = "  "
 theme = dark:One Half Dark,light:artisan
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
-macos-titlebar-proxy-icon = hidden
 
 font-family = MonoLisa
 font-style = Medium
 font-style-italic = Medium Italic
 font-style-bold = Medium
 font-style-bold-italic = Medium Italic
-font-size = 12
 window-padding-balance = true
-window-padding-y = 8,4
-window-padding-x = 4,4
 
 window-save-state = always
 
 cursor-style = bar
 confirm-close-surface = false
-macos-option-as-alt = true
 shell-integration-features = sudo
-
 keybind = shift+enter=text:\x1b\r
+
+# Custom

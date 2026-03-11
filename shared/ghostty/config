@@ -9,9 +9,7 @@ font-style = Medium
 font-style-italic = Medium Italic
 font-style-bold = Medium
 font-style-bold-italic = Medium Italic
-font-size = 18
-
-adjust-cell-height = 65%
+font-size = 12
 
 window-padding-balance = true
 window-padding-y = 0,0

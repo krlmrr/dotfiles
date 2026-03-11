@@ -3,6 +3,8 @@ set -e
 
 # Keep sudo alive throughout the script
 sudo -v
+while true; do sudo -n true; sleep 60; done 2>/dev/null &
+SUDO_PID=$!
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$DOTFILES_DIR/shared/functions.sh"
@@ -119,4 +121,5 @@ else
     fc-cache -fv
 fi
 
+kill "$SUDO_PID" 2>/dev/null
 echo "Done!"

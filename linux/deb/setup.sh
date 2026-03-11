@@ -89,8 +89,10 @@ if ! command -v php &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
 fi
 
-# DDEV global config
-sg docker -c "ddev config global --project-tld=test"
+# DDEV global config (sg runs command with docker group access in current session)
+if command -v ddev &> /dev/null; then
+    sg docker -c "ddev config global --project-tld=test"
+fi
 
 # Remove unwanted default apps
 source "$DOTFILES_DIR/linux/deb/cleanup.sh"

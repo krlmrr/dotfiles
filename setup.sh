@@ -138,6 +138,8 @@ zen_root() {
         echo "$HOME/.var/app/app.zen_browser.zen/.zen"
     elif [ -d "$HOME/.zen" ]; then
         echo "$HOME/.zen"
+    elif [ -d "$HOME/.config/zen" ]; then
+        echo "$HOME/.config/zen"
     fi
 }
 

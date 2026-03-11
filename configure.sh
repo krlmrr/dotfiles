@@ -31,6 +31,10 @@ else
     link "$DOTFILES_DIR/shared/zed" ~/.config/zed
 fi
 
+# Claude Code skills
+mkdir -p ~/.claude/skills
+link "$DOTFILES_DIR/shared/claude/skills/laravel" ~/.claude/skills/laravel
+
 # Build Ghostty config
 bash "$DOTFILES_DIR/buildghostty.sh"
 

@@ -126,7 +126,7 @@ zen_launch() {
     ZEN_PID=$!
     # Wait for profile to be created (up to 15s)
     for i in $(seq 1 15); do
-        [ -n "$(zen_root)" ] && ls "$(zen_root)"/*.*/ &>/dev/null && break
+        [ -n "$(zen_root)" ] && find "$(zen_root)" -maxdepth 1 -type d -name "*.*" 2>/dev/null | grep -q . && break
         sleep 1
     done
     kill "$ZEN_PID" 2>/dev/null || true
@@ -144,14 +144,13 @@ zen_root() {
 }
 
 ZEN_ROOT="$(zen_root)"
-if [ -z "$ZEN_ROOT" ] || ! ls "$ZEN_ROOT"/*.*/ &>/dev/null; then
+if [ -z "$ZEN_ROOT" ] || ! find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" 2>/dev/null | grep -q .; then
     echo "Opening Zen to create profile..."
     zen_launch || true
     ZEN_ROOT="$(zen_root)"
 fi
 if [ -n "$ZEN_ROOT" ]; then
-    for profile_dir in "$ZEN_ROOT"/*.*/; do
-        [ -d "$profile_dir" ] || continue
+    find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" | while read -r profile_dir; do
         cp "$DOTFILES_DIR/shared/zen/user.js" "$profile_dir/user.js"
     done
 fi

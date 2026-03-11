@@ -30,7 +30,7 @@ setup.sh (entry point)
 - `shared/` — cross-platform configs (nvim, ghostty, lazygit, zed, zsh, git, fonts, wallpapers)
 - `mac/` — macOS-specific (hammerspoon, vscode, phpstorm, zed keymap, zsh aliases)
 - `linux/` — all Linux stuff
-  - `linux/shared/` — shared across linux distros (zsh aliases)
+  - `linux/shared/` — shared across linux distros (zsh aliases, keyd config, COSMIC desktop configs, zed keymap)
   - `linux/deb/` — Debian/Ubuntu specific (setup + cleanup scripts)
   - `linux/arch/` — Arch specific (setup script + hypr, waybar, rofi, mako, sddm configs)
 
@@ -42,6 +42,8 @@ setup.sh (entry point)
 - Use `buildzshrc.sh` to rebuild `.zshrc` without running full setup
 - System packages install before brew (zsh must exist before oh-my-zsh)
 - `source` not `bash` for child scripts (shares sudo session)
+- COSMIC configs are copied (not symlinked) because COSMIC rewrites its own config files. Use `cp -a --force` to overwrite in place (avoids race with running desktop)
+- Caps lock remapping: keyd on Linux (symlinked config), LaunchDaemon + Hammerspoon on Mac
 
 ## Key Aliases
 
@@ -53,7 +55,7 @@ setup.sh (entry point)
 
 Push a tag to trigger a GitHub Action that creates a release:
 ```bash
-bash release.sh 1.0.11
+bash release.sh <next-version>
 ```
 
 Uses semver. Check the latest tag with `git tag --sort=-v:refname | head -1` and bump accordingly. Always run the release script after pushing commits.

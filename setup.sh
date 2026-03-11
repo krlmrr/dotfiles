@@ -3,7 +3,7 @@ set -e
 
 # Keep sudo alive throughout the script
 sudo -v
-while true; do sudo -n true; sleep 60; done 2>/dev/null &
+while true; do sudo -v; sleep 30; done 2>/dev/null &
 SUDO_PID=$!
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"

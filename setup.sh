@@ -122,7 +122,11 @@ zen_launch() {
         return 1
     fi
     ZEN_PID=$!
-    sleep 5
+    # Wait for profile to be created (up to 15s)
+    for i in $(seq 1 15); do
+        [ -n "$(zen_root)" ] && ls "$(zen_root)"/*.*/ &>/dev/null && break
+        sleep 1
+    done
     kill "$ZEN_PID" 2>/dev/null || true
     wait "$ZEN_PID" 2>/dev/null || true
 }

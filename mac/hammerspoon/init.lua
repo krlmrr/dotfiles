@@ -1,85 +1,49 @@
 -- Caps Lock → tap for Escape, hold for Control
--- Uses hidutil to remap Caps Lock → F18, then Hammerspoon handles F18.
+-- Requires: System Preferences > Keyboard > Modifier Keys > Caps Lock → Control
 
 local log = hs.logger.new("capslock", "info")
 
-local function applyHidutil(reason)
-    log.i("Applying hidutil mapping: " .. reason)
-    hs.execute('/usr/bin/hidutil property --set \'{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x70000006D}]}\'')
-end
+local sendEscape = false
+local lastModifiers = {}
 
-applyHidutil("init")
-
--- Re-apply after wake/unlock
-local sleepWatcher = hs.caffeinate.watcher.new(function(event)
-    if event == hs.caffeinate.watcher.systemDidWake
-        or event == hs.caffeinate.watcher.screensDidWake
-        or event == hs.caffeinate.watcher.sessionDidBecomeActive
-        or event == hs.caffeinate.watcher.screensDidUnlock then
-        hs.timer.doAfter(1, function() applyHidutil("wake/unlock") end)
-    end
+-- If control is held longer than this, don't send escape
+local cancelTimer = hs.timer.delayed.new(0.150, function()
+    sendEscape = false
 end)
-sleepWatcher:start()
 
--- Re-apply when USB keyboard connected
-local usbWatcher = hs.usb.watcher.new(function(data)
-    if data.eventType == "added" then
-        log.i("USB device added: " .. (data.productName or "unknown"))
-        hs.timer.doAfter(1, function() applyHidutil("usb-added") end)
-    end
-end)
-usbWatcher:start()
+-- Watch for control key state changes (flagsChanged)
+local controlTap = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, function(event)
+    local newModifiers = event:getFlags()
 
--- Eventtap for F18 → Escape/Control
-local f18KeyCode = 0x4F
-local capsDown = false
-local capsAlone = true
-
-local capsWatcher = hs.eventtap.new({ hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp }, function(event)
-    local keyCode = event:getKeyCode()
-    local type = event:getType()
-
-    if keyCode == f18KeyCode then
-        if type == hs.eventtap.event.types.keyDown then
-            if not capsDown then
-                capsDown = true
-                capsAlone = true
-            end
-            return true
-        elseif type == hs.eventtap.event.types.keyUp then
-            local alone = capsAlone
-            capsDown = false
-            capsAlone = false
-            if alone then
-                hs.timer.doAfter(0, function()
-                    hs.eventtap.keyStroke({}, "escape", 50000)
-                end)
-            end
-            return true
-        end
+    -- Ignore if control state hasn't changed
+    if lastModifiers["ctrl"] == newModifiers["ctrl"] then
+        return false
     end
 
-    if capsDown then
-        if type == hs.eventtap.event.types.keyDown or type == hs.eventtap.event.types.keyUp then
-            capsAlone = false
-            local flags = event:getFlags()
-            flags.ctrl = true
-            event:setFlags(flags)
+    if not lastModifiers["ctrl"] then
+        -- Control just pressed
+        lastModifiers = newModifiers
+        sendEscape = true
+        cancelTimer:start()
+    else
+        -- Control just released
+        if sendEscape then
+            hs.eventtap.keyStroke({}, "escape", 1)
         end
+        lastModifiers = newModifiers
+        cancelTimer:stop()
     end
 
     return false
 end)
 
-capsWatcher:start()
-log.i("Eventtap started")
-
--- Monitor eventtap health every 30s
-hs.timer.doEvery(30, function()
-    if not capsWatcher:isEnabled() then
-        log.w("Eventtap died — restarting")
-        capsWatcher:start()
-    end
+-- Any other key pressed while control is held cancels the escape
+local keyDownTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
+    sendEscape = false
+    return false
 end)
 
-log.i("Config loaded successfully")
+controlTap:start()
+keyDownTap:start()
+
+log.i("Caps Lock → Control/Escape loaded")

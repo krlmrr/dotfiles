@@ -385,8 +385,8 @@
     "workbench.startupEditor": "none",
     // Custom CSS
     "vscode_custom_css.imports": [
-        "file:///Users/karlm/code/dotfiles/vscode/custom.css",
-        "file:///Users/karlm/code/dotfiles/vscode/custom.js"
+        "file:///Users/karlm/Code/dotfiles/mac/vscode/custom.css",
+        "file:///Users/karlm/Code/dotfiles/mac/vscode/custom.js"
     ],
     "claudeCode.preferredLocation": "sidebar",
     "claudeCode.diffEnabled": false,

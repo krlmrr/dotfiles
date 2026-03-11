@@ -2,6 +2,10 @@
 
 # Remove existing and symlink
 link() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "link() error: missing argument" >&2
+        return 1
+    fi
     rm -rf "$2"
     ln -snf "$1" "$2"
 }

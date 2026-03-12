@@ -23,6 +23,19 @@ $users = User::all();
 
 Never use single-letter variables. Use the best possible variable name — clear and precise, but not needlessly long.
 
+## Inline Single-Use Variables
+
+If a variable is only used once, inline it instead of assigning it.
+
+```php
+// Wrong
+$activeUsers = User::where('active', true)->get();
+return response()->json($activeUsers);
+
+// Right
+return response()->json(User::where('active', true)->get());
+```
+
 ## Ternaries on Their Own Lines
 
 Break ternary expressions onto separate lines so the logic is easy to follow.

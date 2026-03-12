@@ -62,6 +62,21 @@ public function store(StoreProjectRequest $request)
 
 When creating validation rules, put them in a Form Request class (`php artisan make:request`). Use `authorize()` for authorization logic and `rules()` for validation.
 
+## Method Chaining
+
+One method per line when chaining.
+
+```php
+// Wrong
+$users = User::where('active', true)->where('role', 'admin')->orderBy('name')->get();
+
+// Right
+$users = User::where('active', true)
+    ->where('role', 'admin')
+    ->orderBy('name')
+    ->get();
+```
+
 ## Code Formatting
 
 This project uses Duster (which includes Pint) for code formatting. Never suggest running `pint` directly — use `duster` instead:

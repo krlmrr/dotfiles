@@ -26,22 +26,6 @@ $users = User::all();
 $users = User::all();
 ```
 
-## Descriptive Variable Names
-
-Never use single-letter variables. Use the best possible variable name — clear and precise, but not needlessly long.
-
-```php
-// Wrong
-$u = User::find($id);
-foreach ($items as $i) {}
-$theUserThatWeFoundInTheDatabase = User::find($id);
-
-// Right
-$user = User::find($id);
-foreach ($items as $item) {}
-$activeUsers = User::where('active', true)->get();
-```
-
 ## Validation Belongs in Request Classes
 
 Never validate in controllers. Always create a dedicated Form Request class.

@@ -33,6 +33,7 @@ fi
 
 # Claude Code skills
 mkdir -p ~/.claude/skills
+link "$DOTFILES_DIR/shared/claude/skills/general" ~/.claude/skills/general
 link "$DOTFILES_DIR/shared/claude/skills/laravel" ~/.claude/skills/laravel
 link "$DOTFILES_DIR/shared/claude/skills/vue" ~/.claude/skills/vue
 

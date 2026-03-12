@@ -28,6 +28,10 @@ public function store(StoreProjectRequest $request)
 
 When creating validation rules, put them in a Form Request class (`php artisan make:request`). Use `authorize()` for authorization logic and `rules()` for validation.
 
+## Controller Methods
+
+Controllers may only contain these methods: `__invoke`, `index`, `show`, `create`, `store`, `edit`, `update`, `destroy`, `forceDelete`. Nothing else. If you need other actions, create a new controller.
+
 ## Method Chaining
 
 One method per line when chaining.
@@ -45,10 +49,14 @@ $users = User::where('active', true)
 
 ## Code Formatting
 
-This project uses Duster (which includes Pint) for code formatting. Never suggest running `pint` directly — use `duster` instead:
+Run code formatting frequently after making changes. Prefer Duster over Pint, but fall back to Pint if Duster is not installed:
 
 ```bash
+# Preferred
 ./vendor/bin/duster fix
+
+# Fallback if Duster is not installed
+./vendor/bin/pint
 ```
 
 ## Local Development

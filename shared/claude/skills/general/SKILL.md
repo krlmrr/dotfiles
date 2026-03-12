@@ -8,6 +8,17 @@ user-invocable: false
 
 Follow these rules when writing or modifying any code:
 
+## No Comments
+
+Never write comments in code. No docblocks, no inline comments, no TODO comments. The code should be self-explanatory through clear naming and structure.
+
+The one exception is PHPStan type annotations. When needed, always use the single-line format:
+
+```php
+/** @var Collection<int, User> */
+$users = User::all();
+```
+
 ## Descriptive Variable Names
 
 Never use single-letter variables. Use the best possible variable name — clear and precise, but not needlessly long.

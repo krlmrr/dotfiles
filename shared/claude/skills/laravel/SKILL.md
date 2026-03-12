@@ -8,24 +8,6 @@ user-invocable: false
 
 Follow these rules when writing or modifying Laravel code:
 
-## No Comments
-
-Never write comments in code. No docblocks, no inline comments, no TODO comments. The code should be self-explanatory through clear naming and structure.
-
-The one exception is PHPStan type annotations. When needed, always use the single-line format:
-
-```php
-// Wrong
-/**
- * @var Collection<int, User>
- */
-$users = User::all();
-
-// Right
-/** @var Collection<int, User> */
-$users = User::all();
-```
-
 ## Validation Belongs in Request Classes
 
 Never validate in controllers. Always create a dedicated Form Request class.

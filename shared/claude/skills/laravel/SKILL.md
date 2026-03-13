@@ -32,6 +32,20 @@ When creating validation rules, put them in a Form Request class (`php artisan m
 
 Controllers may only contain these methods: `__invoke`, `index`, `show`, `create`, `store`, `edit`, `update`, `destroy`, `forceDelete`. Nothing else. If you need other actions, create a new controller.
 
+## Use Import Statements
+
+Always use `use` statements at the top of the file. Never inline fully qualified class names.
+
+```php
+// Wrong
+/** @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string> */
+
+// Right
+use Illuminate\Contracts\Validation\ValidationRule;
+
+/** @return array<string, ValidationRule|array<mixed>|string> */
+```
+
 ## Method Chaining
 
 One method per line when chaining.

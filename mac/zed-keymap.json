@@ -119,5 +119,10 @@
         "bindings": {
             "cmd-n": null
         }
+    },
+    {
+        "bindings": {
+            "cmd-shift-c": null
+        }
     }
 ]

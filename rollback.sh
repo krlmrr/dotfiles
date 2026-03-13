@@ -18,6 +18,9 @@ rm -f ~/.var/app/dev.zed.Zed/config/zed/keymap.json
 
 # Remove mac-specific symlinks
 rm -f ~/.hammerspoon
+rm -f ~/.config/sketchybar
+rm -f ~/.yabairc
+rm -f ~/.skhdrc
 rm -f "$HOME/Library/Application Support/Code/User/settings.json" 2>/dev/null
 rm -f "$HOME/Library/Application Support/Code/User/keybindings.json" 2>/dev/null
 rm -f ~/.config/zed/keymap.json

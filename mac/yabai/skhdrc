@@ -1,0 +1,86 @@
+# Focus (alt for laptop, meh for Lily58)
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east
+ctrl + alt + cmd - h : yabai -m window --focus west
+ctrl + alt + cmd - j : yabai -m window --focus south
+ctrl + alt + cmd - k : yabai -m window --focus north
+ctrl + alt + cmd - l : yabai -m window --focus east
+
+alt - left : yabai -m window --focus west
+alt - down : yabai -m window --focus south
+alt - up : yabai -m window --focus north
+alt - right : yabai -m window --focus east
+ctrl + alt + cmd - left : yabai -m window --focus west
+ctrl + alt + cmd - down : yabai -m window --focus south
+ctrl + alt + cmd - up : yabai -m window --focus north
+ctrl + alt + cmd - right : yabai -m window --focus east
+
+# Move windows (alt-shift for laptop, meh+shift for Lily58)
+shift + alt - h : yabai -m window --warp west
+shift + alt - j : yabai -m window --warp south
+shift + alt - k : yabai -m window --warp north
+shift + alt - l : yabai -m window --warp east
+shift + ctrl + alt + cmd - h : yabai -m window --warp west
+shift + ctrl + alt + cmd - j : yabai -m window --warp south
+shift + ctrl + alt + cmd - k : yabai -m window --warp north
+shift + ctrl + alt + cmd - l : yabai -m window --warp east
+
+shift + alt - left : yabai -m window --warp west
+shift + alt - down : yabai -m window --warp south
+shift + alt - up : yabai -m window --warp north
+shift + alt - right : yabai -m window --warp east
+shift + ctrl + alt + cmd - left : yabai -m window --warp west
+shift + ctrl + alt + cmd - down : yabai -m window --warp south
+shift + ctrl + alt + cmd - up : yabai -m window --warp north
+shift + ctrl + alt + cmd - right : yabai -m window --warp east
+
+# Workspaces
+alt - 1 : yabai -m space --focus 1
+alt - 2 : yabai -m space --focus 2
+alt - 3 : yabai -m space --focus 3
+alt - 4 : yabai -m space --focus 4
+alt - 5 : yabai -m space --focus 5
+alt - 6 : yabai -m space --focus 6
+alt - 7 : yabai -m space --focus 7
+alt - 8 : yabai -m space --focus 8
+alt - 9 : yabai -m space --focus 9
+ctrl + alt + cmd - 1 : yabai -m space --focus 1
+ctrl + alt + cmd - 2 : yabai -m space --focus 2
+ctrl + alt + cmd - 3 : yabai -m space --focus 3
+ctrl + alt + cmd - 4 : yabai -m space --focus 4
+ctrl + alt + cmd - 5 : yabai -m space --focus 5
+ctrl + alt + cmd - 6 : yabai -m space --focus 6
+ctrl + alt + cmd - 7 : yabai -m space --focus 7
+ctrl + alt + cmd - 8 : yabai -m space --focus 8
+ctrl + alt + cmd - 9 : yabai -m space --focus 9
+
+# Move to workspace
+shift + alt - 1 : yabai -m window --space 1; yabai -m space --focus 1
+shift + alt - 2 : yabai -m window --space 2; yabai -m space --focus 2
+shift + alt - 3 : yabai -m window --space 3; yabai -m space --focus 3
+shift + alt - 4 : yabai -m window --space 4; yabai -m space --focus 4
+shift + alt - 5 : yabai -m window --space 5; yabai -m space --focus 5
+shift + alt - 6 : yabai -m window --space 6; yabai -m space --focus 6
+shift + alt - 7 : yabai -m window --space 7; yabai -m space --focus 7
+shift + alt - 8 : yabai -m window --space 8; yabai -m space --focus 8
+shift + alt - 9 : yabai -m window --space 9; yabai -m space --focus 9
+shift + ctrl + alt + cmd - 1 : yabai -m window --space 1; yabai -m space --focus 1
+shift + ctrl + alt + cmd - 2 : yabai -m window --space 2; yabai -m space --focus 2
+shift + ctrl + alt + cmd - 3 : yabai -m window --space 3; yabai -m space --focus 3
+shift + ctrl + alt + cmd - 4 : yabai -m window --space 4; yabai -m space --focus 4
+shift + ctrl + alt + cmd - 5 : yabai -m window --space 5; yabai -m space --focus 5
+shift + ctrl + alt + cmd - 6 : yabai -m window --space 6; yabai -m space --focus 6
+shift + ctrl + alt + cmd - 7 : yabai -m window --space 7; yabai -m space --focus 7
+shift + ctrl + alt + cmd - 8 : yabai -m window --space 8; yabai -m space --focus 8
+shift + ctrl + alt + cmd - 9 : yabai -m window --space 9; yabai -m space --focus 9
+
+# Layout
+alt - f : yabai -m window --toggle zoom-fullscreen
+shift + alt - f : yabai -m window --toggle float; yabai -m window --grid 4:4:1:1:2:2
+alt - 0x2F : yabai -m space --layout bsp
+alt - 0x2B : yabai -m space --layout stack
+
+# Balance tree (make all windows equal size)
+shift + alt - 0 : yabai -m space --balance

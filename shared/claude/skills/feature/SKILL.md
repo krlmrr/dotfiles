@@ -18,6 +18,10 @@ When given a feature description:
 
 Do not start coding until the user has reviewed the plan and given the go-ahead.
 
+## Branching
+
+Create a new branch for the feature off `main`. If the feature appears to depend on work in another branch, ask the user which branch to base off of before creating it.
+
 Do not write tests during implementation. Tests come after the feature has been verified working by the user.
 
 ## Feature Boundaries

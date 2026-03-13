@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+
+# Scripting addition (requires SIP partially disabled)
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+sudo yabai --load-sa
+
+# Reserve space for sketchybar
+yabai -m config external_bar all:0:0
+
+# BSP layout (binary space partitioning - auto alternates h/v splits)
+yabai -m config layout bsp
+
+# New window spawns to the right or bottom (auto-alternates)
+yabai -m config window_placement second_child
+
+# Gaps
+yabai -m config top_padding 6
+yabai -m config bottom_padding 12
+yabai -m config left_padding 6
+yabai -m config right_padding 6
+yabai -m config window_gap 6
+
+# Mouse
+yabai -m config mouse_follows_focus off
+yabai -m config focus_follows_mouse autofocus
+yabai -m config mouse_modifier alt
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+yabai -m config mouse_drop_action swap
+
+# Window rules
+yabai -m rule --add app="^System Settings$" manage=off
+yabai -m rule --add app="^Calculator$" manage=off
+yabai -m rule --add app="^Finder$" title="^(Copy|Move|Delete|Connecting)" manage=off
+yabai -m rule --add app="^Logi Options\+$" manage=off
+
+# Workspace 2 floating
+yabai -m space 2 --label chat
+yabai -m config --space 2 layout float
+
+# App assignments
+yabai -m rule --add app="^Spark Desktop$" space=1
+yabai -m rule --add app="^Mail$" space=1
+yabai -m rule --add app="^Slack$" space=2
+yabai -m rule --add app="^Discord$" space=2
+yabai -m rule --add app="^Messages$" space=2
+
+yabai -m space 5 --label code
+yabai -m rule --add app="^Zed$" space=5
+
+# Start on workspace 4
+yabai -m space --focus 4
+
+echo "yabai configuration loaded"

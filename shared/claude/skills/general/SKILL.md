@@ -59,3 +59,7 @@ const label = isEnabled
     ? 'On'
     : 'Off'
 ```
+
+## Atomic Commits
+
+Keep commits small and focused. Each commit should represent one logical change. Keep PRs small and reviewable — don't bundle unrelated changes together.

@@ -16,7 +16,7 @@ yabai -m config window_placement second_child
 
 # Gaps
 yabai -m config top_padding 6
-yabai -m config bottom_padding 12
+yabai -m config bottom_padding 16
 yabai -m config left_padding 12
 yabai -m config right_padding 12
 yabai -m config window_gap 10
@@ -34,6 +34,7 @@ yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
 yabai -m rule --add app="^Finder$" title="^(Copy|Move|Delete|Connecting)" manage=off
 yabai -m rule --add app="^Logi Options\+$" manage=off
+yabai -m rule --add app="^PhpStorm(-EAP)?$" title="^Settings$" manage=off
 
 # Workspace 2 floating
 yabai -m space 2 --label chat

@@ -5,7 +5,7 @@ source "$CONFIG_DIR/plugins/icon_map.sh"
 SPACE_ID=$(echo "$NAME" | sed 's/space\.//')
 
 ICONS=""
-for app in $(yabai -m query --windows --space "$SPACE_ID" 2>/dev/null | jq -r '[.[] | select(."is-minimized" == false and ."is-hidden" == false and ."has-ax-reference" == true)] | [.[].app] | unique | .[]'); do
+for app in $(yabai -m query --windows --space "$SPACE_ID" 2>/dev/null | jq -r '[.[] | select(."is-minimized" == false and ."is-hidden" == false)] | [.[].app] | unique | .[]'); do
   __icon_map "$app"
   ICONS="${ICONS}${icon_result} "
 done

@@ -17,7 +17,7 @@ if [ "$SENDER" = "space_windows_change" ] || [ "$SENDER" = "forced" ]; then
 
   for sid in 1 2 3 4 5 6 7 8 9 10; do
     ICONS=""
-    for app in $(echo "$WINDOWS" | jq -r --argjson s "$sid" '[.[] | select(.space == $s and ."is-minimized" == false and ."is-hidden" == false and ."has-ax-reference" == true)] | [.[].app] | unique | .[]' 2>/dev/null); do
+    for app in $(echo "$WINDOWS" | jq -r --argjson s "$sid" '[.[] | select(.space == $s and ."is-minimized" == false and ."is-hidden" == false)] | [.[].app] | unique | .[]' 2>/dev/null); do
       __icon_map "$app"
       ICONS="${ICONS}${icon_result} "
     done

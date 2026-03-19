@@ -22,7 +22,11 @@ bash "$DOTFILES_DIR/buildzshrc.sh"
 # Shared configs
 mkdir -p ~/.config
 link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
-link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
+if [ "$OS" = "mac" ]; then
+    link "$DOTFILES_DIR/shared/lazygit" "$HOME/Library/Application Support/lazygit"
+else
+    link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
+fi
 if [ -d "$HOME/.var/app/dev.zed.Zed" ]; then
     link "$DOTFILES_DIR/shared/zed/settings.json" ~/.var/app/dev.zed.Zed/config/zed/settings.json
     link "$DOTFILES_DIR/shared/zed/themes" ~/.var/app/dev.zed.Zed/config/zed/themes

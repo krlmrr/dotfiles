@@ -18,3 +18,4 @@ shell-integration-features = sudo
 keybind = shift+enter=text:\x1b\r
 
 # Custom
+split-divider-color = #2C313A

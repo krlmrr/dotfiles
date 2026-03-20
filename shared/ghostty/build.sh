@@ -13,7 +13,7 @@ link "$DOTFILES_DIR/shared/ghostty/themes" ~/.config/ghostty/themes
 if [ "$OS" = "mac" ]; then
     append "macos-titlebar-proxy-icon = hidden" ~/.config/ghostty/config
     append "font-size = 18" ~/.config/ghostty/config
-    append "window-padding-y = 8,8" ~/.config/ghostty/config
+    append "window-padding-y = 8,0" ~/.config/ghostty/config
     append "window-padding-x = 8,8" ~/.config/ghostty/config
     append "macos-option-as-alt = true" ~/.config/ghostty/config
 
@@ -25,7 +25,7 @@ if [ "$OS" = "mac" ]; then
 elif [ "$OS" = "linux" ]; then
     append "window-decoration = false" ~/.config/ghostty/config
     append "font-size = 12" ~/.config/ghostty/config
-    append "window-padding-y = 8,4" ~/.config/ghostty/config
+    append "window-padding-y = 8,0" ~/.config/ghostty/config
     append "window-padding-x = 4,4" ~/.config/ghostty/config
 fi
 

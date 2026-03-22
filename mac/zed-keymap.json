@@ -40,8 +40,8 @@
         "context": "Workspace",
         "bindings": {
             "ctrl-t": "terminal_panel::Toggle",
-            "cmd-e": "project_panel::ToggleFocus",
-            "cmd-g": "git_panel::ToggleFocus",
+            "ctrl-e": "project_panel::ToggleFocus",
+            "ctrl-g": "git_panel::ToggleFocus",
         },
     },
     {
@@ -59,20 +59,20 @@
     {
         "context": "vim_mode == normal && !menu",
         "bindings": {
-            "cmd-e": "project_panel::ToggleFocus",
-            "cmd-g": "git_panel::ToggleFocus",
+            "ctrl-e": "project_panel::ToggleFocus",
+            "ctrl-g": "git_panel::ToggleFocus",
         },
     },
     {
         "context": "ProjectPanel",
         "bindings": {
-            "cmd-e": "workspace::ToggleRightDock",
+            "ctrl-e": "workspace::ToggleRightDock",
         },
     },
     {
         "context": "GitPanel",
         "bindings": {
-            "cmd-g": "workspace::ToggleRightDock",
+            "ctrl-g": "workspace::ToggleRightDock",
         },
     },
     {

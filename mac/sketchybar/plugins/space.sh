@@ -5,10 +5,11 @@ source "$CONFIG_DIR/plugins/icon_map.sh"
 SPACE_ID=$(echo "$NAME" | sed 's/space\.//')
 
 ICONS=""
-for app in $(yabai -m query --windows --space "$SPACE_ID" 2>/dev/null | jq -r '[.[] | select(."is-minimized" == false and ."is-hidden" == false)] | [.[].app] | unique | .[]'); do
+while IFS= read -r app; do
+  [ -z "$app" ] && continue
   __icon_map "$app"
   ICONS="${ICONS}${icon_result} "
-done
+done <<< "$(yabai -m query --windows --space "$SPACE_ID" 2>/dev/null | jq -r '[.[] | select(."is-minimized" == false and ."is-hidden" == false and .role == "AXWindow")] | [.[].app] | unique | .[]')"
 
 CURRENT_SPACE=$(yabai -m query --spaces --space 2>/dev/null | jq -r '.index')
 if [ "$SPACE_ID" = "$CURRENT_SPACE" ]; then

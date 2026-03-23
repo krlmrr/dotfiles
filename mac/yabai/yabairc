@@ -47,6 +47,7 @@ yabai -m rule --add app="^Mail$" space=1
 yabai -m rule --add app="^Slack$" space=2
 yabai -m rule --add app="^Discord$" space=2
 yabai -m rule --add app="^Messages$" space=2
+yabai -m rule --add app="^Tuple$" space=2
 
 yabai -m space 4 --label code
 yabai -m rule --add app="^Ghostty$" space=4

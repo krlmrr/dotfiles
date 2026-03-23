@@ -21,5 +21,5 @@ fi
 if [ -z "$ICONS" ]; then
   sketchybar --set "$NAME" icon="$SPACE_ID" icon.font="SF Pro:Regular:13.0" label.drawing=off background.drawing="$IS_SELECTED"
 else
-  sketchybar --set "$NAME" icon="$SPACE_ID" icon.font="SF Pro:Regular:13.0" label="${ICONS% }" label.font="sketchybar-app-font:Regular:13.0" label.drawing=on label.y_offset=-1 background.drawing="$IS_SELECTED"
+  sketchybar --set "$NAME" icon="$SPACE_ID" icon.font="SF Pro:Regular:13.0" label="${ICONS% }" label.font="sketchybar-app-font:Regular:13.0" label.drawing=on label.y_offset=0 background.drawing="$IS_SELECTED"
 fi

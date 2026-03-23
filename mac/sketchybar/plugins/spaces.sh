@@ -26,7 +26,7 @@ if [ "$SENDER" = "space_windows_change" ] || [ "$SENDER" = "space_change" ] || [
     if [ -z "$ICONS" ]; then
       ARGS+=(--set space."$sid" label.drawing=off)
     else
-      ARGS+=(--set space."$sid" label="${ICONS% }" label.font="sketchybar-app-font:Regular:13.0" label.drawing=on label.y_offset=-1)
+      ARGS+=(--set space."$sid" label="${ICONS% }" label.font="sketchybar-app-font:Regular:13.0" label.drawing=on label.y_offset=0)
     fi
   done
 fi

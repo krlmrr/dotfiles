@@ -7,6 +7,11 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "agent_servers": {
+        "claude-acp": {
+            "type": "registry"
+        }
+    },
     "tab_size": 4,
     "indent_guides": {
         "enabled": true,
@@ -82,7 +87,7 @@
         },
     },
     "terminal": {
-        "line_height": { "custom": 2.2 },
+        "line_height": { "custom": 1.4 },
         "font_weight": 300.0,
         "button": false,
     },
@@ -178,40 +183,40 @@
             "format_on_save": "on",
         },
         "JavaScript": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "TypeScript": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "TSX": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "JSX": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "CSS": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "HTML": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "JSON": {
             "tab_size": 4,
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "Markdown": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
         "YAML": {
-            "formatter": "prettier",
+            "formatter": "language_server",
             "format_on_save": "on",
         },
     },

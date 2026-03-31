@@ -36,17 +36,21 @@ yabai -m rule --add app="^Finder$" title="^(Copy|Move|Delete|Connecting)" manage
 yabai -m rule --add app="^Logi Options\+$" manage=off
 yabai -m rule --add app="^Herd$" manage=off
 yabai -m rule --add app="^PhpStorm$" title="^(Settings|Create New Branch|Push Commits to .+|Rollback Changes|Update Project)$" manage=off
+yabai -m rule --add app="^Zed$" title="Settings$" manage=off
 
 # Workspace 2 floating
 yabai -m space 2 --label chat
 yabai -m config --space 2 layout float
+yabai -m signal --add event=window_created action="[ \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space') -eq 2 ] && yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
 
 # App assignments
 yabai -m rule --add app="^Spark Desktop$" space=1
 yabai -m rule --add app="^Mail$" space=1
 yabai -m rule --add app="^Slack$" space=2
 yabai -m rule --add app="^Discord$" space=2
+yabai -m rule --add app="^Telegram$" space=2
 yabai -m rule --add app="^Messages$" space=2
+yabai -m rule --add app="^Microsoft Teams$" space=2
 yabai -m rule --add app="^Tuple$" space=2 manage=off
 
 yabai -m space 4 --label code

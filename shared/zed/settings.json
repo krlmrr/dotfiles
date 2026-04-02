@@ -7,6 +7,10 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "node": {
+        "path": "/opt/homebrew/bin/node"
+    },
+    "word_diff_enabled": false,
     "agent_servers": {
         "claude-acp": {
             "type": "registry"
@@ -100,6 +104,7 @@
         "button": false,
     },
     "git_panel": {
+        "diff_stats": false,
         "dock": "right",
         "button": false,
     },

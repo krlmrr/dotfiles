@@ -40,8 +40,8 @@
         "context": "Workspace",
         "bindings": {
             "ctrl-t": "terminal_panel::Toggle",
-            "ctrl-e": "project_panel::ToggleFocus",
-            "ctrl-g": "git_panel::ToggleFocus",
+            "cmd-e": "project_panel::ToggleFocus",
+            "cmd-g": "git_panel::ToggleFocus",
         },
     },
     {
@@ -59,20 +59,20 @@
     {
         "context": "vim_mode == normal && !menu",
         "bindings": {
-            "ctrl-e": "project_panel::ToggleFocus",
-            "ctrl-g": "git_panel::ToggleFocus",
+            "cmd-e": "project_panel::ToggleFocus",
+            "cmd-g": "git_panel::ToggleFocus",
         },
     },
     {
         "context": "ProjectPanel",
         "bindings": {
-            "ctrl-e": "workspace::ToggleRightDock",
+            "cmd-e": "workspace::ToggleRightDock",
         },
     },
     {
         "context": "GitPanel",
         "bindings": {
-            "ctrl-g": "workspace::ToggleRightDock",
+            "cmd-g": "workspace::ToggleRightDock",
         },
     },
     {
@@ -123,6 +123,40 @@
     {
         "bindings": {
             "cmd-shift-c": null
+        }
+    },
+    {
+        "context": "KeymapEditor",
+        "unbind": {
+            "cmd-e": "zed::OpenKeymapFile"
+        }
+    },
+    {
+        "context": "Editor && mode == full",
+        "unbind": {
+            "cmd-e": [
+                "buffer_search::Deploy",
+                {
+                    "focus": false
+                }
+            ]
+        }
+    },
+    {
+        "bindings": {
+            "ctrl-a": "agent::Toggle"
+        }
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-a": "agent::ToggleFocus"
+        }
+    },
+    {
+        "context": "Workspace",
+        "unbind": {
+            "cmd-?": "agent::ToggleFocus"
         }
     }
 ]

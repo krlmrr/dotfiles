@@ -65,7 +65,7 @@ return {
 
     require('ibl').setup {
       indent = { char = '│', highlight = "IblIndent" },
-      scope = { enabled = true, highlight = highlight, show_start = false, show_end = false },
+      scope = { enabled = false },
       exclude = { filetypes = { 'dashboard', 'alpha', 'starter' } },
     }
     -- IblIndent color is set by config.theme module

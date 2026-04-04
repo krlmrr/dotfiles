@@ -1,9 +1,19 @@
 #!/bin/bash
-# Sets up SSH key for GitHub
+# Sets up SSH key and config
 
-# Add GitHub to known_hosts first to prevent host key prompts
+# Ensure ~/.ssh exists with correct permissions
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
+
+# Set TERM for remote SSH sessions (Ghostty terminfo isn't available on most servers)
+if ! grep -q 'SetEnv TERM=xterm-256color' ~/.ssh/config 2>/dev/null; then
+    echo "" >> ~/.ssh/config
+    echo "Host *" >> ~/.ssh/config
+    echo "  SetEnv TERM=xterm-256color" >> ~/.ssh/config
+    chmod 600 ~/.ssh/config
+fi
+
+# Add GitHub to known_hosts first to prevent host key prompts
 ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
 
 if ! ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then

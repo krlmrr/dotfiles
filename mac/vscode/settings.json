@@ -11,7 +11,6 @@
     "files.trimTrailingWhitespace": true,
     "diffEditor.renderSideBySide": false,
     "editor.snippetSuggestions": "top",
-    "editor.detectIndentation": false,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     // Hide Everything
@@ -39,7 +38,7 @@
     "editor.gotoLocation.multipleTypeDefinitions": "goto",
     // Typography
     "editor.fontSize": 16,
-    "editor.lineHeight": 3.5,
+    "editor.lineHeight": 2.8,
     "editor.suggestFontSize": 17,
     "editor.suggestLineHeight": 28,
     "terminal.integrated.fontSize": 15,
@@ -110,7 +109,7 @@
     "editor.codeLens": false,
     "explorer.compactFolders": false,
     "window.title": "${activeEditorMedium}  ",
-    "workbench.editor.editorActionsLocation": "hidden",
+    "workbench.editor.editorActionsLocation": "titleBar",
     "git.autofetch": true,
     "editor.unicodeHighlight.ambiguousCharacters": false,
     "editor.cursorBlinking": "solid",
@@ -191,7 +190,6 @@
     "git.ignoreRebaseWarning": true,
     "editor.lineDecorationsWidth": 25,
     "security.promptForRemoteFileProtocolHandling": false,
-    "workbench.activityBar.location": "hidden",
     "workbench.editor.limit.enabled": true,
     "editor.linkedEditing": true,
     "javascript.suggest.autoImports": true,
@@ -409,4 +407,5 @@
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "tailwindCSS.colorDecorators": false,
+    "workbench.activityBar.location": "hidden",
 }

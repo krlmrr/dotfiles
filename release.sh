@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-VERSION="v$1"
+VERSION="$1"
 
 echo "Creating release $VERSION..."
 

@@ -2725,27 +2725,6 @@
         "key": "cmd+f",
         "command": "-editor.action.extensioneditor.showfind"
     },
-    // Workbench views (using neovim leader keys instead)
-    {
-        "key": "shift+cmd+d",
-        "command": "-workbench.view.debug"
-    },
-    {
-        "key": "shift+cmd+e",
-        "command": "-workbench.view.explorer"
-    },
-    {
-        "key": "shift+cmd+x",
-        "command": "-workbench.view.extensions"
-    },
-    {
-        "key": "ctrl+shift+g",
-        "command": "-workbench.view.scm"
-    },
-    {
-        "key": "shift+cmd+f",
-        "command": "-workbench.view.search"
-    },
     // Panels
     {
         "key": "ctrl+cmd+i",
@@ -2913,118 +2892,6 @@
     {
         "key": "cmd+f",
         "command": "-editor.action.webvieweditor.showFind"
-    },
-    // Disable ALL testing keybindings (using <leader>t* in neovim instead)
-    {
-        "key": "alt+enter",
-        "command": "-testing.editFocusedTest"
-    },
-    {
-        "key": "alt+f9",
-        "command": "-testing.coverage.goToNextMissedLine"
-    },
-    {
-        "key": "shift+alt+f9",
-        "command": "-testing.coverage.goToPreviousMissedLine"
-    },
-    {
-        "key": "alt+f8",
-        "command": "-testing.goToNextMessage"
-    },
-    {
-        "key": "shift+alt+f8",
-        "command": "-testing.goToPreviousMessage"
-    },
-    {
-        "key": "alt+h",
-        "command": "-testing.toggleTestingPeekHistory"
-    },
-    {
-        "key": "cmd+; a",
-        "command": "-testing.runAll"
-    },
-    {
-        "key": "cmd+; c",
-        "command": "-testing.runAtCursor"
-    },
-    {
-        "key": "cmd+; e",
-        "command": "-testing.reRunFailTests"
-    },
-    {
-        "key": "cmd+; f",
-        "command": "-testing.runCurrentFile",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "cmd+; l",
-        "command": "-testing.reRunLastRun"
-    },
-    {
-        "key": "cmd+; cmd+a",
-        "command": "-testing.debugAll"
-    },
-    {
-        "key": "cmd+; cmd+c",
-        "command": "-testing.debugAtCursor",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "cmd+; cmd+e",
-        "command": "-testing.debugFailTests"
-    },
-    {
-        "key": "cmd+; cmd+f",
-        "command": "-testing.debugCurrentFile",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "cmd+; cmd+l",
-        "command": "-testing.debugLastRun"
-    },
-    {
-        "key": "cmd+; cmd+m",
-        "command": "-testing.openOutputPeek"
-    },
-    {
-        "key": "cmd+; cmd+o",
-        "command": "-testing.showMostRecentOutput",
-        "when": "testing.hasAnyResults"
-    },
-    {
-        "key": "cmd+; cmd+r",
-        "command": "-testing.refreshTests",
-        "when": "testing.canRefresh"
-    },
-    {
-        "key": "cmd+; cmd+i",
-        "command": "-testing.toggleInlineTestOutput"
-    },
-    {
-        "key": "cmd+; cmd+x",
-        "command": "-testing.cancelRun"
-    },
-    {
-        "key": "cmd+; shift+cmd+a",
-        "command": "-testing.coverageAll"
-    },
-    {
-        "key": "cmd+; shift+cmd+c",
-        "command": "-testing.coverageAtCursor",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "cmd+; shift+cmd+f",
-        "command": "-testing.coverageCurrentFile",
-        "when": "editorTextFocus"
-    },
-    {
-        "key": "cmd+; shift+cmd+l",
-        "command": "-testing.coverageLastRun"
-    },
-    {
-        "key": "cmd+; shift+cmd+i",
-        "command": "-testing.toggleInlineCoverage"
     },
     {
         "key": "cmd+d",
@@ -3782,15 +3649,6 @@
         "key": "cmd+k cmd+down",
         "command": "-workbench.action.focusBelowGroup"
     },
-    // Close editor group (use leader+x instead)
-    {
-        "key": "cmd+k w",
-        "command": "-workbench.action.closeEditorsInGroup"
-    },
-    {
-        "key": "cmd+k cmd+w",
-        "command": "-workbench.action.closeAllEditors"
-    },
     // Reveal in explorer (just use sidebar)
     {
         "key": "cmd+k r",
@@ -3810,26 +3668,6 @@
     {
         "key": "shift+cmd+x",
         "command": "-workbench.view.extensions"
-    },
-    // Source control view (use leader+gg instead)
-    {
-        "key": "ctrl+shift+g",
-        "command": "-workbench.view.scm"
-    },
-    // Explorer focus (use leader+e instead)
-    {
-        "key": "shift+cmd+e",
-        "command": "-workbench.view.explorer"
-    },
-    // Show all symbols (use leader+ws instead)
-    {
-        "key": "cmd+t",
-        "command": "-workbench.action.showAllSymbols"
-    },
-    // Go to symbol in editor (use leader+ds instead)
-    {
-        "key": "shift+cmd+o",
-        "command": "-workbench.action.gotoSymbol"
     },
     // Transform text commands
     {
@@ -3879,11 +3717,6 @@
     {
         "key": "shift+cmd+f2",
         "command": "-editor.action.startLinkedEditing"
-    },
-    // Keybindings editor (use leader+sk instead)
-    {
-        "key": "cmd+k cmd+s",
-        "command": "-workbench.action.openGlobalKeybindings"
     },
     {
         "key": "alt+cmd+k",
@@ -3978,11 +3811,6 @@
     {
         "key": "alt+cmd+w",
         "command": "-toggleFindWholeWord"
-    },
-    // Search in files focus (use leader+sg instead)
-    {
-        "key": "shift+cmd+f",
-        "command": "-workbench.action.findInFiles"
     },
     {
         "key": "shift+cmd+h",
@@ -4114,11 +3942,6 @@
         "key": "cmd+c",
         "command": "-execCopy"
     },
-    // Quick open (use leader+sf instead)
-    {
-        "key": "cmd+p",
-        "command": "-workbench.action.quickOpen"
-    },
     {
         "key": "cmd+e",
         "command": "-workbench.action.quickOpenNavigateNextInFilePicker"
@@ -4126,11 +3949,6 @@
     {
         "key": "shift+cmd+e",
         "command": "-workbench.action.quickOpenNavigatePreviousInFilePicker"
-    },
-    // Show recently opened (use leader+? instead)
-    {
-        "key": "ctrl+r",
-        "command": "-workbench.action.openRecent"
     },
     // Command palette (keep one but remove duplicates)
     {
@@ -4228,23 +4046,6 @@
     {
         "key": "ctrl+shift+tab",
         "command": "-workbench.action.quickOpenNavigatePreviousInEditorPicker"
-    },
-    // Editor navigation (use leader keys instead)
-    {
-        "key": "shift+cmd+]",
-        "command": "-workbench.action.nextEditor"
-    },
-    {
-        "key": "shift+cmd+[",
-        "command": "-workbench.action.previousEditor"
-    },
-    {
-        "key": "alt+cmd+right",
-        "command": "-workbench.action.nextEditor"
-    },
-    {
-        "key": "alt+cmd+left",
-        "command": "-workbench.action.previousEditor"
     },
     // Numbered editor opening (prefer quick open)
     {
@@ -4552,11 +4353,6 @@
         "key": "cmd+i",
         "command": "-workbench.action.terminal.chat.start"
     },
-    // Quick fix (use leader+ca instead)
-    {
-        "key": "cmd+.",
-        "command": "-editor.action.quickFix"
-    },
     // Copilot panel
     {
         "key": "ctrl+enter",
@@ -4592,11 +4388,6 @@
     {
         "key": "ctrl+cmd+b",
         "command": "-workbench.action.toggleActivityBarVisibility"
-    },
-    // Sidebar visibility (use leader+e instead)
-    {
-        "key": "cmd+b",
-        "command": "-workbench.action.toggleSidebarVisibility"
     },
     // Status bar visibility
     {
@@ -4685,11 +4476,6 @@
     {
         "key": "ctrl+shift+e",
         "command": "-cursorLineEndSelect"
-    },
-    // Focus sidebar (use leader+e instead)
-    {
-        "key": "cmd+0",
-        "command": "-workbench.action.focusSideBar"
     },
     // Focus parts (use vim navigation)
     {
@@ -4940,16 +4726,6 @@
     {
         "key": "cmd+/",
         "command": "-editor.action.commentLine"
-    },
-    // Find in buffer (use leader+/ instead)
-    {
-        "key": "cmd+f",
-        "command": "-actions.find"
-    },
-    // Replace in buffer (use leader+/ then navigate)
-    {
-        "key": "alt+cmd+f",
-        "command": "-editor.action.startFindReplaceAction"
     },
     // Basic cut (will use vim d/x instead)
     {
@@ -5401,11 +5177,6 @@
         "key": "ctrl+backspace",
         "command": "-deleteWordLeft"
     },
-    // Rename (use leader+rn in vim instead)
-    {
-        "key": "f2",
-        "command": "-editor.action.rename"
-    },
     // Welcome new file entries
     {
         "key": "ctrl+alt+cmd+n",
@@ -5415,15 +5186,6 @@
     {
         "key": "cmd+k cmd+r",
         "command": "-workbench.action.keybindingsReference"
-    },
-    // More close commands (use leader+x instead)
-    {
-        "key": "cmd+k u",
-        "command": "-workbench.action.closeUnmodifiedEditors"
-    },
-    {
-        "key": "cmd+k shift+cmd+w",
-        "command": "-workbench.action.closeAllGroups"
     },
     // More cmd+k chords
     {
@@ -5506,11 +5268,6 @@
     {
         "key": "shift+escape",
         "command": "-cancelRenameInput"
-    },
-    // View problems (use leader+q instead)
-    {
-        "key": "shift+cmd+m",
-        "command": "-workbench.actions.view.problems"
     },
     // Terminal toggle (use ctrl+t instead)
     {

@@ -77,28 +77,13 @@ vim.keymap.set("n", "<C-j>", function() call('workbench.action.focusBelowGroup')
 vim.keymap.set("n", "<C-k>", function() call('workbench.action.focusAboveGroup') end, { desc = "Move to top window" })
 vim.keymap.set("n", "<C-l>", function() call('workbench.action.focusRightGroup') end, { desc = "Move to right window" })
 
--- File tree (Neo-tree equivalent)
-vim.keymap.set("n", "<leader>e", function() call('workbench.view.explorer') end, { desc = "Focus explorer" })
-
 -- Buffers and windows
-vim.keymap.set("n", "<leader>x", function() call('alwaysNew.closeEditor') end, { desc = "Close editor" })
-vim.keymap.set("n", "<leader>w", function() call('alwaysNew.closeEditor') end, { desc = "Close editor" })
 vim.keymap.set("n", "<leader>s", function() call('workbench.action.files.save') end, { desc = "Save file" })
 vim.keymap.set("n", "<leader>v", function() call('workbench.action.splitEditorRight') end, { desc = "Split right" })
-
--- Telescope equivalents
-vim.keymap.set('n', '<leader>sf', function() call('workbench.action.quickOpen') end, { desc = 'Search files' })
-vim.keymap.set('n', '<leader>sg', function() call('workbench.action.findInFiles') end, { desc = 'Search by grep' })
-vim.keymap.set('n', '<leader>?', function() call('workbench.action.openRecent') end, { desc = 'Recent files' })
-vim.keymap.set('n', '<leader><space>', function() call('workbench.action.showAllEditors') end, { desc = 'Show all editors' })
-vim.keymap.set('n', '<leader>/', function() call('actions.find') end, { desc = 'Search in buffer' })
-vim.keymap.set('n', '<leader>gf', function() call('workbench.action.quickOpen') end, { desc = 'Git files' })
-vim.keymap.set('n', '<leader>sd', function() call('workbench.actions.view.problems') end, { desc = 'Search diagnostics' })
 
 -- Multi-cursor (ctrl+g - matches vim-visual-multi in terminal)
 vim.keymap.set('n', '<C-g>', function() call('editor.action.addSelectionToNextFindMatch') end, { desc = 'Add cursor to next match' })
 vim.keymap.set('i', '<C-g>', function() call('editor.action.addSelectionToNextFindMatch') end, { desc = 'Add cursor to next match' })
-vim.keymap.set('n', '<leader>sk', function() call('workbench.action.openGlobalKeybindings') end, { desc = 'Search keymaps' })
 
 -- LSP equivalents
 vim.keymap.set('n', 'gd', function() call('editor.action.revealDefinition') end, { desc = 'Go to definition' })
@@ -107,27 +92,15 @@ vim.keymap.set('n', 'gI', function() call('editor.action.goToImplementation') en
 vim.keymap.set('n', 'gD', function() call('editor.action.revealDeclaration') end, { desc = 'Go to declaration' })
 vim.keymap.set('n', 'K', function() call('editor.action.showHover') end, { desc = 'Hover' })
 vim.keymap.set('n', '<C-k>', function() call('editor.action.triggerParameterHints') end, { desc = 'Signature help' })
-vim.keymap.set('n', '<leader>rn', function() call('editor.action.rename') end, { desc = 'Rename' })
-vim.keymap.set('n', '<leader>ca', function() call('editor.action.quickFix') end, { desc = 'Code action' })
 vim.keymap.set('n', '<leader>D', function() call('editor.action.goToTypeDefinition') end, { desc = 'Type definition' })
-vim.keymap.set('n', '<leader>ds', function() call('workbench.action.gotoSymbol') end, { desc = 'Document symbols' })
-vim.keymap.set('n', '<leader>ws', function() call('workbench.action.showAllSymbols') end, { desc = 'Workspace symbols' })
 
 -- Diagnostics
 vim.keymap.set('n', '[d', function() call('editor.action.marker.prev') end, { desc = 'Previous diagnostic' })
 vim.keymap.set('n', ']d', function() call('editor.action.marker.next') end, { desc = 'Next diagnostic' })
-vim.keymap.set('n', '<leader>q', function() call('workbench.actions.view.problems') end, { desc = 'Problems panel' })
-
 -- Git
-vim.keymap.set('n', '<leader>gg', function() call('workbench.view.scm') end, { desc = 'Git source control' })
 vim.keymap.set('n', '<leader>gb', function() call('git.blame.toggleEditorDecoration') end, { desc = 'Git blame toggle' })
 
 -- Resize splits
 vim.keymap.set('n', '<C-=>', function() call('workbench.action.increaseViewSize') end, { desc = 'Increase view size' })
 vim.keymap.set('n', '<C-->', function() call('workbench.action.decreaseViewSize') end, { desc = 'Decrease view size' })
 
--- Testing (VS Code built-in)
-vim.keymap.set('n', '<leader>ta', function() call('testing.runAll') end, { desc = 'Test all' })
-vim.keymap.set('n', '<leader>tl', function() call('testing.reRunLastRun') end, { desc = 'Test last' })
-vim.keymap.set('n', '<leader>tc', function() call('testing.runAtCursor') end, { desc = 'Test at cursor' })
-vim.keymap.set('n', '<leader>tf', function() call('testing.runCurrentFile') end, { desc = 'Test file' })

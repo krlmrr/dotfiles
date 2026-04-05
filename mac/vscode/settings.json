@@ -408,4 +408,8 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "tailwindCSS.colorDecorators": false,
     "workbench.activityBar.location": "hidden",
+    "glspc.server.command": "/Users/karlm/Code/dotfiles/phpantom_lsp",
+    "glspc.server.languageId": [
+        "php"
+    ],
 }

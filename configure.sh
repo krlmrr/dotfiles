@@ -16,6 +16,10 @@ git config --global core.excludesfile ~/.gitignore_global
 [ -n "$GIT_NAME" ] && git config --global user.name "$GIT_NAME"
 [ -n "$GIT_EMAIL" ] && git config --global user.email "$GIT_EMAIL"
 
+# Git hooks
+mkdir -p "$DOTFILES_DIR/.git/hooks"
+link "$DOTFILES_DIR/shared/git/hooks/pre-commit" "$DOTFILES_DIR/.git/hooks/pre-commit"
+
 # Build .zshrc
 bash "$DOTFILES_DIR/buildzshrc.sh"
 

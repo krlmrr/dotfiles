@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Auto-sort Brewfile entries and re-stage
+for brewfile in shared/Brewfile mac/Brewfile linux/Brewfile; do
+    git diff --cached --name-only | grep -q "^$brewfile$" || continue
+    [ -f "$brewfile" ] || continue
+    for prefix in brew cask; do
+        lines=$(grep "^$prefix " "$brewfile" 2>/dev/null || true)
+        [ -z "$lines" ] && continue
+        sorted=$(echo "$lines" | sort)
+        if [ "$lines" != "$sorted" ]; then
+            tmp=$(mktemp)
+            awk -v prefix="$prefix " -v sorted="$sorted" '
+                BEGIN { split(sorted, arr, "\n"); idx=1; in_block=0 }
+                index($0, prefix) == 1 { if (!in_block) in_block=1; print arr[idx++]; next }
+                { in_block=0; print }
+            ' "$brewfile" > "$tmp" && mv "$tmp" "$brewfile"
+            git add "$brewfile"
+        fi
+    done
+done

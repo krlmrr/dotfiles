@@ -13,8 +13,9 @@ func run(_ cmd: String) {
 }
 
 Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
-    guard let screen = NSScreen.main else { return }
-    let mouseY = screen.frame.height - NSEvent.mouseLocation.y
+    let mouseLocation = NSEvent.mouseLocation
+    guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) else { return }
+    let mouseY = screen.frame.maxY - mouseLocation.y
 
     if state == "sketchy" && mouseY <= triggerZone {
         run("yabai -m config menubar_opacity 1.0; sketchybar --bar hidden=on")

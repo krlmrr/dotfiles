@@ -2,6 +2,7 @@
 
 # Scripting addition (requires SIP partially disabled)
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+yabai -m signal --add event=system_woke action="yabai -m rule --apply"
 sudo yabai --load-sa
 yabai -m config menubar_opacity 0.0
 
@@ -51,6 +52,7 @@ yabai -m rule --add app="^Discord$" space=2
 yabai -m rule --add app="^Telegram$" space=2
 yabai -m rule --add app="^Messages$" space=2
 yabai -m rule --add app="^Microsoft Teams$" space=2
+yabai -m signal --add event=window_created app="^Microsoft Teams$" action="yabai -m window \$YABAI_WINDOW_ID --space 2"
 yabai -m rule --add app="^Tuple$" space=2 manage=off
 
 yabai -m space 4 --label code

@@ -60,6 +60,44 @@ const label = isEnabled
     : 'Off'
 ```
 
+## No Flying Vs
+
+Never nest deeply. Deeply indented code (nested ifs, nested divs, nested loops) forms a "Flying V" shape that is hard to read and maintain.
+
+- Use early returns and guard clauses instead of nested `if` statements.
+- Extract components or partials when template nesting gets deep.
+- Prefer flat control flow: validate and bail early, then run the happy path at the top level.
+
+```php
+// Wrong - Flying V
+public function handle(Request $request): Response
+{
+    if ($request->has('token')) {
+        if ($request->user()) {
+            if ($request->user()->isAdmin()) {
+                return response()->json(['ok' => true]);
+            }
+        }
+    }
+
+    return response()->json(['error' => 'Unauthorized'], 403);
+}
+
+// Right - guard clauses
+public function handle(Request $request): Response
+{
+    if (! $request->has('token')) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    if (! $request->user()?->isAdmin()) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    return response()->json(['ok' => true]);
+}
+```
+
 ## Atomic Commits
 
 Keep commits small and focused. Each commit should represent one logical change. Keep PRs small and reviewable — don't bundle unrelated changes together.

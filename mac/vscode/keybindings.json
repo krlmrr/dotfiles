@@ -72,9 +72,8 @@
     },
     // Cmd+E - toggle explorer sidebar
     {
-        "key": "cmd+e",
+        "key": "cmd+b",
         "command": "workbench.action.toggleSidebarVisibility",
-        "when": "sideBarVisible && activeViewlet == 'workbench.view.explorer'"
     },
     {
         "key": "cmd+e",
@@ -3017,11 +3016,6 @@
         "when": "editorTextFocus && !editorReadonly"
     },
     {
-        "key": "cmd+/",
-        "command": "-editor.action.commentLine",
-        "when": "editorTextFocus && !editorReadonly"
-    },
-    {
         "key": "cmd+b",
         "command": "-workbench.action.toggleSidebarVisibility"
     },
@@ -4722,11 +4716,6 @@
         "key": "shift+alt+a",
         "command": "-editor.action.blockComment"
     },
-    // Toggle comment (use gcc in vim instead)
-    {
-        "key": "cmd+/",
-        "command": "-editor.action.commentLine"
-    },
     // Basic cut (will use vim d/x instead)
     {
         "key": "f3",
@@ -5954,5 +5943,14 @@
     {
         "key": "cmd+k cmd+e",
         "command": "workbench.view.extensions"
+    },
+    {
+        "key": "shift+cmd+n",
+        "command": "-chatEditor.action.reject",
+        "when": "chatEdits.hasEditorModifications && editorFocus && !chatEdits.isCurrentlyBeingModified || chatEdits.hasEditorModifications && notebookEditorFocused && !chatEdits.isCurrentlyBeingModified"
+    },
+    {
+        "key": "shift+cmd+n",
+        "command": "workbench.action.newWindow"
     }
 ]

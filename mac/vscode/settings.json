@@ -332,7 +332,6 @@
     "git.showPushSuccessNotification": true,
     "editor.scrollbar.verticalScrollbarSize": 8,
     "editor.foldingHighlight": false,
-    "window.openFoldersInNewWindow": "off",
     "settingsSync.ignoredExtensions": [
         "coder.coder-remote",
         "ms-vscode-remote.remote-ssh",
@@ -367,13 +366,9 @@
             "command": "vscode-neovim.escape"
         }
     },
-    "php.inlayHints.parameters.enabled": true,
     "php.inlayHints.parameters.suppressNameMatchingValue": true,
     "php.inlayHints.parameters.byReference": false,
     "php.inlayHints.types.return": true,
-    "php.inlayHints.insertOnDoubleClick": false,
-    "php.inlayHints.types.lambdaParameter": false,
-    "php.inlayHints.types.suppressVariableFromLiteral": false,
     "[php]": {
         "editor.defaultFormatter": "laravel.vscode-laravel"
     },
@@ -412,4 +407,7 @@
     "glspc.server.languageId": [
         "php"
     ],
+    "workbench.browser.showInTitleBar": false,
+    "vscode-neovim.logOutputToConsole": true,
+    "editor.inlayHints.maximumLength": 0,
 }

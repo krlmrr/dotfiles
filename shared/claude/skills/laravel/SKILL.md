@@ -46,6 +46,20 @@ use Illuminate\Contracts\Validation\ValidationRule;
 /** @return array<string, ValidationRule|array<mixed>|string> */
 ```
 
+## Always Use `query()` for Eloquent Queries
+
+Always start Eloquent queries with `Model::query()` instead of calling methods directly on the model. This returns a typed `Builder` instance, giving the IDE proper autocomplete and static analysis support.
+
+```php
+// Wrong - __callStatic magic, no IDE support
+$user = User::where('active', true)->first();
+$variant = ProductVariant::firstWhere('sku', $sku);
+
+// Right - typed Builder, full IDE support
+$user = User::query()->where('active', true)->first();
+$variant = ProductVariant::query()->firstWhere('sku', $sku);
+```
+
 ## Method Chaining
 
 One method per line when chaining.
@@ -72,6 +86,17 @@ Run code formatting frequently after making changes. Prefer Duster over Pint, bu
 # Fallback if Duster is not installed
 ./vendor/bin/pint
 ```
+
+## Avoid Nested Ifs — Use Laravel Alternatives
+
+Laravel provides expressive alternatives to nested conditionals. Use them:
+
+- `when()` / `unless()` instead of wrapping queries in ifs
+- `match()` instead of if/elseif chains
+- `firstOr()` / `firstOrFail()` instead of find-then-check-null
+- `?->` nullsafe operator for optional chaining
+- `tap()` for acting on a value without breaking the chain
+- Pipelines for sequential transformations
 
 ## Local Development
 

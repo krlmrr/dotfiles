@@ -7,6 +7,8 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "show_wrap_guides": false,
+    "hide_mouse": "never",
     "node": {
         "path": "/opt/homebrew/bin/node"
     },
@@ -27,6 +29,9 @@
     },
     "inline_code_actions": true,
     "edit_predictions": {
+        "ollama": {
+            "api_url": "http://localhost:11434"
+        },
         "provider": "zed",
     },
     "session": {

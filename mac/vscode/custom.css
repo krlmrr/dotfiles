@@ -53,3 +53,8 @@
     display: none !important;
 }
 
+/* Override broken vertical-align: middle from Monaco's dynamic rules */
+.mtk1 {
+    vertical-align: baseline !important;
+}
+

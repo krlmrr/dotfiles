@@ -21,7 +21,10 @@ $users = User::all();
 
 ## Descriptive Variable Names
 
-Never use single-letter variables. Use the best possible variable name — clear and precise, but not needlessly long.
+**Never use single-letter variables.** Use the best possible variable name — clear and precise, but not needlessly long.
+
+Wrong: `foreach ($items as $k => $v)`, `fn ($c) =>`, `catch (Throwable $e)`
+Right: `foreach ($items as $key => $item)`, `fn (Credential $credential) =>`, `catch (Throwable $exception)`
 
 ## Inline Single-Use Variables
 

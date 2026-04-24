@@ -77,6 +77,11 @@
     },
     {
         "key": "cmd+e",
+        "command": "workbench.action.toggleSidebarVisibility",
+        "when": "sideBarVisible && activeViewlet == 'workbench.view.explorer'"
+    },
+    {
+        "key": "cmd+e",
         "command": "workbench.view.explorer",
         "when": "!sideBarVisible || activeViewlet != 'workbench.view.explorer'"
     },

@@ -14,7 +14,10 @@ func run(_ cmd: String) {
 
 Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
     let mouseLocation = NSEvent.mouseLocation
-    guard let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) else { return }
+    guard let screen = NSScreen.screens.first(where: {
+        mouseLocation.x >= $0.frame.minX && mouseLocation.x <= $0.frame.maxX &&
+        mouseLocation.y >= $0.frame.minY && mouseLocation.y <= $0.frame.maxY
+    }) else { return }
     let mouseY = screen.frame.maxY - mouseLocation.y
 
     if state == "sketchy" && mouseY <= triggerZone {

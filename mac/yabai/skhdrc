@@ -57,8 +57,8 @@ ctrl + alt + cmd - 8 : yabai -m space --focus 8
 ctrl + alt + cmd - 9 : yabai -m space --focus 9
 
 # Sequential workspace navigation
-ctrl - left : yabai -m space --focus prev || yabai -m space --focus last
-ctrl - right : yabai -m space --focus next || yabai -m space --focus first
+ctrl - left : yabai -m space --focus prev
+ctrl - right : yabai -m space --focus next
 
 # Move to workspace
 shift + alt - 1 : yabai -m window --space 1; yabai -m space --focus 1

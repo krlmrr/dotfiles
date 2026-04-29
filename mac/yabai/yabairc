@@ -60,9 +60,6 @@ yabai -m rule --add app="^Ghostty$" space=4
 yabai -m rule --add app="^Zen$" space=4
 yabai -m rule --add app="^Zed$" space=4
 
-# Follow app to its assigned space when opened
-yabai -m signal --add event=window_created action="yabai -m space --focus \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space')"
-
 # Start on workspace 4
 yabai -m space --focus 4
 

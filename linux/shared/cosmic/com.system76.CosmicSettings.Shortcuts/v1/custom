@@ -1,0 +1,19 @@
+{
+    (
+        modifiers: [
+            Super,
+        ],
+        key: "slash",
+    ): Disable,
+    (
+        modifiers: [
+            Super,
+        ],
+    ): Disable,
+    (
+        modifiers: [
+            Ctrl,
+        ],
+        key: "space",
+    ): System(Launcher),
+}

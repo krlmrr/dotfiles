@@ -6,6 +6,7 @@ link() {
         echo "link() error: missing argument" >&2
         return 1
     fi
+    mkdir -p "$(dirname "$2")"
     rm -rf "$2"
     ln -snf "$1" "$2"
 }

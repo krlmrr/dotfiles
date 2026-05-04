@@ -4,7 +4,7 @@ Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch).
 
 ## Architecture
 
-`setup.sh` is the entry point. It sources `shared/functions.sh` which provides:
+`setup` is the entry point. It sources `shared/functions.sh` which provides:
 - `link()` — removes target and creates symlink
 - `$OS` — "mac" or "linux"
 - `$DISTRO` — "deb" or "arch" (linux only)
@@ -15,9 +15,9 @@ All child scripts are `source`d (not `bash`d) so they share the same process, va
 ## Script Chain
 
 ```
-setup.sh (entry point)
+setup (entry point)
 ├── shared/functions.sh (sourced for helpers/constants)
-├── buildzshrc.sh → shared/zsh/build.sh (builds .zshrc from parts)
+├── buildzshrc → shared/zsh/build.sh (builds .zshrc from parts)
 ├── mac/setup.sh (sourced on mac)
 └── linux/setup.sh (sourced on linux)
     ├── linux/deb/setup.sh (sourced on debian/ubuntu)
@@ -39,7 +39,7 @@ setup.sh (entry point)
 - Mac is the source of truth for shared configs
 - Configs are symlinked, `.gitconfig` is copied (to avoid repo pollution from `git config --global`)
 - `.zshrc` is built by concatenating: `shared/zsh/zshrc` + `shared/zsh/aliases.sh` + OS-specific aliases
-- Use `buildzshrc.sh` to rebuild `.zshrc` without running full setup
+- Use `buildzshrc` to rebuild `.zshrc` without running full setup
 - System packages install before brew (zsh must exist before oh-my-zsh)
 - `source` not `bash` for child scripts (shares sudo session)
 - COSMIC configs are copied (not symlinked) because COSMIC rewrites its own config files. Use `cp -a --force` to overwrite in place (avoids race with running desktop)
@@ -55,11 +55,11 @@ setup.sh (entry point)
 
 Push a tag to trigger a GitHub Action that creates a release:
 ```bash
-bash release.sh <next-version>
+./release <next-version>
 ```
 
 Uses semver. Check the latest tag with `git tag --sort=-v:refname | head -1` and bump accordingly. Always run the release script after pushing commits.
 
 ## Testing
 
-Run `bash setup.sh` on a fresh install. Use `bash rollback.sh` to undo symlinks/configs without removing packages, then re-run setup.
+Run `./setup` on a fresh install. Use `./testing/rollback.sh` to undo symlinks/configs without removing packages, then re-run setup.

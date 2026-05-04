@@ -16,4 +16,3 @@ else
     cat "$DOTFILES_DIR/linux/shared/zsh/aliases.sh" >> ~/.zshrc
 fi
 
-echo ".zshrc rebuilt. Run 'source ~/.zshrc' to reload."

@@ -5,19 +5,19 @@ Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch).
 ## Quick Start
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/krlmrr/dotfiles/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/krlmrr/dotfiles/main/install | bash
 ```
 
 Or manually:
 
 ```bash
 git clone https://github.com/krlmrr/dotfiles.git ~/Code/dotfiles
-cd ~/Code/dotfiles && bash setup.sh
+cd ~/Code/dotfiles && ./setup
 ```
 
 ## What It Does
 
-`setup.sh` detects the OS and runs the appropriate setup chain:
+`setup` detects the OS and runs the appropriate setup chain:
 
 1. Installs system packages (Linux only)
 2. Installs [Homebrew](https://brew.sh) + shared formulae (gcc, gh, neovim, lazygit, ripgrep, fd)
@@ -35,9 +35,10 @@ cd ~/Code/dotfiles && bash setup.sh
 
 ```
 dotfiles/
-├── setup.sh              # Entry point
-├── buildzshrc.sh         # Rebuild .zshrc without full setup
-├── rollback.sh           # Undo symlinks and configs
+├── setup                 # Entry point
+├── buildzshrc            # Rebuild .zshrc without full setup
+├── testing/
+│   └── rollback.sh       # Undo symlinks and configs
 ├── shared/               # Cross-platform
 │   ├── functions.sh      # Helpers (link, OS/distro detection)
 │   ├── nvim/
@@ -93,11 +94,11 @@ Installs Docker, keyd, DDEV (AUR), Hyprland, Waybar, Rofi, Mako, and SDDM.
 
 ```bash
 # Rebuild .zshrc after changing aliases
-bash ~/Code/dotfiles/buildzshrc.sh && source ~/.zshrc
+~/Code/dotfiles/buildzshrc && source ~/.zshrc
 
 # Undo all symlinks and configs (leaves packages installed)
-bash ~/Code/dotfiles/rollback.sh
+~/Code/dotfiles/testing/rollback.sh
 
 # Re-run full setup
-bash ~/Code/dotfiles/setup.sh
+~/Code/dotfiles/setup
 ```

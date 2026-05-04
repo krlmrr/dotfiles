@@ -2,8 +2,8 @@
 set -e
 
 if [ -z "$1" ]; then
-    echo "Usage: bash release.sh <version>"
-    echo "Example: bash release.sh 1.1.0"
+    echo "Usage: ./release <version>"
+    echo "Example: ./release 1.1.0"
     exit 1
 fi
 

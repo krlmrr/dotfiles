@@ -17,14 +17,12 @@ git config --global core.excludesfile ~/.gitignore_global
 [ -n "$GIT_EMAIL" ] && git config --global user.email "$GIT_EMAIL"
 
 # Git hooks
-mkdir -p "$DOTFILES_DIR/.git/hooks"
 link "$DOTFILES_DIR/shared/git/hooks/pre-commit" "$DOTFILES_DIR/.git/hooks/pre-commit"
 
 # Build .zshrc
-bash "$DOTFILES_DIR/buildzshrc.sh"
+bash "$DOTFILES_DIR/buildzshrc"
 
 # Shared configs
-mkdir -p ~/.config
 link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
 if [ "$OS" = "mac" ]; then
     link "$DOTFILES_DIR/shared/lazygit" "$HOME/Library/Application Support/lazygit"
@@ -40,20 +38,18 @@ else
 fi
 
 # Claude Code skills
-mkdir -p ~/.claude/skills
 link "$DOTFILES_DIR/shared/claude/skills/general" ~/.claude/skills/general
 link "$DOTFILES_DIR/shared/claude/skills/laravel" ~/.claude/skills/laravel
 link "$DOTFILES_DIR/shared/claude/skills/feature" ~/.claude/skills/feature
 link "$DOTFILES_DIR/shared/claude/skills/vue" ~/.claude/skills/vue
 
 # Build Ghostty config
-bash "$DOTFILES_DIR/buildghostty.sh"
+bash "$DOTFILES_DIR/buildghostty"
 
 # OS-specific configs
 if [ "$OS" = "mac" ]; then
     link "$DOTFILES_DIR/mac/hammerspoon" ~/.hammerspoon
     open -a Hammerspoon
-    mkdir -p "$HOME/Library/Application Support/Code/User"
     link "$DOTFILES_DIR/mac/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
     link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
     link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json

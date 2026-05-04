@@ -59,7 +59,7 @@ echo "Installing shared brew formulae..."
 brew bundle --file="$DOTFILES_DIR/shared/Brewfile"
 
 # SSH + GitHub auth
-source "$DOTFILES_DIR/ssh-setup.sh"
+source "$DOTFILES_DIR/scripts/ssh-setup.sh"
 
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -108,7 +108,7 @@ else
 fi
 
 # Configure all configs and symlinks
-bash "$DOTFILES_DIR/configure.sh"
+bash "$DOTFILES_DIR/configure"
 
 kill "$SUDO_PID" 2>/dev/null || true
 echo "Done!"

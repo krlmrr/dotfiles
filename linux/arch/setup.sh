@@ -26,7 +26,6 @@ ddev config global --project-tld=test
 mkcert -install
 
 # Hyprland
-mkdir -p ~/.config/hypr
 link "$DOTFILES_DIR/linux/arch/hypr/hyprland.conf" ~/.config/hypr/hyprland.conf
 link "$DOTFILES_DIR/linux/arch/hypr/hyprlock.conf" ~/.config/hypr/hyprlock.conf
 link "$DOTFILES_DIR/linux/arch/hypr/hypridle.conf" ~/.config/hypr/hypridle.conf

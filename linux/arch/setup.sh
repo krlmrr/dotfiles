@@ -12,6 +12,7 @@ pacman_install keyd hyprland hyprlock hypridle waybar rofi-wayland mako sddm
 # keyd config (caps lock -> ctrl/esc)
 sudo mkdir -p /etc/keyd
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/default.conf" /etc/keyd/default.conf
+sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/dell.conf" /etc/keyd/dell.conf
 sudo systemctl enable --now keyd
 
 # AUR packages

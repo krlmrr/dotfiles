@@ -92,10 +92,10 @@ fi
 # Tauri development libraries
 apt_install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
 
-# PHP / Laravel CLI
-if ! command -v php &> /dev/null; then
-    echo "Installing PHP / Laravel CLI..."
-    /bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
+# Laravel installer (PHP + Composer come from brew)
+if ! command -v laravel &> /dev/null; then
+    echo "Installing Laravel installer..."
+    composer global require laravel/installer
 fi
 
 # DDEV global config (sg runs command with docker group access in current session)

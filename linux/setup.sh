@@ -33,6 +33,16 @@ if command -v zen &>/dev/null; then
     xdg-settings set default-web-browser zen.desktop
 fi
 
+# Flatpak app integrations (only applied if installed)
+if command -v flatpak &>/dev/null; then
+    # Zed: expose `zed` CLI by symlinking the flatpak launcher into ~/.local/bin
+    if [ -x "$HOME/.local/share/flatpak/exports/bin/dev.zed.Zed" ]; then
+        echo "Linking Zed flatpak launcher to ~/.local/bin/zed..."
+        mkdir -p "$HOME/.local/bin"
+        ln -sf "$HOME/.local/share/flatpak/exports/bin/dev.zed.Zed" "$HOME/.local/bin/zed"
+    fi
+fi
+
 # COSMIC desktop config
 if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
     echo "Configuring COSMIC desktop..."

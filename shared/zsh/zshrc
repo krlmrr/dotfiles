@@ -14,11 +14,10 @@ source $ZSH/oh-my-zsh.sh
 
 setopt HIST_IGNORE_SPACE
 
-export PATH="$PATH:$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin"
-export PATH="$PATH:$HOME/.local/bin"
-
 # Homebrew (Linux)
 if [ -d /home/linuxbrew/.linuxbrew ]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
     export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig"
 fi
+
+export PATH="$HOME/.local/bin:$PATH:$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin"

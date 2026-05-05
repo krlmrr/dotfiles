@@ -7,6 +7,9 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "active_pane_modifiers": {
+        "inactive_opacity": 1.0
+    },
     "cli_default_open_behavior": "existing_window",
     "auto_install_extensions": {
         "blade": true,
@@ -34,8 +37,10 @@
     },
     "diff_view_style": "unified",
     "title_bar": {
+        "show_user_picture": false,
+        "show_onboarding_banner": false,
         "show_user_menu": false,
-        "show_sign_in": true,
+        "show_sign_in": false,
     },
     "inline_code_actions": true,
     "edit_predictions": {
@@ -61,6 +66,7 @@
         "button": false,
     },
     "status_bar": {
+        "active_encoding_button": "disabled",
         "cursor_position_button": false,
         "active_language_button": false,
     },

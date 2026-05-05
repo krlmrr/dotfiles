@@ -1,2 +1,3 @@
 brew "composer"
 brew "lazydocker"
+brew "node"

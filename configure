@@ -29,7 +29,9 @@ if [ "$OS" = "mac" ]; then
 else
     link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
 fi
-if [ -d "$HOME/.var/app/dev.zed.Zed" ]; then
+if command -v flatpak &>/dev/null && flatpak list 2>/dev/null | grep -q dev.zed.Zed; then
+    # Flatpak data dir is only created on first launch — pre-create so symlinks land in the right place
+    mkdir -p ~/.var/app/dev.zed.Zed/config/zed
     link "$DOTFILES_DIR/shared/zed/settings.json" ~/.var/app/dev.zed.Zed/config/zed/settings.json
     link "$DOTFILES_DIR/shared/zed/themes" ~/.var/app/dev.zed.Zed/config/zed/themes
     link "$DOTFILES_DIR/linux/shared/zed-keymap.json" ~/.var/app/dev.zed.Zed/config/zed/keymap.json

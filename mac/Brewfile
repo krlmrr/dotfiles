@@ -1,7 +1,11 @@
+tap "qmk/qmk"
+
 brew "FelixKratz/formulae/sketchybar"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 brew "mole"
+brew "qmk/qmk/qmk"
+brew "xcodegen"
 
 cask "1password"
 cask "1password-cli"

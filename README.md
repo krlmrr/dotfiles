@@ -1,6 +1,6 @@
 # dotfiles
 
-Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch).
+Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch + Fedora).
 
 ## Quick Start
 
@@ -63,13 +63,16 @@ dotfiles/
     ├── deb/
     │   ├── setup.sh      # Docker, keyd, DDEV, Ghostty, Chromium, Zen, 1Password, PHP
     │   └── cleanup.sh    # Remove unwanted default apps
-    └── arch/
-        ├── setup.sh      # Docker, keyd, Hyprland, SDDM
-        ├── hypr/
-        ├── waybar/
-        ├── rofi/
-        ├── mako/
-        └── sddm/
+    ├── arch/
+    │   ├── setup.sh      # Docker, keyd, Hyprland, SDDM
+    │   ├── hypr/
+    │   ├── waybar/
+    │   ├── rofi/
+    │   ├── mako/
+    │   └── sddm/
+    └── fedora/
+        ├── setup.sh      # RPM Fusion, Docker, keyd (COPR), DDEV, Ghostty, Chromium, 1Password, Discord, PHP
+        └── cleanup.sh    # Remove unwanted default apps
 ```
 
 ## Platform Details
@@ -89,6 +92,10 @@ Configures keyd for caps lock remapping (ctrl/esc), udev rules for Keychron Q8 (
 ### Linux (Arch)
 
 Installs Docker, keyd, DDEV (AUR), Hyprland, Waybar, Rofi, Mako, and SDDM.
+
+### Linux (Fedora)
+
+Targets the Fedora COSMIC spin. Enables RPM Fusion (free + nonfree), then installs Docker, keyd (COPR `alternateved/keyd`), DDEV (official RPM repo), Ghostty, Ungoogled Chromium (COPR `wojnilowicz/ungoogled-chromium`), 1Password (official RPM repo), Discord (RPM Fusion nonfree), Slack/Zed/Zen Browser (Flathub), and PHP/Laravel CLI. Same COSMIC config and Keychron udev rule as Debian.
 
 ## Useful Commands
 

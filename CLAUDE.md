@@ -1,13 +1,13 @@
 # Dotfiles
 
-Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch).
+Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch + Fedora).
 
 ## Architecture
 
 `setup` is the entry point. It sources `shared/functions.sh` which provides:
 - `link()` — removes target and creates symlink
 - `$OS` — "mac" or "linux"
-- `$DISTRO` — "deb" or "arch" (linux only)
+- `$DISTRO` — "deb", "arch", or "fedora" (linux only)
 - `$PKG` / `$PKG_UPDATE` — package manager commands (linux only)
 
 All child scripts are `source`d (not `bash`d) so they share the same process, variables, and sudo session.
@@ -22,7 +22,9 @@ setup (entry point)
 └── linux/setup.sh (sourced on linux)
     ├── linux/deb/setup.sh (sourced on debian/ubuntu)
     │   └── linux/deb/cleanup.sh (sourced, removes unwanted apps)
-    └── linux/arch/setup.sh (sourced on arch)
+    ├── linux/arch/setup.sh (sourced on arch)
+    └── linux/fedora/setup.sh (sourced on fedora)
+        └── linux/fedora/cleanup.sh (sourced, removes unwanted apps)
 ```
 
 ## Directory Structure
@@ -33,6 +35,7 @@ setup (entry point)
   - `linux/shared/` — shared across linux distros (zsh aliases, keyd config, COSMIC desktop configs, zed keymap)
   - `linux/deb/` — Debian/Ubuntu specific (setup + cleanup scripts)
   - `linux/arch/` — Arch specific (setup script + hypr, waybar, rofi, mako, sddm configs)
+  - `linux/fedora/` — Fedora specific (setup + cleanup scripts; uses COSMIC like deb)
 
 ## Conventions
 

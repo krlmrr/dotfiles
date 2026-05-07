@@ -13,8 +13,10 @@ echo "Setting up dotfiles from $DOTFILES_DIR"
 
 # Install core system packages (Linux)
 if [ "$OS" = "linux" ]; then
+    ensure_ca_trust
     echo "Updating system..."
     sudo $PKG_UPDATE
+    ensure_ca_trust  # dnf upgrade can re-break the bundle on Fedora; re-verify before any further dnf calls
     if [ -n "$PKG_UPGRADE" ]; then
         sudo $PKG_UPGRADE
     fi
@@ -22,6 +24,9 @@ if [ "$OS" = "linux" ]; then
     if [ "$DISTRO" = "arch" ]; then
         sudo pacman -S --needed --noconfirm base-devel
         pacman_install git curl wget unzip zsh wl-clipboard
+    elif [ "$DISTRO" = "fedora" ]; then
+        sudo dnf group install -y development-tools
+        dnf_install git curl wget unzip zsh wl-clipboard
     else
         apt_install git curl wget unzip zsh build-essential wl-clipboard
     fi
@@ -51,6 +56,10 @@ if ! command -v brew &> /dev/null; then
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     if [ "$OS" = "linux" ]; then
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        if ! grep -q 'linuxbrew/.linuxbrew/bin/brew shellenv' ~/.bashrc 2>/dev/null; then
+            echo '' >> ~/.bashrc
+            echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
+        fi
     fi
 fi
 
@@ -77,9 +86,17 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
 fi
 
 # Set zsh as default shell
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "Setting zsh as default shell..."
-    chsh -s "$(which zsh)"
+ZSH_PATH="$(command -v zsh)"
+if [ -n "$ZSH_PATH" ]; then
+    # chsh requires the target shell to be listed in /etc/shells
+    if ! grep -qxF "$ZSH_PATH" /etc/shells; then
+        echo "$ZSH_PATH" | sudo tee -a /etc/shells > /dev/null
+    fi
+    CURRENT_SHELL="$(getent passwd "$USER" | cut -d: -f7)"
+    if [ "$CURRENT_SHELL" != "$ZSH_PATH" ]; then
+        echo "Setting zsh as default shell..."
+        chsh -s "$ZSH_PATH"
+    fi
 fi
 
 # OS-specific setup (installs)

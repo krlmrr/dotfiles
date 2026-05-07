@@ -99,7 +99,7 @@
         "button": false,
     },
     "scrollbar": {
-        "show": "system",
+        "show": "never",
         "cursors": false,
         "git_diff": false,
         "search_results": true,

@@ -16,6 +16,10 @@ cursor-style = bar
 confirm-close-surface = false
 shell-integration-features = sudo
 keybind = shift+enter=text:\x1b\r
+# ctrl+shift+w is hijacked by GTK on Linux (closes whole window even when
+# bound to close_surface — see ghostty discussions #5538, #9026). Use
+# ctrl+shift+x instead, which has no GTK default and reliably closes splits.
+keybind = ctrl+shift+x=close_surface
 
 # Custom
 split-divider-color = #2C313A

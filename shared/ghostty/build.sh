@@ -27,6 +27,10 @@ elif [ "$OS" = "linux" ]; then
     append "font-size = 12" ~/.config/ghostty/config
     append "window-padding-y = 8,0" ~/.config/ghostty/config
     append "window-padding-x = 4,4" ~/.config/ghostty/config
+    # ctrl+q closes (splits first, then window, then app) — Linux convention.
+    # Uses close_surface so it peels off splits like ctrl+shift+x; `quit` would
+    # kill the app immediately, ignoring open splits/windows.
+    append "keybind = ctrl+q=close_surface" ~/.config/ghostty/config
 fi
 
 echo "Ghostty config rebuilt."

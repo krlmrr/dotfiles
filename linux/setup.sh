@@ -30,10 +30,13 @@ EOF
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
-# Default browser
-if command -v zen &>/dev/null; then
+# Default browser (Zen — native install exposes `zen-browser`, Flatpak doesn't)
+if command -v zen-browser &>/dev/null; then
     echo "Setting Zen Browser as default..."
-    xdg-settings set default-web-browser zen.desktop
+    xdg-settings set default-web-browser zen-browser.desktop
+elif flatpak list 2>/dev/null | grep -q app.zen_browser.zen; then
+    echo "Setting Zen Browser (Flatpak) as default..."
+    xdg-settings set default-web-browser app.zen_browser.zen.desktop
 fi
 
 # Flatpak app integrations (only applied if installed)

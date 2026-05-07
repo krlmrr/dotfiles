@@ -104,10 +104,13 @@ if ! flatpak list 2>/dev/null | grep -q dev.zed.Zed; then
     flatpak install -y flathub dev.zed.Zed
 fi
 
-# Zen Browser (Flathub)
-if ! flatpak list 2>/dev/null | grep -q app.zen_browser.zen; then
+# Zen Browser (COPR sneexy/zen-browser — official binaries packaged for Fedora).
+# Native (not Flatpak) so dev tooling works: localhost certs, native messaging
+# hosts (1Password CLI), file:// access to project dirs.
+if ! command -v zen-browser &> /dev/null; then
     echo "Installing Zen Browser..."
-    flatpak install -y flathub app.zen_browser.zen
+    sudo dnf copr enable -y sneexy/zen-browser
+    sudo dnf install -y zen-browser
 fi
 
 # Tauri development libraries

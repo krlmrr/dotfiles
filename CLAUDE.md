@@ -37,15 +37,23 @@ setup (entry point)
   - `linux/arch/` — Arch specific (setup script + hypr, waybar, rofi, mako, sddm configs)
   - `linux/fedora/` — Fedora specific (setup + cleanup scripts; uses COSMIC like deb)
 
+## Config delivery: built vs symlinked vs copied
+
+Three delivery modes. **Editing the source isn't always enough — built and copied configs need a rebuild step.** Always check this table before editing a source file:
+
+| Mode | After editing source | Examples |
+| --- | --- | --- |
+| **Symlinked** | Live — change is immediate | nvim, lazygit, zed, ghostty `themes/`, claude skills, `gitignore_global`, all `mac/*` configs (hammerspoon, vscode, sketchybar, yabai, phpstorm), arch `hypr/waybar/rofi/mako`, keyd |
+| **Built** | Run the build script | `.zshrc` → `./buildzshrc` (concatenates `shared/zsh/zshrc` + `aliases.sh` + OS-specific aliases). `~/.config/ghostty/config` → `./buildghostty` (copies `shared/ghostty/config`, then `append`s OS-specific lines). |
+| **Copied (one-shot)** | Re-run `./configure` (or the step that copies it) | `.gitconfig` (copied to avoid `git config --global` polluting the repo), COSMIC `~/.config/cosmic/*` (COSMIC rewrites its own files; `cp -a --force` from `linux/shared/cosmic/`), fonts, Zen `user.js` (Zen ignores symlinks) |
+
+**Rule of thumb:** if `~/.config/foo` is a regular file (not a symlink), it's built or copied — find the script that produces it before editing. For Ghostty specifically, OS-specific overrides go in `shared/ghostty/build.sh` (the `mac` / `linux` branches use `append`), not in the source `config` file.
+
 ## Conventions
 
 - Mac is the source of truth for shared configs
-- Configs are symlinked, `.gitconfig` is copied (to avoid repo pollution from `git config --global`)
-- `.zshrc` is built by concatenating: `shared/zsh/zshrc` + `shared/zsh/aliases.sh` + OS-specific aliases
-- Use `buildzshrc` to rebuild `.zshrc` without running full setup
 - System packages install before brew (zsh must exist before oh-my-zsh)
 - `source` not `bash` for child scripts (shares sudo session)
-- COSMIC configs are copied (not symlinked) because COSMIC rewrites its own config files. Use `cp -a --force` to overwrite in place (avoids race with running desktop)
 - Caps lock remapping: keyd on Linux (symlinked config), LaunchDaemon + Hammerspoon on Mac
 
 ## Key Aliases

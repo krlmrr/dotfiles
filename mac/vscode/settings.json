@@ -410,4 +410,5 @@
     "workbench.browser.showInTitleBar": false,
     "vscode-neovim.logOutputToConsole": true,
     "editor.inlayHints.maximumLength": 0,
+    "workbench.browser.enableChatTools": true,
 }

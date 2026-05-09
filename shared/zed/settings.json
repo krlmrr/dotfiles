@@ -23,6 +23,7 @@
         "vue": true,
         "zig": true,
     },
+    "cursor_blink": true,
     "show_wrap_guides": false,
     "hide_mouse": "never",
     "word_diff_enabled": false,
@@ -87,7 +88,7 @@
         "dock": "left",
     },
     "buffer_line_height": {
-        "custom": 3,
+        "custom": 2.799999952316284
     },
     "git": {
         "inline_blame": {

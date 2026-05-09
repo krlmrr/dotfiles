@@ -60,6 +60,12 @@ yabai -m rule --add app="^Ghostty$" space=4
 yabai -m rule --add app="^Zen$" space=4
 yabai -m rule --add app="^Zed$" space=4
 
+# Follow app to its assigned space when opened (skip space 2 so chat apps don't yank focus)
+yabai -m signal --add event=window_created action="space=\$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space'); [ \"\$space\" != \"2\" ] && yabai -m space --focus \$space"
+
+# Rebalance BSP layout when a window closes so the sibling fills the gap
+yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
+
 # Start on workspace 4
 yabai -m space --focus 4
 

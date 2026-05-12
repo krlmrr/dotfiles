@@ -50,6 +50,11 @@ if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
     # cosmic-comp is intentionally NOT restarted — would crash the session.
     pkill cosmic-bg 2>/dev/null || true
     pkill cosmic-panel 2>/dev/null || true
+
+    # cosmic-greeter wallpaper sync — must run after the COSMIC config copy above,
+    # otherwise the install-time initial sync sees an empty source dir and no-ops.
+    # Self-guards on the cosmic-greeter user existing.
+    source "$DOTFILES_DIR/linux/shared/cosmic-greeter/install.sh"
 fi
 
 echo "=== Linux setup complete ==="

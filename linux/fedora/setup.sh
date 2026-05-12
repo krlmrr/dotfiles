@@ -129,10 +129,9 @@ if command -v ddev &> /dev/null; then
     mkcert -install
 fi
 
-# cosmic-greeter wallpaper sync (login screen mirrors current desktop wallpaper).
-# cosmic-greeter is its own system user with its own ~/.config/cosmic, so without
-# this it drifts back to whatever was set last.
-source "$DOTFILES_DIR/linux/shared/cosmic-greeter/install.sh"
+# cosmic-greeter wallpaper sync is installed from linux/setup.sh after the
+# COSMIC config copy — it does an initial sync that needs ~/.config/cosmic
+# already populated, otherwise the first run is a silent no-op.
 
 # Remove unwanted default apps
 source "$DOTFILES_DIR/linux/fedora/cleanup.sh"

@@ -44,6 +44,22 @@ while IFS= read -r f; do
     done < <(grep -oE 'Path\("[^"]+"\)' "$f" | sed -E 's/^Path\("(.*)"\)$/\1/')
 done < <(find "$TMP" -type f)
 
+# cosmic-greeter clears per-output entries when `same-on-all: true` and then
+# applies the `all` fallback to only one output, leaving the others on a stock
+# default. Force `same-on-all: false` and write explicit per-output entries for
+# each connected DRM connector so the greeter renders the configured wallpaper
+# on every monitor.
+if [ -f "$TMP/v1/same-on-all" ] && [ "$(cat "$TMP/v1/same-on-all")" = "true" ] && [ -f "$TMP/v1/all" ]; then
+    for status in /sys/class/drm/card*-*/status; do
+        [ -f "$status" ] || continue
+        [ "$(cat "$status")" = "connected" ] || continue
+        name="$(basename "$(dirname "$status")" | sed -E 's/^card[0-9]+-//')"
+        [ "$name" = "all" ] && continue
+        sed -E 's/output: "all"/output: "'"$name"'"/' "$TMP/v1/all" > "$TMP/v1/$name"
+    done
+    printf 'false' > "$TMP/v1/same-on-all"
+fi
+
 mkdir -p "$(dirname "$DST")"
 rm -rf "$DST"
 cp -a "$TMP/." "$DST/"

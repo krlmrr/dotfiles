@@ -101,5 +101,37 @@
         "bindings": {
             "ctrl-n": "workspace::NewTerminal"
         }
+    },
+    {
+        // Fire ctrl-w immediately to close the active tab. vim mode treats ctrl-w
+        // as a window-command prefix (ctrl-w h/j/k/l/v/s/...), which makes Zed
+        // wait for a follow-up keystroke before firing. Nullify those chords so
+        // there's nothing to wait for; vim splits via ctrl-w are sacrificed.
+        "context": "vim_mode == normal || vim_mode == visual || vim_mode == insert",
+        "bindings": {
+            "ctrl-w": "pane::CloseActiveItem",
+            "ctrl-w h": null,
+            "ctrl-w j": null,
+            "ctrl-w k": null,
+            "ctrl-w l": null,
+            "ctrl-w shift-h": null,
+            "ctrl-w shift-j": null,
+            "ctrl-w shift-k": null,
+            "ctrl-w shift-l": null,
+            "ctrl-w v": null,
+            "ctrl-w s": null,
+            "ctrl-w q": null,
+            "ctrl-w c": null,
+            "ctrl-w o": null,
+            "ctrl-w w": null,
+            "ctrl-w x": null,
+            "ctrl-w =": null,
+            "ctrl-w -": null,
+            "ctrl-w +": null,
+            "ctrl-w >": null,
+            "ctrl-w <": null,
+            "ctrl-w |": null,
+            "ctrl-w _": null
+        }
     }
 ]

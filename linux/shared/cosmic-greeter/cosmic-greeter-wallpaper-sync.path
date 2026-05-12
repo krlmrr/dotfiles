@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch COSMIC wallpaper config for changes
+
+[Path]
+PathChanged=%h/.config/cosmic/com.system76.CosmicBackground
+Unit=cosmic-greeter-wallpaper-sync.service
+
+[Install]
+WantedBy=default.target

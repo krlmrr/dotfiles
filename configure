@@ -29,14 +29,18 @@ if [ "$OS" = "mac" ]; then
 else
     link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
 fi
-if command -v flatpak &>/dev/null && flatpak list 2>/dev/null | grep -q dev.zed.Zed; then
-    # Flatpak data dir is only created on first launch — pre-create so symlinks land in the right place
-    mkdir -p ~/.var/app/dev.zed.Zed/config/zed
-    link "$DOTFILES_DIR/shared/zed/settings.json" ~/.var/app/dev.zed.Zed/config/zed/settings.json
-    link "$DOTFILES_DIR/shared/zed/themes" ~/.var/app/dev.zed.Zed/config/zed/themes
-    link "$DOTFILES_DIR/linux/shared/zed-keymap.json" ~/.var/app/dev.zed.Zed/config/zed/keymap.json
+# Zed config — symlink files individually, not the whole shared/zed/ directory.
+# Linking the directory makes ~/.config/zed → shared/zed, which means any later
+# `link X ~/.config/zed/keymap.json` writes a symlink INTO the repo at
+# shared/zed/keymap.json — that's how a Mac-path keymap symlink ended up
+# committed to shared/zed/ in the past.
+mkdir -p ~/.config/zed
+link "$DOTFILES_DIR/shared/zed/settings.json" ~/.config/zed/settings.json
+link "$DOTFILES_DIR/shared/zed/themes" ~/.config/zed/themes
+if [ "$OS" = "mac" ]; then
+    link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
 else
-    link "$DOTFILES_DIR/shared/zed" ~/.config/zed
+    link "$DOTFILES_DIR/linux/shared/zed-keymap.json" ~/.config/zed/keymap.json
 fi
 
 # Claude Code skills
@@ -54,7 +58,6 @@ if [ "$OS" = "mac" ]; then
     open -a Hammerspoon
     link "$DOTFILES_DIR/mac/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
     link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
-    link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
     link "$DOTFILES_DIR/mac/phpstorm/vimrc" ~/.vimrc
     link "$DOTFILES_DIR/mac/phpstorm/ideavimrc" ~/.ideavimrc
 fi

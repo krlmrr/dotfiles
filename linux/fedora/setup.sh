@@ -98,10 +98,11 @@ if ! flatpak list 2>/dev/null | grep -q com.slack.Slack; then
     flatpak install -y flathub com.slack.Slack
 fi
 
-# Zed (Flathub)
-if ! flatpak list 2>/dev/null | grep -q dev.zed.Zed; then
+# Zed (official install script — native, not Flatpak, so the `zed` CLI lands in
+# ~/.local/bin and there's no sandbox to fight for file access / project paths).
+if ! command -v zed &> /dev/null; then
     echo "Installing Zed..."
-    flatpak install -y flathub dev.zed.Zed
+    curl -f https://zed.dev/install.sh | sh
 fi
 
 # Zen Browser (COPR sneexy/zen-browser — official binaries packaged for Fedora).
@@ -127,6 +128,11 @@ if command -v ddev &> /dev/null; then
     sg docker -c "ddev config global --project-tld=test"
     mkcert -install
 fi
+
+# cosmic-greeter wallpaper sync (login screen mirrors current desktop wallpaper).
+# cosmic-greeter is its own system user with its own ~/.config/cosmic, so without
+# this it drifts back to whatever was set last.
+source "$DOTFILES_DIR/linux/shared/cosmic-greeter/install.sh"
 
 # Remove unwanted default apps
 source "$DOTFILES_DIR/linux/fedora/cleanup.sh"

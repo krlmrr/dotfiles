@@ -30,23 +30,10 @@ EOF
 sudo udevadm control --reload-rules
 sudo udevadm trigger
 
-# Default browser (Zen — native install exposes `zen-browser`, Flatpak doesn't)
+# Default browser — Zen is installed natively (COPR on Fedora, wakemeops on Deb).
 if command -v zen-browser &>/dev/null; then
     echo "Setting Zen Browser as default..."
     xdg-settings set default-web-browser zen-browser.desktop
-elif flatpak list 2>/dev/null | grep -q app.zen_browser.zen; then
-    echo "Setting Zen Browser (Flatpak) as default..."
-    xdg-settings set default-web-browser app.zen_browser.zen.desktop
-fi
-
-# Flatpak app integrations (only applied if installed)
-if command -v flatpak &>/dev/null; then
-    # Zed: expose `zed` CLI by symlinking the flatpak launcher into ~/.local/bin
-    if [ -x "$HOME/.local/share/flatpak/exports/bin/dev.zed.Zed" ]; then
-        echo "Linking Zed flatpak launcher to ~/.local/bin/zed..."
-        mkdir -p "$HOME/.local/bin"
-        ln -sf "$HOME/.local/share/flatpak/exports/bin/dev.zed.Zed" "$HOME/.local/bin/zed"
-    fi
 fi
 
 # COSMIC desktop config

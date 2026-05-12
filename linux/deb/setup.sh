@@ -76,10 +76,11 @@ if ! command -v slack &> /dev/null; then
     sudo apt install -y slack-desktop
 fi
 
-# Zed
-if ! flatpak list 2>/dev/null | grep -q dev.zed.Zed; then
+# Zed (official install script — native, not Flatpak, so the `zed` CLI lands in
+# ~/.local/bin and there's no sandbox to fight for file access / project paths).
+if ! command -v zed &> /dev/null; then
     echo "Installing Zed..."
-    flatpak install -y flathub dev.zed.Zed
+    curl -f https://zed.dev/install.sh | sh
 fi
 
 # Zen Browser

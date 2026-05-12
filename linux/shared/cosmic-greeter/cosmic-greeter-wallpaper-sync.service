@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync COSMIC wallpaper to greeter login screen
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sudo -n /usr/local/sbin/cosmic-greeter-wallpaper-sync

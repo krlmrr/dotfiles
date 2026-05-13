@@ -73,6 +73,7 @@
     "current_line_highlight": "none",
     "scroll_beyond_last_line": "off",
     "gutter": {
+        "bookmarks": false,
         "runnables": false,
         "breakpoints": false,
         "folds": false,

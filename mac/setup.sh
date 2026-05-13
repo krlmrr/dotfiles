@@ -24,9 +24,6 @@ link "$DOTFILES_DIR/mac/sketchybar" ~/.config/sketchybar
 link "$DOTFILES_DIR/mac/yabai/yabairc" ~/.yabairc
 link "$DOTFILES_DIR/mac/yabai/skhdrc" ~/.skhdrc
 
-# Zed keymap (mac-specific)
-link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
-
 # IdeaVim (PhpStorm)
 link "$DOTFILES_DIR/mac/phpstorm/vimrc" ~/.vimrc
 link "$DOTFILES_DIR/mac/phpstorm/ideavimrc" ~/.ideavimrc

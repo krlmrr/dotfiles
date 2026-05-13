@@ -16,4 +16,11 @@
         ],
         key: "space",
     ): System(Launcher),
+    (
+        modifiers: [
+            Super,
+            Shift,
+        ],
+        key: "s",
+    ): Spawn("cosmic-screenshot"),
 }

@@ -109,6 +109,21 @@
         }
     },
     {
+        // ctrl-e toggles focus to the project panel across all vim modes.
+        // vim binds ctrl-e to scroll-line-down in normal and a yank-from-below
+        // in insert, which otherwise shadow our Workspace-context binding.
+        "context": "vim_mode == insert",
+        "bindings": {
+            "ctrl-e": "project_panel::ToggleFocus"
+        }
+    },
+    {
+        "context": "vim_mode == visual",
+        "bindings": {
+            "ctrl-e": "project_panel::ToggleFocus"
+        }
+    },
+    {
         // Save with ctrl-s. Zed's default vim.json binds ctrl-s in insert
         // mode to editor::ShowSignatureHelp, which blocks save until you exit
         // insert. Override per vim mode so save fires regardless.

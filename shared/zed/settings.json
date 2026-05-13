@@ -10,7 +10,7 @@
     "active_pane_modifiers": {
         "inactive_opacity": 1.0
     },
-    "cli_default_open_behavior": "existing_window",
+    "cli_default_open_behavior": "new_window",
     "auto_install_extensions": {
         "blade": true,
         "catppuccin-icons": true,

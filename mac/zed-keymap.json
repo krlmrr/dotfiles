@@ -172,5 +172,17 @@
         "unbind": {
             "cmd-?": "agent::ToggleFocus"
         }
+    },
+    {
+        // ;; / ,, in normal mode: append the punct at end of line and stay
+        // in normal mode. Vim's insert mode doesn't evaluate chords, so this
+        // only works after escape. Trade-off: shadows vim's repeat-find on `;`.
+        "context": "vim_mode == normal",
+        "bindings": {
+            ";": null,
+            ",": null,
+            "; ;": ["workspace::SendKeystrokes", "shift-a ; escape"],
+            ", ,": ["workspace::SendKeystrokes", "shift-a , escape"]
+        }
     }
 ]

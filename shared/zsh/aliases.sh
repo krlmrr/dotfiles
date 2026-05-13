@@ -55,3 +55,19 @@ alias pip="pip3"
 alias code.="code ."
 alias ps.="phpstorm ."
 alias zed.="zed ."
+
+publish() {
+    local repo_name visibility="--private"
+
+    # `publish --public` flips visibility; default is private.
+    [[ "$1" == "--public" ]] && visibility="--public"
+
+    repo_name=$(basename "$PWD")
+
+    # Ensure we have a git repo with at least one commit on the main branch.
+    [ -d .git ] || git init -b main -q
+    git rev-parse HEAD &>/dev/null || { git add -A && git commit -qm "Initial commit"; }
+    git branch -M main 2>/dev/null
+
+    gh repo create "krlmrr/$repo_name" "$visibility" --source=. --remote=origin --push
+}

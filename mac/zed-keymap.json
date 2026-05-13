@@ -179,8 +179,6 @@
         // only works after escape. Trade-off: shadows vim's repeat-find on `;`.
         "context": "vim_mode == normal",
         "bindings": {
-            ";": null,
-            ",": null,
             "; ;": ["workspace::SendKeystrokes", "shift-a ; escape"],
             ", ,": ["workspace::SendKeystrokes", "shift-a , escape"]
         }

@@ -8,6 +8,9 @@ if [ -z "$1" ]; then
 fi
 
 VERSION="$1"
+# Auto-prefix with `v` so the tag matches the release.yml `v*` trigger.
+# Strip a leading `v` if the caller already included one, then re-add it.
+VERSION="v${VERSION#v}"
 
 echo "Creating release $VERSION..."
 

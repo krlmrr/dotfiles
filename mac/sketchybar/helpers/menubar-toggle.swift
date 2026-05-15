@@ -14,9 +14,12 @@ func run(_ cmd: String) {
 
 Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
     let mouseLocation = NSEvent.mouseLocation
+    // Screens can overlap in Y when displays have different heights or are
+    // offset vertically; `first(where:)` would pick whichever screen comes
+    // first and measure from the wrong top edge. Instead, find the screen
+    // whose horizontal range contains the cursor and use its own top.
     guard let screen = NSScreen.screens.first(where: {
-        mouseLocation.x >= $0.frame.minX && mouseLocation.x <= $0.frame.maxX &&
-        mouseLocation.y >= $0.frame.minY && mouseLocation.y <= $0.frame.maxY
+        mouseLocation.x >= $0.frame.minX && mouseLocation.x <= $0.frame.maxX
     }) else { return }
     let mouseY = screen.frame.maxY - mouseLocation.y
 

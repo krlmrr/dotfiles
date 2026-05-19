@@ -62,21 +62,17 @@ if [ "$OS" = "mac" ]; then
     link "$DOTFILES_DIR/mac/phpstorm/ideavimrc" ~/.ideavimrc
 fi
 
-# Zen Browser user.js
-zen_root() {
-    if [ -d "$HOME/.var/app/app.zen_browser.zen/.zen" ]; then
-        echo "$HOME/.var/app/app.zen_browser.zen/.zen"
-    elif [ -d "$HOME/.zen" ]; then
-        echo "$HOME/.zen"
-    elif [ -d "$HOME/.config/zen" ]; then
-        echo "$HOME/.config/zen"
-    fi
-}
-ZEN_ROOT="$(zen_root)"
-if [ -n "$ZEN_ROOT" ]; then
+# Zen Browser user.js — deploy to every Zen root we find, since the user may
+# have stale Flatpak data alongside a native install (or vice versa) and we
+# don't want one orphaned tree to shadow the active one.
+for ZEN_ROOT in \
+    "$HOME/.var/app/app.zen_browser.zen/.zen" \
+    "$HOME/.zen" \
+    "$HOME/.config/zen"; do
+    [ -d "$ZEN_ROOT" ] || continue
     find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" | while read -r profile_dir; do
         cp "$DOTFILES_DIR/shared/zen/user.js" "$profile_dir/user.js"
     done
-fi
+done
 
 echo "Done!"

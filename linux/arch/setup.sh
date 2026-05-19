@@ -1,7 +1,13 @@
 echo "=== Arch (CachyOS) Setup ==="
 
 # Arch-specific packages
-pacman_install keyd hyprland hyprlock hypridle waybar rofi-wayland mako sddm
+pacman_install keyd hyprland hyprlock hypridle waybar rofi-wayland mako sddm podman
+
+# Lerd (podman-based Laravel local dev environment)
+if ! command -v lerd &>/dev/null; then
+    echo "Installing Lerd..."
+    curl -fsSL https://raw.githubusercontent.com/geodro/lerd/main/install.sh | bash
+fi
 
 # keyd config (caps lock -> ctrl/esc)
 sudo mkdir -p /etc/keyd

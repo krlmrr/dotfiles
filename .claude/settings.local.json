@@ -348,7 +348,16 @@
       "Bash(grep -n \" $\" mac/yabai/skhdrc)",
       "Bash(grep -v \"^$\")",
       "Bash(/tmp/verify_skhdrc.sh)",
-      "Bash(/tmp/check_dupes.sh)"
+      "Bash(/tmp/check_dupes.sh)",
+      "Bash(command -v mkcert)",
+      "Bash(mkcert -version)",
+      "Bash(mkcert -CAROOT)",
+      "Bash(./configure)",
+      "Read(//home/karlm/.var/app/app.zen_browser.zen/.zen/**)",
+      "Bash(flatpak list *)",
+      "Bash(lerd man *)",
+      "Bash(command -v podman)",
+      "Bash(rpm -q podman)"
     ]
   }
 }

@@ -100,6 +100,15 @@ if ! command -v laravel &> /dev/null; then
     composer global require laravel/installer
 fi
 
+# Podman (Lerd's container runtime)
+dnf_install podman
+
+# Lerd (podman-based Laravel local dev environment)
+if ! command -v lerd &>/dev/null; then
+    echo "Installing Lerd..."
+    curl -fsSL https://raw.githubusercontent.com/geodro/lerd/main/install.sh | bash
+fi
+
 # cosmic-greeter wallpaper sync is installed from linux/setup.sh after the
 # COSMIC config copy — it does an initial sync that needs ~/.config/cosmic
 # already populated, otherwise the first run is a silent no-op.

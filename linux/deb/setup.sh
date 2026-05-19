@@ -83,6 +83,15 @@ if ! command -v laravel &> /dev/null; then
     composer global require laravel/installer
 fi
 
+# Podman (Lerd's container runtime)
+apt_install podman
+
+# Lerd (podman-based Laravel local dev environment)
+if ! command -v lerd &>/dev/null; then
+    echo "Installing Lerd..."
+    curl -fsSL https://raw.githubusercontent.com/geodro/lerd/main/install.sh | bash
+fi
+
 # Remove unwanted default apps
 source "$DOTFILES_DIR/linux/deb/cleanup.sh"
 

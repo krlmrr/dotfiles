@@ -20,14 +20,6 @@ dnf_install dnf-plugins-core
 dnf_install flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Docker
-if ! command -v docker &> /dev/null; then
-    echo "Installing Docker..."
-    curl -fsSL https://get.docker.com | sh
-    sudo usermod -aG docker "$USER"
-    sudo systemctl enable --now docker
-fi
-
 # NVIDIA drivers (skipped automatically on machines without an NVIDIA GPU)
 source "$DOTFILES_DIR/linux/fedora/nvidia.sh"
 
@@ -43,21 +35,6 @@ sudo mkdir -p /etc/keyd
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/default.conf" /etc/keyd/default.conf
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/dell.conf" /etc/keyd/dell.conf
 sudo systemctl enable --now keyd
-
-# DDEV (official RPM repo — write .repo file directly per DDEV's Fedora docs).
-# Their hosted ddev.repo file 404s; gpgcheck=0 because signed yum repo support
-# is "added in the future" per https://docs.ddev.com/...
-if ! command -v ddev &> /dev/null; then
-    echo "Installing DDEV..."
-    sudo tee /etc/yum.repos.d/ddev.repo > /dev/null <<'EOF'
-[ddev]
-name=ddev
-baseurl=https://pkg.ddev.com/yum/
-gpgcheck=0
-enabled=1
-EOF
-    sudo dnf install --refresh -y ddev
-fi
 
 # Ghostty (COPR scottames/ghostty per ghostty.org/docs/install/binary)
 if ! command -v ghostty &> /dev/null; then
@@ -121,12 +98,6 @@ dnf_install webkit2gtk4.1-devel gtk3-devel libappindicator-gtk3-devel librsvg2-d
 if ! command -v laravel &> /dev/null; then
     echo "Installing Laravel installer..."
     composer global require laravel/installer
-fi
-
-# DDEV global config (sg runs command with docker group access in current session)
-if command -v ddev &> /dev/null; then
-    sg docker -c "ddev config global --project-tld=test"
-    mkcert -install
 fi
 
 # cosmic-greeter wallpaper sync is installed from linux/setup.sh after the

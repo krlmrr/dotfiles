@@ -1,11 +1,5 @@
 echo "=== Arch (CachyOS) Setup ==="
 
-# Docker
-if ! command -v docker &> /dev/null; then
-    pacman_install docker
-    sudo usermod -aG docker "$USER"
-fi
-
 # Arch-specific packages
 pacman_install keyd hyprland hyprlock hypridle waybar rofi-wayland mako sddm
 
@@ -14,17 +8,6 @@ sudo mkdir -p /etc/keyd
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/default.conf" /etc/keyd/default.conf
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/dell.conf" /etc/keyd/dell.conf
 sudo systemctl enable --now keyd
-
-# AUR packages
-if command -v yay &> /dev/null; then
-    if ! pacman -Q ddev-bin &>/dev/null; then
-        yay -S --noconfirm ddev-bin
-    fi
-fi
-
-# DDEV global config
-ddev config global --project-tld=test
-mkcert -install
 
 # Hyprland
 link "$DOTFILES_DIR/linux/arch/hypr/hyprland.conf" ~/.config/hypr/hyprland.conf

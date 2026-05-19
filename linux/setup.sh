@@ -10,7 +10,7 @@ mkdir -p ~/Sites ~/Code
 echo "Installing Linux brew formulae..."
 brew bundle --file="$DOTFILES_DIR/linux/Brewfile"
 
-# Distro-specific setup (docker, keyd, ddev, ghostty, etc.)
+# Distro-specific setup (keyd, ghostty, etc.)
 if [ "$DISTRO" = "deb" ]; then
     echo "Running Debian/Ubuntu setup..."
     source "$DOTFILES_DIR/linux/deb/setup.sh"

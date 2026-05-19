@@ -1,12 +1,5 @@
 echo "=== Debian/Ubuntu Setup ==="
 
-# Docker
-if ! command -v docker &> /dev/null; then
-    echo "Installing Docker..."
-    curl -fsSL https://get.docker.com | sh
-    sudo usermod -aG docker "$USER"
-fi
-
 # keyd
 if ! command -v keyd &> /dev/null; then
     echo "Installing keyd..."
@@ -20,15 +13,6 @@ sudo mkdir -p /etc/keyd
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/default.conf" /etc/keyd/default.conf
 sudo ln -snf "$DOTFILES_DIR/linux/shared/keyd/dell.conf" /etc/keyd/dell.conf
 sudo systemctl enable --now keyd
-
-# DDEV
-if ! command -v ddev &> /dev/null; then
-    echo "Installing DDEV..."
-    curl -fsSL https://pkg.ddev.com/apt/gpg.key | gpg --dearmor | sudo tee /usr/share/keyrings/ddev.gpg > /dev/null
-    echo "deb [signed-by=/usr/share/keyrings/ddev.gpg] https://pkg.ddev.com/apt/ * *" | sudo tee /etc/apt/sources.list.d/ddev.list
-    sudo apt update
-    sudo apt install -y ddev
-fi
 
 # Ghostty
 if ! command -v ghostty &> /dev/null; then
@@ -97,12 +81,6 @@ apt_install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev libr
 if ! command -v laravel &> /dev/null; then
     echo "Installing Laravel installer..."
     composer global require laravel/installer
-fi
-
-# DDEV global config (sg runs command with docker group access in current session)
-if command -v ddev &> /dev/null; then
-    sg docker -c "ddev config global --project-tld=test"
-    mkcert -install
 fi
 
 # Remove unwanted default apps

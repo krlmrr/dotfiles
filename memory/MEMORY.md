@@ -10,3 +10,6 @@
 - [Review skills before committing](feedback_review_before_commit.md) — Always review changes against coding skills BEFORE git commit/push
 - [Yabai space 2 is intentionally unmanaged](feedback_yabai_space2.md) — Space 2 is float layout (chat apps); never touch it in window logic or diagnostics
 - [Yabai display event semantics](feedback_yabai_display_events.md) — display_changed fires on focus crossing screens; use display_added/removed/moved/resized for hardware reconfig
+
+## Project
+- [Migrating Linux PHP dev to Lerd (podman)](project_lerd_migration.md) — Docker + DDEV removed on 2026-05-13. Lerd not yet wired in; `a`/`d`/`lzd` aliases left as TODO markers.

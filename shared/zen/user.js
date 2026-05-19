@@ -18,3 +18,7 @@ user_pref("signon.rememberSignons", false);
 
 // Disable telemetry first-run prompt
 user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);
+
+// Trust the system NSS CA store so Lerd's (and any other) locally-installed
+// dev CAs are recognized without per-profile imports.
+user_pref("security.enterprise_roots.enabled", true);

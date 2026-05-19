@@ -65,6 +65,17 @@ fi
 # Zen Browser user.js — deploy to every Zen root we find, since the user may
 # have stale Flatpak data alongside a native install (or vice versa) and we
 # don't want one orphaned tree to shadow the active one.
+#
+# Also import mkcert's root CA into each Zen profile's NSS DB so HTTPS dev
+# certs (Lerd, mkcert-generated) are trusted. `mkcert -install` covers Firefox
+# but not Zen's ~/.zen paths, so do it ourselves with certutil — same tool
+# mkcert uses internally. Idempotent: skips profiles where the CA is already
+# imported.
+MKCERT_ROOT_CA=""
+if command -v mkcert &>/dev/null; then
+    MKCERT_ROOT_CA="$(mkcert -CAROOT)/rootCA.pem"
+    [ -f "$MKCERT_ROOT_CA" ] || MKCERT_ROOT_CA=""
+fi
 for ZEN_ROOT in \
     "$HOME/.var/app/app.zen_browser.zen/.zen" \
     "$HOME/.zen" \
@@ -72,6 +83,11 @@ for ZEN_ROOT in \
     [ -d "$ZEN_ROOT" ] || continue
     find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" | while read -r profile_dir; do
         cp "$DOTFILES_DIR/shared/zen/user.js" "$profile_dir/user.js"
+        if [ -n "$MKCERT_ROOT_CA" ] && command -v certutil &>/dev/null; then
+            if ! certutil -L -d "sql:$profile_dir" 2>/dev/null | grep -q "mkcert development CA"; then
+                certutil -A -d "sql:$profile_dir" -t "C,," -n "mkcert development CA" -i "$MKCERT_ROOT_CA" 2>/dev/null || true
+            fi
+        fi
     done
 done
 

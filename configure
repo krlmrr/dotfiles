@@ -49,6 +49,10 @@ link "$DOTFILES_DIR/shared/claude/skills/laravel" ~/.claude/skills/laravel
 link "$DOTFILES_DIR/shared/claude/skills/feature" ~/.claude/skills/feature
 link "$DOTFILES_DIR/shared/claude/skills/vue" ~/.claude/skills/vue
 
+# Claude Code auto-memory for this dotfiles project. The project ID is derived
+# from the absolute repo path, so this assumes the repo lives at ~/Code/dotfiles.
+link "$DOTFILES_DIR/shared/claude/memory" ~/.claude/projects/-Users-karlm-Code-dotfiles/memory
+
 # Build Ghostty config
 bash "$DOTFILES_DIR/buildghostty"
 

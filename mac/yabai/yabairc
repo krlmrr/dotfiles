@@ -2,7 +2,11 @@
 
 # Scripting addition (requires SIP partially disabled)
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-yabai -m signal --add event=system_woke action="yabai -m rule --apply"
+yabai -m signal --add event=system_woke action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
+yabai -m signal --add event=display_added action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
+yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
+yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
+yabai -m signal --add event=display_moved action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
 sudo yabai --load-sa
 yabai -m config menubar_opacity 0.0
 
@@ -42,6 +46,10 @@ yabai -m rule --add app="^Zed$" title="Settings$" manage=off
 # Workspace 2 floating
 yabai -m space 2 --label chat
 yabai -m config --space 2 layout float
+# After --restart-service, windows pre-existing on space 2 get inserted into the
+# BSP tree before this layout=float line runs. Re-float them to restore the invariant.
+yabai -m query --windows --space 2 | jq -r '.[] | select(."is-floating" == false) | .id' \
+  | xargs -I{} yabai -m window {} --toggle float
 yabai -m signal --add event=window_created action="[ \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space') -eq 2 ] && yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
 
 # App assignments

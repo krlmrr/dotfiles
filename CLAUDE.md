@@ -2,6 +2,10 @@
 
 Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch + Fedora).
 
+## Memory
+
+This project's memory lives in `./memory/` at the repo root. Read `./memory/MEMORY.md` for the index and the linked files for context. When you would normally write auto-memory to `~/.claude/projects/.../memory/`, write it to `./memory/` instead — that's the only place memory for this project belongs.
+
 ## Architecture
 
 `setup` is the entry point. It sources `shared/functions.sh` which provides:

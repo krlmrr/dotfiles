@@ -24,6 +24,15 @@ link "$DOTFILES_DIR/mac/sketchybar" ~/.config/sketchybar
 link "$DOTFILES_DIR/mac/yabai/yabairc" ~/.yabairc
 link "$DOTFILES_DIR/mac/yabai/skhdrc" ~/.skhdrc
 
+# yabai sudoers: allow --load-sa / --uninstall-sa without password.
+# yabai's default sudoers entry pins a sha256 of the binary, which breaks on
+# every brew upgrade (SA stops loading, --sub-layer / space ops fail). Drop
+# the hash so brewup can reload the scripting addition non-interactively.
+echo 'karlm ALL = (root) NOPASSWD: /opt/homebrew/bin/yabai --load-sa, /opt/homebrew/bin/yabai --uninstall-sa' \
+  | sudo tee /etc/sudoers.d/yabai >/dev/null
+sudo chmod 440 /etc/sudoers.d/yabai
+sudo visudo -c -f /etc/sudoers.d/yabai
+
 # IdeaVim (PhpStorm)
 link "$DOTFILES_DIR/mac/phpstorm/vimrc" ~/.vimrc
 link "$DOTFILES_DIR/mac/phpstorm/ideavimrc" ~/.ideavimrc

@@ -43,6 +43,15 @@ yabai -m rule --add app="^Herd$" manage=off
 yabai -m rule --add app="^PhpStorm$" title="^(Settings|Create New Branch|Push Commits to .+|Rollback Changes|Update Project)$" manage=off
 yabai -m rule --add app="^Zed$" title="Settings$" manage=off
 
+# Picture-in-Picture (TV's always-on-top is handled by its own
+# "Keep video playback on top of all other windows" setting)
+yabai -m rule --add title="^Picture-in-Picture$" manage=off
+yabai -m rule --add app="^TV$" manage=off
+# Rules only apply on window_created. After --restart-service, pre-existing
+# windows are still in the BSP tree — float them so they exit it.
+yabai -m query --windows | jq -r '.[] | select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false) | .id' \
+  | xargs -I{} yabai -m window {} --toggle float
+
 # Workspace 2 floating
 yabai -m space 2 --label chat
 yabai -m config --space 2 layout float
@@ -52,7 +61,7 @@ yabai -m query --windows --space 2 | jq -r '.[] | select(."is-floating" == false
   | xargs -I{} yabai -m window {} --toggle float
 yabai -m signal --add event=window_created action="[ \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space') -eq 2 ] && yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
 
-# App assignments
+# App assignments (chat)
 yabai -m rule --add app="^Spark Desktop$" space=1
 yabai -m rule --add app="^Mail$" space=1
 yabai -m rule --add app="^Slack$" space=2
@@ -62,14 +71,6 @@ yabai -m rule --add app="^Messages$" space=2
 yabai -m rule --add app="^Microsoft Teams$" space=2
 yabai -m signal --add event=window_created app="^Microsoft Teams$" action="yabai -m window \$YABAI_WINDOW_ID --space 2"
 yabai -m rule --add app="^Tuple$" space=2 manage=off
-
-yabai -m space 4 --label code
-yabai -m rule --add app="^Ghostty$" space=4
-yabai -m rule --add app="^Zen$" space=4
-yabai -m rule --add app="^Zed$" space=4
-
-# Follow app to its assigned space when opened (skip space 2 so chat apps don't yank focus)
-yabai -m signal --add event=window_created action="space=\$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space'); [ \"\$space\" != \"2\" ] && yabai -m space --focus \$space"
 
 # Rebalance BSP layout when a window closes so the sibling fills the gap
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"

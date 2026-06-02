@@ -12,12 +12,14 @@ Follow these rules when writing or modifying any code:
 
 Never write comments in code. No docblocks, no inline comments, no TODO comments. The code should be self-explanatory through clear naming and structure.
 
-The one exception is PHPStan type annotations. When needed, always use the single-line format:
+The one exception is PHPStan type annotations that carry information the native type declaration *cannot* — generics like `array<string, string>`, `Collection<int, User>`, `list<string>`, or relation generics like `BelongsTo<Team, $this>`. Always use the single-line format:
 
 ```php
 /** @var Collection<int, User> */
 $users = User::all();
 ```
+
+A docblock that only restates the signature is redundant — remove it. If a method declares `: void` / `: array` / `: bool`, drop the `@return`; if a property is plainly a string or bool, drop the `@var`. Keep the annotation only when it adds a generic the signature can't hold.
 
 ## Descriptive Variable Names
 
@@ -100,6 +102,26 @@ public function handle(Request $request): Response
     return response()->json(['ok' => true]);
 }
 ```
+
+## Test Behavior, Not Tautologies
+
+A test only earns its place if it verifies observable behavior. A unit test that feeds a function an input and asserts the output it was literally written to produce is a tautology, not a test — delete it and cover the behavior through the feature instead.
+
+```php
+// Wrong - restates the function body; proves nothing
+test('it returns a valid timezone unchanged', function () {
+    expect(Timezone::sanitize('America/New_York'))->toBe('America/New_York');
+});
+
+// Right - asserts the outcome that matters, end to end
+test('registration stores the submitted timezone', function () {
+    $this->post(route('register.store'), [...'timezone' => 'America/New_York']);
+
+    expect(User::firstWhere('email', '...')->timezone)->toBe('America/New_York');
+});
+```
+
+Only write a standalone unit test when the unit has non-trivial logic (a real transformation, an algorithm, edge cases) that isn't already exercised in context.
 
 ## Atomic Commits
 

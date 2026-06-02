@@ -60,6 +60,15 @@ $user = User::query()->where('active', true)->first();
 $variant = ProductVariant::query()->firstWhere('sku', $sku);
 ```
 
+## Eloquent Models
+
+- Mass assignment: always `protected $guarded = [];`. Never use `$fillable`.
+- Declare the factory with the `#[UseFactory(XFactory::class)]` attribute. Keep the `HasFactory` trait; drop the redundant `/** @use HasFactory<XFactory> */` generic.
+- Model attributes are for config only (`#[UseFactory]`, `#[ObservedBy]`, …); keep `$guarded`, `$hidden`, and `casts()` as properties/methods — never `#[Fillable]` / `#[Hidden]`.
+- Don't assign-then-`instanceof` an `Authenticatable`; act on the typed model via its identifier (`User::whereKey($event->user->getAuthIdentifier())`).
+
+Read `references/eloquent.md` before writing model code.
+
 ## Method Chaining
 
 One method per line when chaining.
@@ -97,6 +106,8 @@ Laravel provides expressive alternatives to nested conditionals. Use them:
 - `?->` nullsafe operator for optional chaining
 - `tap()` for acting on a value without breaking the chain
 - Pipelines for sequential transformations
+
+Build values with expressions instead of conditionally appending (`array_filter([...])` over an `if`), and keep empty method bodies on one line (`__construct(...) {}`). See `references/php-style.md`.
 
 ## Local Development
 

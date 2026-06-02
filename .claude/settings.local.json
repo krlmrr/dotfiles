@@ -502,7 +502,15 @@
       "Bash(sudo -n cat /private/etc/sudoers.d/yabai)",
       "Bash(sudo -n /opt/homebrew/bin/yabai --load-sa)",
       "Bash(sudo -n -l)",
-      "Bash(shasum *)"
+      "Bash(shasum *)",
+      "WebFetch(domain:hermes-agent.nousresearch.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(brew uses *)",
+      "Bash(brew reinstall *)",
+      "Bash(brew autoremove *)",
+      "Bash(brew doctor *)",
+      "Skill(superpowers:brainstorming)",
+      "Bash(ping -c 2 -W 2 homeassistant)"
     ]
   }
 }

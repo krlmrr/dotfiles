@@ -510,7 +510,12 @@
       "Bash(brew autoremove *)",
       "Bash(brew doctor *)",
       "Skill(superpowers:brainstorming)",
-      "Bash(ping -c 2 -W 2 homeassistant)"
+      "Bash(ping -c 2 -W 2 homeassistant)",
+      "Bash(zsh -n /Users/karlm/Code/dotfiles/mac/zsh/aliases.sh)",
+      "Bash(sh -n /Users/karlm/Code/dotfiles/mac/yabai/retile.sh)",
+      "Bash(sh -c 'echo \"$HOME/Code/dotfiles/mac/yabai/retile.sh\"')",
+      "Bash(col -bx)",
+      "Bash(sh -n /Users/karlm/Code/dotfiles/mac/yabai/yabairc)"
     ]
   }
 }

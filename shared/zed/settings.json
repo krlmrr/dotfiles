@@ -29,6 +29,9 @@
     "word_diff_enabled": false,
     "agent_servers": {
         "claude-acp": {
+            "default_config_options": {
+                "model": "claude-opus-4-8"
+            },
             "type": "registry"
         }
     },

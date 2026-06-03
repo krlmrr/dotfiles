@@ -515,7 +515,13 @@
       "Bash(sh -n /Users/karlm/Code/dotfiles/mac/yabai/retile.sh)",
       "Bash(sh -c 'echo \"$HOME/Code/dotfiles/mac/yabai/retile.sh\"')",
       "Bash(col -bx)",
-      "Bash(sh -n /Users/karlm/Code/dotfiles/mac/yabai/yabairc)"
+      "Bash(sh -n /Users/karlm/Code/dotfiles/mac/yabai/yabairc)",
+      "Bash(sh -n /Users/karlm/Code/dotfiles/mac/yabai/display-layout.sh)",
+      "Bash(system_profiler SPDisplaysDataType)",
+      "Bash(ioreg -r -k AppleClamshellState)",
+      "Bash(awk '/AppleClamshellState/{print \\($NF==\"Yes\"\\)?\"closed\":\"open\"; exit}')",
+      "Bash(xargs -I{} yabai -m window {} --space 1)",
+      "Bash(xargs -I{} yabai -m window {} --space 5)"
     ]
   }
 }

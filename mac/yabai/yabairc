@@ -86,6 +86,16 @@ yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 # Teams windows stay BSP-managed on space 2 despite the float layout.
 yabai -m rule --apply
 
+# Display-conditional placement for Zen and Zed:
+# - External display connected: both on the external display's 3rd space,
+#   BSP-tiled with Zen left / Zed right.
+# - Laptop only: Zen on space 3, Zed on space 4.
+# Script also re-runs on Zen/Zed window_created so new launches land right.
+yabai -m signal --add event=window_created app="^Zen$" action="\$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
+yabai -m signal --add event=window_created app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
+yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
+"$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
+
 # Start on workspace 4
 yabai -m space --focus 4
 

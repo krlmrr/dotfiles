@@ -53,27 +53,38 @@ yabai -m query --windows | jq -r '.[] | select((.app=="TV" or .title=="Picture-i
   | xargs -I{} yabai -m window {} --toggle float
 
 # Workspace 2 floating
+# The space layout=float and per-app manage=off rules below are what actually
+# keep chat windows floating. The previous --toggle float recovery here was
+# wrong: per `man yabai`, --toggle float is BSP-only ("toggle whether the
+# focused window should be tiled (only on bsp spaces)") and has undefined
+# behavior on float-layout spaces. `yabai -m rule --apply` at the end of this
+# file retroactively applies the manage=off rules to existing windows after
+# --restart-service, which is the canonical primitive for "this window must
+# float" across yabai's startup.
 yabai -m space 2 --label chat
 yabai -m config --space 2 layout float
-# After --restart-service, windows pre-existing on space 2 get inserted into the
-# BSP tree before this layout=float line runs. Re-float them to restore the invariant.
-yabai -m query --windows --space 2 | jq -r '.[] | select(."is-floating" == false) | .id' \
-  | xargs -I{} yabai -m window {} --toggle float
 yabai -m signal --add event=window_created action="[ \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space') -eq 2 ] && yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
 
 # App assignments (chat)
 yabai -m rule --add app="^Spark Desktop$" space=1
 yabai -m rule --add app="^Mail$" space=1
-yabai -m rule --add app="^Slack$" space=2
-yabai -m rule --add app="^Discord$" space=2
-yabai -m rule --add app="^Telegram$" space=2
-yabai -m rule --add app="^Messages$" space=2
-yabai -m rule --add app="^Microsoft Teams$" space=2
+yabai -m rule --add app="^Slack$" space=2 manage=off
+yabai -m rule --add app="^Discord$" space=2 manage=off
+yabai -m rule --add app="^Telegram$" space=2 manage=off
+yabai -m rule --add app="^Messages$" space=2 manage=off
+yabai -m rule --add app="^Microsoft Teams$" space=2 manage=off
 yabai -m signal --add event=window_created app="^Microsoft Teams$" action="yabai -m window \$YABAI_WINDOW_ID --space 2"
 yabai -m rule --add app="^Tuple$" space=2 manage=off
 
 # Rebalance BSP layout when a window closes so the sibling fills the gap
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
+
+# Re-apply all rules against existing windows. Critical after --restart-service
+# (e.g., from brewup), where pre-existing chat-app windows get re-attached to
+# the BSP tree before the rules are re-registered. Without this, manage=off
+# rules only affect newly-created windows, so existing Slack/Discord/Messages/
+# Teams windows stay BSP-managed on space 2 despite the float layout.
+yabai -m rule --apply
 
 # Start on workspace 4
 yabai -m space --focus 4

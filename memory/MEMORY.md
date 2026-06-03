@@ -11,6 +11,7 @@
 - [Review skills before committing](feedback_review_before_commit.md) — Always review changes against coding skills BEFORE git commit/push
 - [Yabai space 2 is intentionally unmanaged](feedback_yabai_space2.md) — Space 2 is float layout (chat apps); never touch it in window logic or diagnostics
 - [Yabai display event semantics](feedback_yabai_display_events.md) — display_changed fires on focus crossing screens; use display_added/removed/moved/resized for hardware reconfig
+- [Don't suggest AeroSpace](feedback_no_aerospace.md) — User evaluated and rejected AeroSpace; needs native macOS spaces. Fix yabai pain inside yabai, don't pitch alternatives.
 - [Raycast is the launcher](feedback_raycast_launcher.md) — Karl uses Raycast for launching apps and shell actions; prefer Raycast script commands over zsh aliases
 - [Clean up remote temp state](feedback_cleanup_remote_state.md) — Don't trust `--rm` under signal kills; verify and clean up containers/files/processes I create on remote hosts before declaring done
 

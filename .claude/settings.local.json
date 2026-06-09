@@ -521,7 +521,32 @@
       "Bash(ioreg -r -k AppleClamshellState)",
       "Bash(awk '/AppleClamshellState/{print \\($NF==\"Yes\"\\)?\"closed\":\"open\"; exit}')",
       "Bash(xargs -I{} yabai -m window {} --space 1)",
-      "Bash(xargs -I{} yabai -m window {} --space 5)"
+      "Bash(xargs -I{} yabai -m window {} --space 5)",
+      "Bash(grep -iA3 'language_servers\\\\|phpcs\\\\|\\\\[language_servers')",
+      "Bash(echo \"=== package.json ===\")",
+      "Bash(cat '/Users/karlm/Library/Application Support/Zed/extensions/work/blade/node_modules/devsense-php-ls-darwin-arm64/package.json')",
+      "Bash(pmset -g log)",
+      "Bash(xargs -I{} yabai -m window {} --sub-layer normal)",
+      "Bash(sh -n retile.sh)",
+      "Bash(sort -t= -k2 -n)",
+      "Bash(echo \"retile refs remaining: $\\(yabai -m signal --list)",
+      "Bash(sh -x /Users/karlm/Code/dotfiles/mac/yabai/display-changed.sh)",
+      "Bash(sh -n display-changed.sh)",
+      "Bash(echo \"signals still wired: $\\(yabai -m signal --list)",
+      "Bash(rm -f /tmp/yabai.log /tmp/yabai_wake.log /tmp/yabai_display.log)",
+      "Bash(sh -n yabairc)",
+      "Bash(./yabairc display-change *)",
+      "Bash(./yabairc place *)",
+      "Bash(echo \"phantom ghostty present in tree? $\\(yabai -m query --windows)",
+      "Bash(sw_vers)",
+      "Bash(system_profiler SPBluetoothDataType)",
+      "Bash(echo \"wired: $\\(yabai -m signal --list)",
+      "Bash(echo \"Zed running? id=[$\\(yabai -m query --windows)",
+      "Bash(./buildghostty)",
+      "Bash(echo \"skhd reloaded \\(exit $?\\)\")",
+      "Bash(/Applications/Ghostty.app/Contents/MacOS/ghostty +list-keybinds)",
+      "Bash(echo \"exit $?\")",
+      "WebFetch(domain:www.youtube.com)"
     ]
   }
 }

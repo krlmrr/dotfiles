@@ -1,22 +1,149 @@
 #!/usr/bin/env sh
+# Single-file yabai config + dynamic layout. Invoked two ways:
+#   • no arg  → yabai runs this on load: full config + signal registration
+#   • "<cmd>" → signal actions re-invoke this file to run one function
+# Everything logs to /tmp/yabai.log so there's one place to watch.
+
+LOG=/tmp/yabai.log
+SELF="$HOME/Code/dotfiles/mac/yabai/yabairc"
+LAPTOP_W=2056          # MBP 16" reports 2056x1329 in yabai points; used to
+LAPTOP_H=1329          # tell the laptop panel from an external display.
+SIG_FILE=/tmp/yabai_display_sig
+
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] ${2:-}" >> "$LOG"; }
+
+# ------------------------------------------------------------------ helpers
+move() {  # move every window of app $1 to space $2
+  yabai -m query --windows 2>/dev/null \
+    | jq -r --arg a "$1" '.[]|select(.app==$a)|.id' \
+    | xargs -I{} yabai -m window {} --space "$2" 2>/dev/null
+}
+
+win_id() {  # id of first STANDARD window of app $1 (exact name; skips phantoms)
+  yabai -m query --windows 2>/dev/null \
+    | jq -r --arg a "$1" '.[]|select(.app==$a and .subrole=="AXStandardWindow")|.id' | head -1
+}
+floating()     { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '."is-floating"'; }
+ensure_tiled() { [ "$(floating "$1")" = "true" ]  && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
+ensure_float() { [ "$(floating "$1")" = "false" ] && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
+
+# True when the editor layout already matches the desired target on space $1:
+#   Zed open  -> Zen-TL / Ghostty-BL (stacked left) / Zed full-R
+#   Zed closed-> Zen | Ghostty side by side (Zen left)
+# 0-or-1 editors present is trivially correct (nothing to arrange).
+external_correct() {
+  yabai -m query --windows --space "$1" 2>/dev/null | jq -e '
+      (map(select(.subrole=="AXStandardWindow"))) as $w
+    | ($w|map(select(.app=="Zen"))|first)     as $zen
+    | ($w|map(select(.app=="Zed"))|first)     as $zed
+    | ($w|map(select(.app=="Ghostty"))|first) as $gho
+    | ([$zen,$zed,$gho]|map(select(.!=null))|length) as $n
+    | if $n <= 1 then true
+      elif $zed then
+        ($zen and $gho)
+        and ($zed.frame.x > $zen.frame.x)
+        and (($zen.frame.x|floor) == ($gho.frame.x|floor))
+        and ($zen.frame.y < $gho.frame.y)
+      else
+        ($zen and $gho)
+        and ($zen.frame.x < $gho.frame.x)
+        and (($zen.frame.y|floor) == ($gho.frame.y|floor))
+      end
+  ' >/dev/null 2>&1
+}
+
+# ------------------------------------------------------------- place editors
+# Acts on whichever editors are OPEN (none required). Deterministic --insert
+# rebuild; skips entirely when the layout is already correct.
+place_editors() {
+  trigger="${1:-startup}"
+  external_idx=$(yabai -m query --displays 2>/dev/null \
+    | jq -r --argjson w "$LAPTOP_W" --argjson h "$LAPTOP_H" \
+      '.[]|select(.frame.w!=$w or .frame.h!=$h)|.index' | head -1)
+
+  if [ -z "$external_idx" ]; then
+    log place "place($trigger): laptop only -> Zen:3 Zed:4 Ghostty:5"
+    move Zen 3; move Zed 4; move Ghostty 5
+    return
+  fi
+
+  target=$(yabai -m query --spaces --display "$external_idx" 2>/dev/null | jq -r '.[2].index // empty')
+  [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
+
+  zed=$(win_id Zed); zen=$(win_id Zen); gho=$(win_id Ghostty)
+  for id in $zed $zen $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
+
+  if external_correct "$target"; then
+    log place "place($trigger): already correct on space $target — skip"
+    return
+  fi
+
+  # Float-then-reinsert build (avoids --warp ambiguity).
+  yabai -m space --focus "$target" 2>/dev/null
+  if [ -n "$zed" ]; then
+    # Zed open -> stacked: Zed base (full-right), Zen west, Ghostty south of Zen.
+    log place "place($trigger): rebuild stacked (Zed open) — Zen TL / Ghostty BL / Zed R"
+    ensure_tiled "$zed"
+    [ -n "$zen" ] && ensure_float "$zen"
+    [ -n "$gho" ] && ensure_float "$gho"
+    if [ -n "$zen" ]; then yabai -m window "$zed" --insert west 2>/dev/null; ensure_tiled "$zen"; fi
+    if [ -n "$gho" ]; then
+      anchor="${zen:-$zed}"
+      yabai -m window "$anchor" --insert south 2>/dev/null
+      ensure_tiled "$gho"
+    fi
+  else
+    # Zed closed -> side by side: Zen left (base), Ghostty re-tiles east of it.
+    log place "place($trigger): rebuild side-by-side (no Zed) — Zen | Ghostty"
+    [ -n "$zen" ] && ensure_tiled "$zen"
+    if [ -n "$gho" ]; then
+      ensure_float "$gho"
+      [ -n "$zen" ] && yabai -m window "$zen" --insert east 2>/dev/null
+      ensure_tiled "$gho"
+    fi
+  fi
+}
+
+# ------------------------------------------------------- display-change gate
+# Re-place editors only when the set of displays actually changed (dock/undock
+# or resolution change), ignoring the duplicate/spurious events a dock fires.
+on_display_change() {
+  LOCK=/tmp/yabai_display.lock
+  if ! mkdir "$LOCK" 2>/dev/null; then log dpy "display-change: locked-skip"; return; fi
+  trap 'rmdir "$LOCK" 2>/dev/null' EXIT
+  sig=$(yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)')
+  prev=$(cat "$SIG_FILE" 2>/dev/null)
+  log dpy "display-change: sig=$sig prev=$prev"
+  [ -z "$sig" ] && { log dpy "  empty query, skip"; return; }
+  [ "$sig" = "$prev" ] && { log dpy "  no change, skip"; return; }
+  printf '%s' "$sig" > "$SIG_FILE"
+  place_editors display-change
+}
+
+# ----------------------------------------------------- dispatch (signal calls)
+case "$1" in
+  display-change) on_display_change; exit 0 ;;
+  place)          place_editors "${2:-window}"; exit 0 ;;
+esac
+
+# ============================================================ yabai load (no arg)
+log load "config loading"
 
 # Scripting addition (requires SIP partially disabled)
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-yabai -m signal --add event=system_woke action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
-yabai -m signal --add event=display_added action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
-yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
-yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
-yabai -m signal --add event=display_moved action="\$HOME/Code/dotfiles/mac/yabai/retile.sh"
 sudo yabai --load-sa
+
+# Display reconfig re-places editors (gated). NO system_woke handler: a
+# restart-service on wake was what broke editors/sub-layers/chat — sleep alone
+# changes nothing.
+yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+
 yabai -m config menubar_opacity 0.0
-
-# Reserve space for sketchybar
 yabai -m config external_bar all:0:0
-
-# BSP layout (binary space partitioning - auto alternates h/v splits)
 yabai -m config layout bsp
-
-# New window spawns to the right or bottom (auto-alternates)
 yabai -m config window_placement second_child
 
 # Gaps
@@ -42,30 +169,18 @@ yabai -m rule --add app="^Logi Options\+$" manage=off
 yabai -m rule --add app="^Herd$" manage=off
 yabai -m rule --add app="^PhpStorm$" title="^(Settings|Create New Branch|Push Commits to .+|Rollback Changes|Update Project)$" manage=off
 yabai -m rule --add app="^Zed$" title="Settings$" manage=off
-
-# Picture-in-Picture (TV's always-on-top is handled by its own
-# "Keep video playback on top of all other windows" setting)
+# Lowercase "ghostty" is a roleless phantom helper window; case-sensitive so it
+# never matches the real "Ghostty".
+yabai -m rule --add app="^ghostty$" manage=off
 yabai -m rule --add title="^Picture-in-Picture$" manage=off
 yabai -m rule --add app="^TV$" manage=off
-# Rules only apply on window_created. After --restart-service, pre-existing
-# windows are still in the BSP tree — float them so they exit it.
-yabai -m query --windows | jq -r '.[] | select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false) | .id' \
+yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 
-# Workspace 2 floating
-# The space layout=float and per-app manage=off rules below are what actually
-# keep chat windows floating. The previous --toggle float recovery here was
-# wrong: per `man yabai`, --toggle float is BSP-only ("toggle whether the
-# focused window should be tiled (only on bsp spaces)") and has undefined
-# behavior on float-layout spaces. `yabai -m rule --apply` at the end of this
-# file retroactively applies the manage=off rules to existing windows after
-# --restart-service, which is the canonical primitive for "this window must
-# float" across yabai's startup.
+# Space 2 = floating chat. manage=off rules + float layout keep these windows
+# free; rule --apply re-applies them to already-open windows.
 yabai -m space 2 --label chat
 yabai -m config --space 2 layout float
-yabai -m signal --add event=window_created action="[ \$(yabai -m query --windows --window \$YABAI_WINDOW_ID | jq -r '.space') -eq 2 ] && yabai -m window \$YABAI_WINDOW_ID --sub-layer normal"
-
-# App assignments (chat)
 yabai -m rule --add app="^Spark Desktop$" space=1
 yabai -m rule --add app="^Mail$" space=1
 yabai -m rule --add app="^Slack$" space=2 manage=off
@@ -75,28 +190,22 @@ yabai -m rule --add app="^Messages$" space=2 manage=off
 yabai -m rule --add app="^Microsoft Teams$" space=2 manage=off
 yabai -m signal --add event=window_created app="^Microsoft Teams$" action="yabai -m window \$YABAI_WINDOW_ID --space 2"
 yabai -m rule --add app="^Tuple$" space=2 manage=off
-
-# Rebalance BSP layout when a window closes so the sibling fills the gap
-yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
-
-# Re-apply all rules against existing windows. Critical after --restart-service
-# (e.g., from brewup), where pre-existing chat-app windows get re-attached to
-# the BSP tree before the rules are re-registered. Without this, manage=off
-# rules only affect newly-created windows, so existing Slack/Discord/Messages/
-# Teams windows stay BSP-managed on space 2 despite the float layout.
 yabai -m rule --apply
 
-# Display-conditional placement for Zen and Zed:
-# - External display connected: both on the external display's 3rd space,
-#   BSP-tiled with Zen left / Zed right.
-# - Laptop only: Zen on space 3, Zed on space 4.
-# Script also re-runs on Zen/Zed window_created so new launches land right.
-yabai -m signal --add event=window_created app="^Zen$" action="\$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
-yabai -m signal --add event=window_created app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
-yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
-"$HOME/Code/dotfiles/mac/yabai/display-layout.sh"
+# Rebalance BSP when a window closes so the sibling fills the gap
+yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
+# When Zed closes, re-place so Zen/Ghostty drop the stack and go side by side
+yabai -m signal --add event=window_destroyed app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 
-# Start on workspace 4
+# Re-place each editor when it launches (so it lands right regardless of order)
+yabai -m signal --add event=window_created app="^Zen$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Zed$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+
+# Seed the display signature and place whatever editors are open now.
+yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
+place_editors startup
+
 yabai -m space --focus 4
-
+log load "config loaded"
 echo "yabai configuration loaded"

@@ -14,8 +14,10 @@
 - [Don't suggest AeroSpace](feedback_no_aerospace.md) — User evaluated and rejected AeroSpace; needs native macOS spaces. Fix yabai pain inside yabai, don't pitch alternatives.
 - [Raycast is the launcher](feedback_raycast_launcher.md) — Karl uses Raycast for launching apps and shell actions; prefer Raycast script commands over zsh aliases
 - [Clean up remote temp state](feedback_cleanup_remote_state.md) — Don't trust `--rm` under signal kills; verify and clean up containers/files/processes I create on remote hosts before declaring done
+- [Minimal comments](feedback_minimal_comments.md) — Don't add explanatory comment blocks just because code changed; make the minimal edit
 
 ## Project
+- [yabai: never restart-service on wake](project_yabai_wake_no_restart.md) — restart-on-wake caused all post-wake breakage; sleep changes nothing. No system_woke signal; display events gated by display-changed.sh
 - [Migrating Linux PHP dev to Lerd (podman)](project_lerd_migration.md) — Docker + DDEV removed on 2026-05-13. Lerd not yet wired in; `a`/`d`/`lzd` aliases left as TODO markers.
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
 - [Synology homelab on vheissulabs.com](project_homelab_synology.md) — DS1618+ runs Docker services (GitLab, Pi-hole) behind DSM reverse proxy + acme.sh wildcard cert; tailnet-private via CGNAT

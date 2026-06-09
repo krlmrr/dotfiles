@@ -36,16 +36,16 @@ shift + ctrl + alt + cmd - down : yabai -m window --warp south
 shift + ctrl + alt + cmd - up : yabai -m window --warp north
 shift + ctrl + alt + cmd - right : yabai -m window --warp east
 
-# Workspaces
-alt - 1 : yabai -m space --focus 1
-alt - 2 : yabai -m space --focus 2
-alt - 3 : yabai -m space --focus 3
-alt - 4 : yabai -m space --focus 4
-alt - 5 : yabai -m space --focus 5
-alt - 6 : yabai -m space --focus 6
-alt - 7 : yabai -m space --focus 7
-alt - 8 : yabai -m space --focus 8
-alt - 9 : yabai -m space --focus 9
+# Switch desktop (ctrl for laptop, meh for Lily58)
+ctrl - 1 : yabai -m space --focus 1
+ctrl - 2 : yabai -m space --focus 2
+ctrl - 3 : yabai -m space --focus 3
+ctrl - 4 : yabai -m space --focus 4
+ctrl - 5 : yabai -m space --focus 5
+ctrl - 6 : yabai -m space --focus 6
+ctrl - 7 : yabai -m space --focus 7
+ctrl - 8 : yabai -m space --focus 8
+ctrl - 9 : yabai -m space --focus 9
 ctrl + alt + cmd - 1 : yabai -m space --focus 1
 ctrl + alt + cmd - 2 : yabai -m space --focus 2
 ctrl + alt + cmd - 3 : yabai -m space --focus 3
@@ -56,22 +56,23 @@ ctrl + alt + cmd - 7 : yabai -m space --focus 7
 ctrl + alt + cmd - 8 : yabai -m space --focus 8
 ctrl + alt + cmd - 9 : yabai -m space --focus 9
 
-# Sequential workspace navigation
-ctrl - left : yabai -m space --focus prev
-ctrl - right : yabai -m space --focus next
+# Sequential workspace navigation (macOS owns Ctrl+←/→ for switching)
 ctrl + alt + shift - h : yabai -m space --focus prev
 ctrl + alt + shift - l : yabai -m space --focus next
+# Move window to adjacent desktop + follow (ctrl+shift mirrors ctrl switching)
+ctrl + shift - left  : yabai -m window --space prev; yabai -m space --focus prev
+ctrl + shift - right : yabai -m window --space next; yabai -m space --focus next
 
-# Move to workspace
-shift + alt - 1 : yabai -m window --space 1; yabai -m space --focus 1
-shift + alt - 2 : yabai -m window --space 2; yabai -m space --focus 2
-shift + alt - 3 : yabai -m window --space 3; yabai -m space --focus 3
-shift + alt - 4 : yabai -m window --space 4; yabai -m space --focus 4
-shift + alt - 5 : yabai -m window --space 5; yabai -m space --focus 5
-shift + alt - 6 : yabai -m window --space 6; yabai -m space --focus 6
-shift + alt - 7 : yabai -m window --space 7; yabai -m space --focus 7
-shift + alt - 8 : yabai -m window --space 8; yabai -m space --focus 8
-shift + alt - 9 : yabai -m window --space 9; yabai -m space --focus 9
+# Move window to desktop + follow (ctrl+shift for laptop, meh+shift for Lily58)
+ctrl + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1
+ctrl + shift - 2 : yabai -m window --space 2; yabai -m space --focus 2
+ctrl + shift - 3 : yabai -m window --space 3; yabai -m space --focus 3
+ctrl + shift - 4 : yabai -m window --space 4; yabai -m space --focus 4
+ctrl + shift - 5 : yabai -m window --space 5; yabai -m space --focus 5
+ctrl + shift - 6 : yabai -m window --space 6; yabai -m space --focus 6
+ctrl + shift - 7 : yabai -m window --space 7; yabai -m space --focus 7
+ctrl + shift - 8 : yabai -m window --space 8; yabai -m space --focus 8
+ctrl + shift - 9 : yabai -m window --space 9; yabai -m space --focus 9
 shift + ctrl + alt + cmd - 1 : yabai -m window --space 1; yabai -m space --focus 1
 shift + ctrl + alt + cmd - 2 : yabai -m window --space 2; yabai -m space --focus 2
 shift + ctrl + alt + cmd - 3 : yabai -m window --space 3; yabai -m space --focus 3

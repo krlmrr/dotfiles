@@ -16,6 +16,8 @@ if [ "$OS" = "mac" ]; then
     append "window-padding-y = 8,0" ~/.config/ghostty/config
     append "window-padding-x = 8,8" ~/.config/ghostty/config
     append "macos-option-as-alt = true" ~/.config/ghostty/config
+    append "keybind = cmd+shift+h=goto_split:left" ~/.config/ghostty/config
+    append "keybind = cmd+shift+l=goto_split:right" ~/.config/ghostty/config
 
     # macOS also reads from Application Support
     mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
@@ -31,6 +33,8 @@ elif [ "$OS" = "linux" ]; then
     # Uses close_surface so it peels off splits like ctrl+shift+x; `quit` would
     # kill the app immediately, ignoring open splits/windows.
     append "keybind = ctrl+q=close_surface" ~/.config/ghostty/config
+    append "keybind = ctrl+shift+h=goto_split:left" ~/.config/ghostty/config
+    append "keybind = ctrl+shift+l=goto_split:right" ~/.config/ghostty/config
 fi
 
 echo "Ghostty config rebuilt."

@@ -149,6 +149,13 @@ fi
 
 yabai -m config menubar_opacity 0.0
 yabai -m config external_bar all:0:0
+
+# Space 2 = chaos zone. float layout means yabai tiles NOTHING here — every
+# window floats wherever you drop it. Declared before the bsp default so a
+# restart can't tile its windows first. Which apps land here is left to macOS
+# (Dock → right-click → Options → Assign To).
+yabai -m config --space 2 layout float
+
 yabai -m config layout bsp
 yabai -m config window_placement second_child
 
@@ -183,19 +190,8 @@ yabai -m rule --add app="^TV$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 
-# Space 2 = floating chat. manage=off rules + float layout keep these windows
-# free; rule --apply re-applies them to already-open windows.
-yabai -m space 2 --label chat
-yabai -m config --space 2 layout float
-yabai -m rule --add app="^Spark Desktop$" space=1
-yabai -m rule --add app="^Mail$" space=1
-yabai -m rule --add app="^Slack$" space=2 manage=off
-yabai -m rule --add app="^Discord$" space=2 manage=off
-yabai -m rule --add app="^Telegram$" space=2 manage=off
-yabai -m rule --add app="^Messages$" space=2 manage=off
-yabai -m rule --add app="^Microsoft Teams$" space=2 manage=off
-yabai -m signal --add event=window_created app="^Microsoft Teams$" action="yabai -m window \$YABAI_WINDOW_ID --space 2"
-yabai -m rule --add app="^Tuple$" space=2 manage=off
+# App->desktop assignment is left to macOS (Dock → Assign To). rule --apply
+# still re-floats the manage=off windows (System Settings, ghostty phantom, TV).
 yabai -m rule --apply
 
 # Rebalance BSP when a window closes (works without the scripting addition)

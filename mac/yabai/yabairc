@@ -211,7 +211,7 @@ if [ "$HAS_SA" = 1 ]; then
   yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
   yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
   place_editors startup
-  yabai -m space --focus 4
+  yabai -m space --focus 3
 fi
 log load "config loaded"
 echo "yabai configuration loaded"

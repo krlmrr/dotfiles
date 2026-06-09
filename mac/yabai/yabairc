@@ -12,6 +12,14 @@ SIG_FILE=/tmp/yabai_display_sig
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] ${2:-}" >> "$LOG"; }
 
+# True when the scripting addition can load (SIP off, or the partial config with
+# filesystem protections disabled). Full SIP -> false -> tiling-only mode.
+sa_capable() {
+  s=$(csrutil status 2>/dev/null)
+  echo "$s" | grep -qi 'status: disabled' && return 0
+  echo "$s" | grep -qi 'Filesystem Protections: disabled'
+}
+
 # ------------------------------------------------------------------ helpers
 move() {  # move every window of app $1 to space $2
   yabai -m query --windows 2>/dev/null \
@@ -129,17 +137,15 @@ esac
 # ============================================================ yabai load (no arg)
 log load "config loading"
 
-# Scripting addition (requires SIP partially disabled)
-yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
-sudo yabai --load-sa
-
-# Display reconfig re-places editors (gated). NO system_woke handler: a
-# restart-service on wake was what broke editors/sub-layers/chat — sleep alone
-# changes nothing.
-yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+# Scripting addition: load only if SIP allows it; otherwise run tiling-only.
+if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
+if [ "$HAS_SA" = 1 ]; then
+  log load "scripting addition available — full mode"
+  sudo yabai --load-sa
+  yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+else
+  log load "no scripting addition (SIP on) — tiling-only mode"
+fi
 
 yabai -m config menubar_opacity 0.0
 yabai -m config external_bar all:0:0
@@ -192,20 +198,24 @@ yabai -m signal --add event=window_created app="^Microsoft Teams$" action="yabai
 yabai -m rule --add app="^Tuple$" space=2 manage=off
 yabai -m rule --apply
 
-# Rebalance BSP when a window closes so the sibling fills the gap
+# Rebalance BSP when a window closes (works without the scripting addition)
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
-# When Zed closes, re-place so Zen/Ghostty drop the stack and go side by side
-yabai -m signal --add event=window_destroyed app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 
-# Re-place each editor when it launches (so it lands right regardless of order)
-yabai -m signal --add event=window_created app="^Zen$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Zed$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-
-# Seed the display signature and place whatever editors are open now.
-yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
-place_editors startup
-
-yabai -m space --focus 4
+# Cross-space + editor placement — scripting-addition only (window --space /
+# space --focus, which macOS blocks under full SIP). Skip the whole block in
+# tiling-only mode; lean on macOS-native spaces there.
+if [ "$HAS_SA" = 1 ]; then
+  yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+  yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+  yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+  yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+  yabai -m signal --add event=window_destroyed app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+  yabai -m signal --add event=window_created app="^Zen$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+  yabai -m signal --add event=window_created app="^Zed$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+  yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+  yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
+  place_editors startup
+  yabai -m space --focus 4
+fi
 log load "config loaded"
 echo "yabai configuration loaded"

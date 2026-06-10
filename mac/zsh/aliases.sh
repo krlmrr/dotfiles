@@ -19,16 +19,15 @@ brewup() {
   after=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
 
   if [[ "$before" != "$after" && -n "$after" ]]; then
-    echo "yabai upgraded ($before → $after) — reloading SA, safe-restarting"
+    echo "yabai upgraded ($before → $after) — reloading SA, restarting, cleaning TCC"
     env -u TERMINFO sudo yabai --uninstall-sa
     env -u TERMINFO sudo yabai --load-sa
-    # retile.sh handles position save/restore around --restart-service
-    "$HOME/Code/dotfiles/mac/yabai/retile.sh"
+    yabai --restart-service
+    sudo bash ~/Code/dotfiles/mac/tcc-cleanup.sh
   else
-    echo "yabai not upgraded — skipping SA reload and service restart"
+    echo "yabai not upgraded — skipping SA reload, restart, and TCC cleanup"
   fi
 
-  sudo bash ~/Code/dotfiles/mac/tcc-cleanup.sh
   open /Applications/Raycast.app/
 }
 

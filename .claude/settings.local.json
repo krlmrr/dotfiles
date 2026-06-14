@@ -546,7 +546,14 @@
       "Bash(echo \"skhd reloaded \\(exit $?\\)\")",
       "Bash(/Applications/Ghostty.app/Contents/MacOS/ghostty +list-keybinds)",
       "Bash(echo \"exit $?\")",
-      "WebFetch(domain:www.youtube.com)"
+      "WebFetch(domain:www.youtube.com)",
+      "WebFetch(domain:mrmacintosh.com)",
+      "Bash(sh -c ' *)",
+      "Bash(grep -nE 'if \\\\[ \"\\\\$HAS_SA\" = 1 \\\\]|sa_capable|--load-sa|place_editors startup|space --focus 4' yabairc)",
+      "WebFetch(domain:formulae.brew.sh)",
+      "Bash(curl -s https://api.github.com/repos/koekeishiya/yabai)",
+      "Bash(curl -sL https://api.github.com/repositories/184909163)",
+      "Bash(gh auth *)"
     ]
   }
 }

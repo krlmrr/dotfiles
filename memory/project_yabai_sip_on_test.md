@@ -11,4 +11,8 @@ Preferred approach (Karl's idea): make `mac/yabai/yabairc` **self-detecting** �
 
 IMPORTANT: don't build blind — verify BOTH branches live (full mode on `Macintosh HD`, no-SA mode on the Beta volume) before shipping, per Karl's test-first rule.
 
+UPDATE 2026-06-14: yabai **v7.1.25** (#2788, shipped 2026-05-08; Karl has it installed) makes `window --space <sel>` work **with SIP enabled / no SA** — routed through `SLSBridgedMoveWindowsToManagedSpaceOperation`, runtime-guarded by `if (SLSPerformAsynchronousBridgedWindowManagementOperation)`, plus `SLSSpaceSetFrontPSN` to front the moved app. Docs dropped the "SIP must be partially disabled" caveat for `--space`. SCOPE IS NARROW: only *moving* windows to spaces is fixed; **`space --focus` (switching the active space) still needs the SA**. Validated upstream on Tahoe 26.4 — NOT yet verified on macOS 27 Golden Gate (the bridged symbol may be absent on 27; the runtime guard degrades silently if so, so it's safe to wire in but must be tested live on the Beta volume per the test-first rule).
+
+Implication for the no-SA branch (`mac/yabai/yabairc` ~L200-215, currently all gated behind HAS_SA=1): the skhdrc "send window to space N" binds can move into no-SA mode (real gain). `place_editors` can only PARTIALLY — it moves editors fine, but its float/reinsert layout build depends on `space --focus "$target"` (yabairc:90) which still needs SA, so it'd need a move-only reduced variant. Startup `space --focus 3` and `ctrl-N` space-switch binds stay SA-only; keep native macOS spaces in no-SA mode. NOT yet implemented — pending live verification on Golden Gate.
+
 The SA boundary and the main no-restart design are documented in [[project-yabai-wake-no-restart]].

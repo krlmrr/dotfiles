@@ -18,7 +18,7 @@
 
 ## Project
 - [yabai: never restart-service on wake](project_yabai_wake_no_restart.md) — restart-on-wake caused all post-wake breakage; sleep changes nothing. No system_woke signal; display events gated by display-changed.sh
-- [yabai SIP-on test on macOS 27 beta](project_yabai_sip_on_test.md) — Karl testing yabai without SA on a "Beta" volume; if asked there, build a SIP-on yabairc variant (no --load-sa, drop cross-space binds, lean on native spaces)
+- [yabai SIP-on test on macOS 27 beta](project_yabai_sip_on_test.md) — Karl testing yabai without SA on a "Beta" volume. v7.1.25 (#2788) makes `window --space` work SIP-on; `space --focus` still needs SA. No-SA branch can regain window-to-space binds pending live test on Golden Gate.
 - [Migrating Linux PHP dev to Lerd (podman)](project_lerd_migration.md) — Docker + DDEV removed on 2026-05-13. Lerd not yet wired in; `a`/`d`/`lzd` aliases left as TODO markers.
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
 - [Synology homelab on vheissulabs.com](project_homelab_synology.md) — DS1618+ runs Docker services (GitLab, Pi-hole) behind DSM reverse proxy + acme.sh wildcard cert; tailnet-private via CGNAT

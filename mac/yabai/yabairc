@@ -86,6 +86,14 @@ place_editors() {
     return
   fi
 
+  # The float/reinsert rebuild below needs the target space focused, which
+  # requires the SA. Under SIP-on the editors are already moved (above); skip
+  # the layout arrange rather than run it blind on a non-visible space.
+  if [ "$HAS_SA" != 1 ]; then
+    log place "place($trigger): SIP-on — moved to $target, skipping layout rebuild"
+    return
+  fi
+
   # Float-then-reinsert build (avoids --warp ambiguity).
   yabai -m space --focus "$target" 2>/dev/null
   if [ -n "$zed" ]; then
@@ -128,6 +136,11 @@ on_display_change() {
   place_editors display-change
 }
 
+# SA capability — needed in BOTH the signal-dispatch path (place_editors gates
+# its focus-dependent rebuild on it) and the main load below, so compute it
+# before the dispatch case exits.
+if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
+
 # ----------------------------------------------------- dispatch (signal calls)
 case "$1" in
   display-change) on_display_change; exit 0 ;;
@@ -138,7 +151,6 @@ esac
 log load "config loading"
 
 # Scripting addition: load only if SIP allows it; otherwise run tiling-only.
-if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
 if [ "$HAS_SA" = 1 ]; then
   log load "scripting addition available — full mode"
   sudo yabai --load-sa
@@ -197,21 +209,21 @@ yabai -m rule --apply
 # Rebalance BSP when a window closes (works without the scripting addition)
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 
-# Cross-space + editor placement — scripting-addition only (window --space /
-# space --focus, which macOS blocks under full SIP). Skip the whole block in
-# tiling-only mode; lean on macOS-native spaces there.
-if [ "$HAS_SA" = 1 ]; then
-  yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-  yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-  yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-  yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-  yabai -m signal --add event=window_destroyed app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-  yabai -m signal --add event=window_created app="^Zen$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-  yabai -m signal --add event=window_created app="^Zed$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-  yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-  yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
-  place_editors startup
-  yabai -m space --focus 3
-fi
+# Cross-space + editor placement. `window --space` works SIP-on (yabai 7.1.25),
+# so editors get MOVED to their spaces in both modes. Only `space --focus` still
+# needs the SA — the startup focus below and the rebuild inside place_editors
+# stay gated; everything else runs unconditionally.
+yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
+yabai -m signal --add event=window_destroyed app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Zen$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Zed$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
+place_editors startup
+# Startup focus of the editor space needs the SA; under SIP-on switch with ^3.
+[ "$HAS_SA" = 1 ] && yabai -m space --focus 3
 log load "config loaded"
 echo "yabai configuration loaded"

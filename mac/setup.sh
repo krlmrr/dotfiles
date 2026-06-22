@@ -2,6 +2,13 @@ echo "=== Mac Setup ==="
 
 # Mac packages
 echo "Installing Mac packages..."
+# Homebrew refuses to load formulae from third-party taps until they're trusted.
+# Tap + trust every non-official tap the Brewfile uses (including osx-cross/{arm,avr}
+# pulled in transitively by qmk) before bundling, or the install aborts on a fresh Mac.
+for t in qmk/qmk osx-cross/arm osx-cross/avr FelixKratz/formulae koekeishiya/formulae; do
+  brew tap "$t"
+  brew trust "$t"
+done
 brew bundle --file="$DOTFILES_DIR/mac/Brewfile"
 
 # Caps Lock → Control (at boot via LaunchDaemon, Hammerspoon adds tap-for-Escape)
@@ -32,6 +39,13 @@ echo 'karlm ALL = (root) NOPASSWD: /opt/homebrew/bin/yabai --load-sa, /opt/homeb
   | sudo tee /etc/sudoers.d/yabai >/dev/null
 sudo chmod 440 /etc/sudoers.d/yabai
 sudo visudo -c -f /etc/sudoers.d/yabai
+
+# Start the window-manager stack. --restart-service reloads the freshly-symlinked
+# config when the launchd agent is already installed; on a fresh Mac it isn't yet,
+# so fall back to --start-service which installs and boots it.
+yabai --restart-service 2>/dev/null || yabai --start-service
+skhd --restart-service 2>/dev/null || skhd --start-service
+brew services restart sketchybar
 
 # IdeaVim (PhpStorm)
 link "$DOTFILES_DIR/mac/phpstorm/vimrc" ~/.vimrc

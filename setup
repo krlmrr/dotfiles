@@ -117,12 +117,19 @@ fi
 # Fonts
 echo "Installing fonts..."
 if [ "$OS" = "mac" ]; then
-    cp -r "$DOTFILES_DIR/shared/fonts/"* ~/Library/Fonts/
+    # macOS fontd only activates fonts placed *directly* in ~/Library/Fonts, not
+    # in subfolders, so flatten the .ttf/.otf files out of their per-family dirs.
+    mkdir -p ~/Library/Fonts
+    find "$DOTFILES_DIR/shared/fonts" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
+        -exec cp {} ~/Library/Fonts/ \;
 else
     mkdir -p ~/.local/share/fonts
     cp -r "$DOTFILES_DIR/shared/fonts/"* ~/.local/share/fonts/
     fc-cache -fv
 fi
+
+# Suppress the "Last login:" banner on new shells
+touch ~/.hushlogin
 
 # Configure all configs and symlinks
 bash "$DOTFILES_DIR/configure"

@@ -1,4 +1,6 @@
 tap "qmk/qmk"
+tap "osx-cross/arm"
+tap "osx-cross/avr"
 
 brew "FelixKratz/formulae/sketchybar"
 brew "koekeishiya/formulae/skhd"
@@ -23,6 +25,7 @@ cask "deskpad"
 cask "discord"
 cask "fantastical"
 cask "figma"
+cask "font-sf-pro" # SF Symbols glyphs for sketchybar (Apple logo, battery, volume)
 cask "forklift"
 cask "ghostty"
 cask "github"
@@ -33,12 +36,14 @@ cask "httpie-desktop"
 cask "iina"
 cask "jdownloader"
 cask "jetbrains-toolbox"
-cask "linear-linear"
+cask "linear"
 cask "logi-options+"
-cask "logitech-g-hub"
+# lghub's installer crashes (signal TRAP) if the app already exists, so only
+# install via brew when it isn't present; LG Hub self-updates thereafter.
+cask "logitech-g-hub" unless File.exist?("/Applications/lghub.app")
 cask "macs-fan-control"
 cask "mactracker"
-cask "obsbot-center"
+# obsbot-center removed from Homebrew Cask (no replacement token); install manually from obsbot.com
 cask "orbstack"
 cask "protonvpn"
 cask "ray"

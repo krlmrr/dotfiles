@@ -568,7 +568,10 @@
       "Bash(/opt/homebrew/bin/sketchybar --query space.1)",
       "Bash(brew --prefix)",
       "Bash(grep -rn \"error_log\\\\|log_path\\\\|StandardError\" \"$\\(brew --prefix\\)/etc\")",
-      "Bash(brew cat *)"
+      "Bash(brew cat *)",
+      "Bash(gh run *)",
+      "Bash(ps -o lstart= -p 767)",
+      "Bash(grep -iE \"^\\\\s+\\(Resolution|Display Type|Connection|.*:$\\)\")"
     ]
   }
 }

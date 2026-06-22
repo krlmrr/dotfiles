@@ -37,15 +37,19 @@ shift + ctrl + alt + cmd - up : yabai -m window --warp north
 shift + ctrl + alt + cmd - right : yabai -m window --warp east
 
 # Switch desktop (ctrl for laptop, meh for Lily58)
-ctrl - 1 : yabai -m space --focus 1
-ctrl - 2 : yabai -m space --focus 2
-ctrl - 3 : yabai -m space --focus 3
-ctrl - 4 : yabai -m space --focus 4
-ctrl - 5 : yabai -m space --focus 5
-ctrl - 6 : yabai -m space --focus 6
-ctrl - 7 : yabai -m space --focus 7
-ctrl - 8 : yabai -m space --focus 8
-ctrl - 9 : yabai -m space --focus 9
+# ctrl - 1..9 disabled: macOS owns ^1..^5 (Mission Control > Switch to Desktop)
+# under SIP-on/tiling-only mode. skhd would otherwise swallow the key and run a
+# `space --focus` that no-ops without the scripting addition. Re-enable if running
+# SIP-off (SA loaded), where yabai can focus spaces directly.
+# ctrl - 1 : yabai -m space --focus 1
+# ctrl - 2 : yabai -m space --focus 2
+# ctrl - 3 : yabai -m space --focus 3
+# ctrl - 4 : yabai -m space --focus 4
+# ctrl - 5 : yabai -m space --focus 5
+# ctrl - 6 : yabai -m space --focus 6
+# ctrl - 7 : yabai -m space --focus 7
+# ctrl - 8 : yabai -m space --focus 8
+# ctrl - 9 : yabai -m space --focus 9
 ctrl + alt + cmd - 1 : yabai -m space --focus 1
 ctrl + alt + cmd - 2 : yabai -m space --focus 2
 ctrl + alt + cmd - 3 : yabai -m space --focus 3

@@ -553,7 +553,22 @@
       "WebFetch(domain:formulae.brew.sh)",
       "Bash(curl -s https://api.github.com/repos/koekeishiya/yabai)",
       "Bash(curl -sL https://api.github.com/repositories/184909163)",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Bash(curl -fsSL \"https://formulae.brew.sh/api/cask.json\")",
+      "Bash(brew trust *)",
+      "Bash(brew tap *)",
+      "Bash(env)",
+      "Bash(mkdir -p ~/Library/Fonts)",
+      "Bash(cp -r shared/fonts/* ~/Library/Fonts/)",
+      "Bash(echo \"--- exit: $? \\(no output = not found\\) ---\")",
+      "Bash(sudo -n true)",
+      "Read(//Library/Fonts/**)",
+      "Bash(system_profiler SPFontsDataType)",
+      "Bash(/opt/homebrew/bin/sketchybar --query bar)",
+      "Bash(/opt/homebrew/bin/sketchybar --query space.1)",
+      "Bash(brew --prefix)",
+      "Bash(grep -rn \"error_log\\\\|log_path\\\\|StandardError\" \"$\\(brew --prefix\\)/etc\")",
+      "Bash(brew cat *)"
     ]
   }
 }

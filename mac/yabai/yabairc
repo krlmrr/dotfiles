@@ -21,15 +21,32 @@ sa_capable() {
 }
 
 # ------------------------------------------------------------------ helpers
-move() {  # move every window of app $1 to space $2
+move() {  # move every window of app $1 to space $2 (leaves the sticky PiP popout alone)
   yabai -m query --windows 2>/dev/null \
-    | jq -r --arg a "$1" '.[]|select(.app==$a)|.id' \
+    | jq -r --arg a "$1" '.[]|select(.app==$a and .title!="Picture-in-Picture")|.id' \
     | xargs -I{} yabai -m window {} --space "$2" 2>/dev/null
 }
 
-win_id() {  # id of first STANDARD window of app $1 (exact name; skips phantoms)
+# The editor set: Zed and VS Code ("Code"). Both are treated interchangeably as
+# "the editor" — whichever are open share the editor slot/layout. This jq
+# predicate is the single source of truth for "is this window an editor".
+editor_sel='(.app=="Zed" or .app=="Code")'
+
+move_editors() {  # move every editor window to space $1 (leaves the sticky PiP popout alone)
   yabai -m query --windows 2>/dev/null \
-    | jq -r --arg a "$1" '.[]|select(.app==$a and .subrole=="AXStandardWindow")|.id' | head -1
+    | jq -r ".[]|select($editor_sel and .title!=\"Picture-in-Picture\")|.id" \
+    | xargs -I{} yabai -m window {} --space "$1" 2>/dev/null
+}
+
+editor_ids() {  # ids of all STANDARD editor windows, in query order (first = base)
+  yabai -m query --windows 2>/dev/null \
+    | jq -r ".[]|select($editor_sel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")|.id"
+}
+
+win_id() {  # id of first STANDARD window of app $1 (exact name; skips phantoms
+            # and the "Picture-in-Picture" popout, which reports AXStandardWindow)
+  yabai -m query --windows 2>/dev/null \
+    | jq -r --arg a "$1" '.[]|select(.app==$a and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")|.id' | head -1
 }
 floating()     { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '."is-floating"'; }
 ensure_tiled() { [ "$(floating "$1")" = "true" ]  && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
@@ -41,7 +58,7 @@ ensure_float() { [ "$(floating "$1")" = "false" ] && yabai -m window "$1" --togg
 # 0-or-1 editors present is trivially correct (nothing to arrange).
 external_correct() {
   yabai -m query --windows --space "$1" 2>/dev/null | jq -e '
-      (map(select(.subrole=="AXStandardWindow"))) as $w
+      (map(select(.subrole=="AXStandardWindow" and .title!="Picture-in-Picture"))) as $w
     | ($w|map(select(.app=="Zen"))|first)     as $zen
     | ($w|map(select(.app=="Zed"))|first)     as $zed
     | ($w|map(select(.app=="Ghostty"))|first) as $gho
@@ -192,13 +209,13 @@ yabai -m rule --add app="^Calculator$" manage=off
 yabai -m rule --add app="^Finder$" title="^(Copy|Move|Delete|Connecting)" manage=off
 yabai -m rule --add app="^Logi Options\+$" manage=off
 yabai -m rule --add app="^Herd$" manage=off
-yabai -m rule --add app="^PhpStorm$" title="^(Settings|Create New Branch|Push Commits to .+|Rollback Changes|Update Project)$" manage=off
 yabai -m rule --add app="^Zed$" title="Settings$" manage=off
 # Lowercase "ghostty" is a roleless phantom helper window; case-sensitive so it
 # never matches the real "Ghostty".
 yabai -m rule --add app="^ghostty$" manage=off
 yabai -m rule --add title="^Picture-in-Picture$" manage=off
 yabai -m rule --add app="^TV$" manage=off
+yabai -m rule --add app="^LilyView$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 

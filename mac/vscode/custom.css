@@ -39,6 +39,11 @@
     transform: translateX(-6px) !important;
 }
 
+/* Hide the terminal scrollbar (xterm.js native scrollbar) */
+.xterm-scrollbar.xterm-vertical {
+    display: none !important;
+}
+
 /* Status bar tweaks */
 .statusbar-item-label {
     background-color: transparent !important;

@@ -144,7 +144,7 @@ external_correct() {
 }
 
 # ------------------------------------------------------------- place editors
-# Acts on whichever editors are OPEN (none required). Deterministic --insert
+# Acts on whichever editors are OPEN (none required). Deterministic warp
 # rebuild; skips entirely when the layout is already correct.
 place_editors() {
   trigger="${1:-startup}"

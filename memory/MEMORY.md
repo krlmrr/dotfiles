@@ -1,5 +1,6 @@
 ## User
 - [Mac is home; pull in the COSMIC ergonomics that matter](user_cross_platform_goal.md) — Mac is the long-term daily-driver, not a stopgap. Borrow COSMIC's coding ergonomics; leave non-coding macOS surface area alone.
+- [Editors: VS Code or Zed only](user_editor_choice.md) — JetBrains/PhpStorm dropped for good (removed 2026-07-06); don't reintroduce it.
 
 ## Feedback
 - [Don't nerd-snipe toward Linux/Framework](feedback_no_linux_nerd_snipe.md) — Karl is committing to Mac; don't suggest Linux/Framework alternatives or romanticize the other side.
@@ -20,5 +21,7 @@
 - [yabai: never restart-service on wake](project_yabai_wake_no_restart.md) — restart-on-wake caused all post-wake breakage; sleep changes nothing. No system_woke signal; display events gated by display-changed.sh
 - [yabai SIP-on test on macOS 27 beta](project_yabai_sip_on_test.md) — Karl testing yabai without SA on a "Beta" volume. v7.1.25 (#2788) makes `window --space` work SIP-on; `space --focus` still needs SA. No-SA branch can regain window-to-space binds pending live test on Golden Gate.
 - [Migrating Linux PHP dev to Lerd (podman)](project_lerd_migration.md) — Docker + DDEV removed on 2026-05-13. Lerd not yet wired in; `a`/`d`/`lzd` aliases left as TODO markers.
+- [yabai: Zen PiP masquerades as AXStandardWindow](project_yabai_pip_masquerade.md) — PiP popout reports AXStandardWindow + is-sticky; hijacked win_id → random red insert-overlay box + wrong editor layout. Fixed by excluding PiP by title in win_id/external_correct/move.
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
-- [Synology homelab on vheissulabs.com](project_homelab_synology.md) — DS1618+ runs Docker services (GitLab, Pi-hole) behind DSM reverse proxy + acme.sh wildcard cert; tailnet-private via CGNAT
+- [TrueNAS homelab "WozServer"](project_homelab_truenas.md) — DS1618+ died in a power surge; replaced by TrueNAS SCALE (RAIDZ2, tailnet-only via Tailscale host-net node + subnet router). Time Machine + Pi-hole + Home Assistant + Plex (Intel QSV transcode) all live; 7GB RAM ceiling. Dropped Cloudflare/acme.sh/GitLab.
+- [yabai --insert parity trap](project_yabai_insert_parity.md) — armed points survive warps; never prime, verify+repair instead

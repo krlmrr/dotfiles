@@ -6,11 +6,11 @@ Date: 2026-07-08 · Scope: `mac/yabai/yabairc` only · Follows: 2026-07-08-yabai
 
 Replace the SA-gated float/reinsert layout rebuild in `place_editors` with a warp-based build that runs identically in both SIP modes, and sweep pre-existing strays under the editor on every place. Deletes the "SIP-on — skipping layout rebuild" limitation.
 
-## Doc-verified semantics (yabai v7.1.25, man page + source)
+## Semantics (yabai v7.1.25 — CORRECTED after live testing 2026-07-08)
 
-- `window --warp <target>` honors an insertion point armed on the target via `window <target> --insert <dir>`; without one it falls back to nearest-area heuristics. Arm-then-warp is deterministic.
-- The insertion point is **consumed on successful warp** (cleared in `view_add_window_node_with_insertion_point`).
-- On **failed** warp the insertion point stays armed, is not queryable, and re-issuing the same `--insert <dir>` toggles it **off** (documented undo behavior). Every warp site therefore uses: arm → warp → on failure, re-issue same `--insert` to disarm.
+- `window --warp <target>` honors an insertion point armed on the target; without one it falls back to nearest-area heuristics.
+- **CORRECTION (empirical, contradicts source-reading):** the armed insertion point **survives a successful warp** on this build. Combined with same-dir `--insert` toggling it off and the armed state being unqueryable, arm-then-warp has coin-flip parity: alternate invocations flip between honored direction and heuristic fallback (observed live: identical arm+warp twice → opposite placements).
+- Consequence: **no `--insert` priming at all.** `warp_to` warps, then verifies the resulting pair geometry and repairs: `--toggle split` if the split axis is wrong, `--swap` if the order is wrong. All tree-only, deterministic, SIP-on safe.
 - `window --warp/--swap/--insert/--toggle float` carry no SIP caveat in the man page (unlike `space --swap`/`space --display`). Same-space warps verified live SIP-on on this machine with the target space focused; **must additionally verify with the target space unfocused** (see Testing).
 
 ## Design

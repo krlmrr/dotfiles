@@ -53,20 +53,20 @@ ensure_tiled() { [ "$(floating "$1")" = "true" ]  && yabai -m window "$1" --togg
 ensure_float() { [ "$(floating "$1")" = "false" ] && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
 
 # True when the editor layout already matches the desired target on space $1:
-#   Zed open  -> Zen-TL / Ghostty-BL (stacked left) / Zed full-R
-#   Zed closed-> Zen | Ghostty side by side (Zen left)
+#   editor open  -> Zen-TL / Ghostty-BL (stacked left) / editor full-R
+#   editor closed-> Zen | Ghostty side by side (Zen left)
 # 0-or-1 editors present is trivially correct (nothing to arrange).
 external_correct() {
   yabai -m query --windows --space "$1" 2>/dev/null | jq -e '
       (map(select(.subrole=="AXStandardWindow" and .title!="Picture-in-Picture"))) as $w
     | ($w|map(select(.app=="Zen"))|first)     as $zen
-    | ($w|map(select(.app=="Zed"))|first)     as $zed
+    | ($w|map(select('"$editor_sel"'))|first) as $ed
     | ($w|map(select(.app=="Ghostty"))|first) as $gho
-    | ([$zen,$zed,$gho]|map(select(.!=null))|length) as $n
+    | ([$zen,$ed,$gho]|map(select(.!=null))|length) as $n
     | if $n <= 1 then true
-      elif $zed then
+      elif $ed then
         ($zen and $gho)
-        and ($zed.frame.x > $zen.frame.x)
+        and ($ed.frame.x > $zen.frame.x)
         and (($zen.frame.x|floor) == ($gho.frame.x|floor))
         and ($zen.frame.y < $gho.frame.y)
       else
@@ -87,16 +87,16 @@ place_editors() {
       '.[]|select(.frame.w!=$w or .frame.h!=$h)|.index' | head -1)
 
   if [ -z "$external_idx" ]; then
-    log place "place($trigger): laptop only -> Zen:3 Zed:4 Ghostty:5"
-    move Zen 3; move Zed 4; move Ghostty 5
+    log place "place($trigger): laptop only -> Zen:3 editors:4 Ghostty:5"
+    move Zen 3; move_editors 4; move Ghostty 5
     return
   fi
 
   target=$(yabai -m query --spaces --display "$external_idx" 2>/dev/null | jq -r '.[2].index // empty')
   [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
 
-  zed=$(win_id Zed); zen=$(win_id Zen); gho=$(win_id Ghostty)
-  for id in $zed $zen $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
+  eds=$(editor_ids); ed=$(echo "$eds" | head -1); zen=$(win_id Zen); gho=$(win_id Ghostty)
+  for id in $eds $zen $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
 
   if external_correct "$target"; then
     log place "place($trigger): already correct on space $target — skip"
@@ -113,21 +113,21 @@ place_editors() {
 
   # Float-then-reinsert build (avoids --warp ambiguity).
   yabai -m space --focus "$target" 2>/dev/null
-  if [ -n "$zed" ]; then
-    # Zed open -> stacked: Zed base (full-right), Zen west, Ghostty south of Zen.
-    log place "place($trigger): rebuild stacked (Zed open) — Zen TL / Ghostty BL / Zed R"
-    ensure_tiled "$zed"
+  if [ -n "$ed" ]; then
+    # Editor open -> stacked: editor base (full-right), Zen west, Ghostty south of Zen.
+    log place "place($trigger): rebuild stacked (editor open) — Zen TL / Ghostty BL / editor R"
+    ensure_tiled "$ed"
     [ -n "$zen" ] && ensure_float "$zen"
     [ -n "$gho" ] && ensure_float "$gho"
-    if [ -n "$zen" ]; then yabai -m window "$zed" --insert west 2>/dev/null; ensure_tiled "$zen"; fi
+    if [ -n "$zen" ]; then yabai -m window "$ed" --insert west 2>/dev/null; ensure_tiled "$zen"; fi
     if [ -n "$gho" ]; then
-      anchor="${zen:-$zed}"
+      anchor="${zen:-$ed}"
       yabai -m window "$anchor" --insert south 2>/dev/null
       ensure_tiled "$gho"
     fi
   else
-    # Zed closed -> side by side: Zen left (base), Ghostty re-tiles east of it.
-    log place "place($trigger): rebuild side-by-side (no Zed) — Zen | Ghostty"
+    # No editor -> side by side: Zen left (base), Ghostty re-tiles east of it.
+    log place "place($trigger): rebuild side-by-side (no editor) — Zen | Ghostty"
     [ -n "$zen" ] && ensure_tiled "$zen"
     if [ -n "$gho" ]; then
       ensure_float "$gho"
@@ -234,10 +234,10 @@ yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yab
 yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=window_destroyed app="^Zed$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Zen$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Zed$"     action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Ghostty$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_destroyed app="^(Zed|Code)$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Zen$"          action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^(Zed|Code)$"   action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Ghostty$"      action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
 place_editors startup
 # Startup focus of the editor space needs the SA; under SIP-on switch with ^3.

@@ -84,13 +84,38 @@ adopt() {  # window_created (any app): tuck a stray under the editor on the
 
 floating()     { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '."is-floating"'; }
 ensure_tiled() { [ "$(floating "$1")" = "true" ]  && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
-warp_to() {  # arm $2's insertion point toward $3, warp $1 onto $2. The point is
-             # consumed on success; on failure re-issue the same --insert, which
-             # toggles it OFF (documented undo), so nothing stays armed.
-  yabai -m window "$2" --insert "$3" 2>/dev/null
-  yabai -m window "$1" --warp "$2" 2>/dev/null && return 0
-  yabai -m window "$2" --insert "$3" 2>/dev/null
-  return 1
+pair_geom() {  # echo "sx sy tx ty" (floored) for window ids $1 $2; empty on miss
+  yabai -m query --windows 2>/dev/null | jq -r --argjson s "$1" --argjson t "$2" '
+      (map(select(.id==$s))[0].frame) as $a
+    | (map(select(.id==$t))[0].frame) as $b
+    | "\($a.x|floor) \($a.y|floor) \($b.x|floor) \($b.y|floor)"' 2>/dev/null
+}
+
+warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
+             # No --insert priming: the armed point survives successful warps and
+             # same-dir --insert toggles it off (verified live), so arming is a
+             # parity coin flip. Warp, then verify geometry and repair with
+             # --toggle split (wrong axis) and --swap (wrong order) instead.
+  yabai -m window "$1" --warp "$2" 2>/dev/null || { log warp "warp $1 onto $2 failed"; return 1; }
+  geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
+  sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
+  tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  case "$3" in
+    west|east)   [ "$sy" -ne "$ty" ] && yabai -m window "$1" --toggle split 2>/dev/null ;;
+    north|south) [ "$sx" -ne "$tx" ] && yabai -m window "$1" --toggle split 2>/dev/null ;;
+  esac
+  geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
+  sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
+  tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  swap=0
+  case "$3" in
+    west)  [ "$sx" -gt "$tx" ] && swap=1 ;;
+    east)  [ "$sx" -lt "$tx" ] && swap=1 ;;
+    north) [ "$sy" -gt "$ty" ] && swap=1 ;;
+    south) [ "$sy" -lt "$ty" ] && swap=1 ;;
+  esac
+  [ "$swap" = 1 ] && yabai -m window "$1" --swap "$2" 2>/dev/null
+  return 0
 }
 
 # True when the editor layout already matches the desired target on space $1:

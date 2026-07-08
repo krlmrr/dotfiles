@@ -153,6 +153,8 @@ place_editors() {
 
   # Sweep pre-existing strays under the editor (adopt carries all the guards,
   # including the no-editor bail, so this is safe when no editor is open).
+  # The tail-of-pipe subshell isolates adopt's var reassignments (target/ed/id)
+  # from this function — keep the loop in the pipeline and keep it last.
   yabai -m query --windows --space "$target" 2>/dev/null \
     | jq -r '.[]|select(.subrole=="AXStandardWindow" and ."is-floating"==false)|.id' \
     | while read -r sid; do adopt "$sid"; done
@@ -248,10 +250,10 @@ yabai -m rule --apply
 # Rebalance BSP when a window closes (works without the scripting addition)
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 
-# Cross-space + editor placement. `window --space` works SIP-on (yabai 7.1.25),
-# so editors get MOVED to their spaces in both modes. Only `space --focus` still
-# needs the SA — the startup focus below and the rebuild inside place_editors
-# stay gated; everything else runs unconditionally.
+# Cross-space + editor placement. `window --space` works SIP-on (yabai 7.1.25)
+# and the layout rebuild is warp-based (tree-only), so placement runs fully in
+# both modes. Only `space --focus` still needs the SA — just the startup focus
+# below remains gated.
 yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"

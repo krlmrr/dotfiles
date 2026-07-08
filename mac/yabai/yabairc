@@ -52,6 +52,34 @@ win_id() {  # id of first STANDARD window of app $1 (exact name; skips phantoms
   yabai -m query --windows 2>/dev/null \
     | jq -r --arg a "$1" '.[]|select(.app==$a and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")|.id' | head -1
 }
+external_idx() {  # index of the non-laptop display, empty when undocked
+  yabai -m query --displays 2>/dev/null \
+    | jq -r --argjson w "$LAPTOP_W" --argjson h "$LAPTOP_H" \
+      '.[]|select(.frame.w!=$w or .frame.h!=$h)|.index' | head -1
+}
+
+editor_space() {  # space where editors live: 3rd space of the external display
+                  # when docked, space 4 laptop-only
+  ext=$(external_idx)
+  [ -z "$ext" ] && { echo 4; return; }
+  yabai -m query --spaces --display "$ext" 2>/dev/null | jq -r '.[2].index // empty'
+}
+
+adopt() {  # window_created (any app): tuck a stray under the editor on the
+           # editor space. Warp is tree-only, so it works SIP-on unfocused.
+  id="$1"; [ -n "$id" ] || return 0
+  win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
+  app=$(echo "$win" | jq -r '.app')
+  case " $EDITOR_APPS Zen Ghostty " in *" $app "*) return 0 ;; esac
+  echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
+  target=$(editor_space); [ -n "$target" ] || return 0
+  [ "$(echo "$win" | jq -r '.space')" = "$target" ] || return 0
+  ed=$(editor_ids | head -1); [ -n "$ed" ] || return 0
+  log adopt "adopt: $app ($id) -> under editor $ed on space $target"
+  yabai -m window "$ed" --insert south 2>/dev/null
+  yabai -m window "$id" --warp "$ed" 2>/dev/null
+}
+
 floating()     { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '."is-floating"'; }
 ensure_tiled() { [ "$(floating "$1")" = "true" ]  && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
 ensure_float() { [ "$(floating "$1")" = "false" ] && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
@@ -86,17 +114,13 @@ external_correct() {
 # rebuild; skips entirely when the layout is already correct.
 place_editors() {
   trigger="${1:-startup}"
-  external_idx=$(yabai -m query --displays 2>/dev/null \
-    | jq -r --argjson w "$LAPTOP_W" --argjson h "$LAPTOP_H" \
-      '.[]|select(.frame.w!=$w or .frame.h!=$h)|.index' | head -1)
-
-  if [ -z "$external_idx" ]; then
+  if [ -z "$(external_idx)" ]; then
     log place "place($trigger): laptop only -> Zen:3 editors:4 Ghostty:5"
     move Zen 3; move_editors 4; move Ghostty 5
     return
   fi
 
-  target=$(yabai -m query --spaces --display "$external_idx" 2>/dev/null | jq -r '.[2].index // empty')
+  target=$(editor_space)
   [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
 
   eds=$(editor_ids); ed=$(echo "$eds" | head -1); zen=$(win_id Zen); gho=$(win_id Ghostty)
@@ -166,6 +190,7 @@ if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
 case "$1" in
   display-change) on_display_change; exit 0 ;;
   place)          place_editors "${2:-window}"; exit 0 ;;
+  adopt)          adopt "$2"; exit 0 ;;
 esac
 
 # ============================================================ yabai load (no arg)
@@ -242,6 +267,7 @@ yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Cod
 yabai -m signal --add event=window_created app="^Zen$"        action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created app="$EDITOR_RE"   action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created app="^Ghostty$"    action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/mac/yabai/yabairc adopt \$YABAI_WINDOW_ID"
 yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
 place_editors startup
 # Startup focus of the editor space needs the SA; under SIP-on switch with ^3.

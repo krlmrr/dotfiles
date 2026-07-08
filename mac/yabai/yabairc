@@ -30,6 +30,7 @@ move() {  # move every window of app $1 to space $2 (leaves the sticky PiP popou
 # The editor set — whichever of these are open share the editor slot/layout.
 # THE one list to edit when editors change; editor_sel (jq predicate) and
 # EDITOR_RE (signal regex) are generated from it.
+# App names must be single words with no regex metacharacters.
 EDITOR_APPS="Zed Code"
 editor_sel=""
 for a in $EDITOR_APPS; do editor_sel="$editor_sel${editor_sel:+ or }.app==\"$a\""; done
@@ -74,7 +75,9 @@ adopt() {  # window_created (any app): tuck a stray under the editor on the
   echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
   target=$(editor_space); [ -n "$target" ] || return 0
   [ "$(echo "$win" | jq -r '.space')" = "$target" ] || return 0
-  ed=$(editor_ids | head -1); [ -n "$ed" ] || return 0
+  ed=$(yabai -m query --windows --space "$target" 2>/dev/null \
+    | jq -r ".[]|select($editor_sel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")|.id" | head -1)
+  [ -n "$ed" ] || return 0
   log adopt "adopt: $app ($id) -> under editor $ed on space $target"
   yabai -m window "$ed" --insert south 2>/dev/null
   yabai -m window "$id" --warp "$ed" 2>/dev/null

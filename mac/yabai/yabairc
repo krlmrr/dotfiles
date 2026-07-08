@@ -27,10 +27,14 @@ move() {  # move every window of app $1 to space $2 (leaves the sticky PiP popou
     | xargs -I{} yabai -m window {} --space "$2" 2>/dev/null
 }
 
-# The editor set: Zed and VS Code ("Code"). Both are treated interchangeably as
-# "the editor" — whichever are open share the editor slot/layout. This jq
-# predicate is the single source of truth for "is this window an editor".
-editor_sel='(.app=="Zed" or .app=="Code")'
+# The editor set — whichever of these are open share the editor slot/layout.
+# THE one list to edit when editors change; editor_sel (jq predicate) and
+# EDITOR_RE (signal regex) are generated from it.
+EDITOR_APPS="Zed Code"
+editor_sel=""
+for a in $EDITOR_APPS; do editor_sel="$editor_sel${editor_sel:+ or }.app==\"$a\""; done
+editor_sel="($editor_sel)"
+EDITOR_RE="^($(echo "$EDITOR_APPS" | tr ' ' '|'))\$"
 
 move_editors() {  # move every editor window to space $1 (leaves the sticky PiP popout alone)
   yabai -m query --windows 2>/dev/null \
@@ -234,10 +238,10 @@ yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yab
 yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=window_destroyed app="^(Zed|Code)$" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Zen$"          action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^(Zed|Code)$"   action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Ghostty$"      action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Zen$"        action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="$EDITOR_RE"   action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="^Ghostty$"    action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
 place_editors startup
 # Startup focus of the editor space needs the SA; under SIP-on switch with ^3.

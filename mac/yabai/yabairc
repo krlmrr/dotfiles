@@ -150,6 +150,7 @@ place_editors() {
     log place "place($trigger): rebuild side-by-side (no editor) — Zen | Ghostty"
     [ -n "$zen" ] && [ -n "$gho" ] && warp_to "$gho" "$zen" east
   fi
+  yabai -m space "$target" --balance 2>/dev/null
 }
 
 # ------------------------------------------------------- display-change gate

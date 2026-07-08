@@ -136,21 +136,26 @@ place_editors() {
   for id in $eds $zen $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
 
   if external_correct "$target"; then
-    log place "place($trigger): already correct on space $target — skip"
-    return
+    log place "place($trigger): trio correct on space $target — skip rebuild"
+  else
+    # Warp-based rebuild: tree-only ops, no space focus needed — runs in both SIP modes.
+    for id in $ed $zen $gho; do ensure_tiled "$id"; done
+    if [ -n "$ed" ]; then
+      log place "place($trigger): rebuild stacked (editor open) — Zen TL / Ghostty BL / editor R"
+      [ -n "$zen" ] && warp_to "$zen" "$ed" west
+      [ -n "$gho" ] && warp_to "$gho" "${zen:-$ed}" south
+    else
+      log place "place($trigger): rebuild side-by-side (no editor) — Zen | Ghostty"
+      [ -n "$zen" ] && [ -n "$gho" ] && warp_to "$gho" "$zen" east
+    fi
+    yabai -m space "$target" --balance 2>/dev/null
   fi
 
-  # Warp-based rebuild: tree-only ops, no space focus needed — runs in both SIP modes.
-  for id in $ed $zen $gho; do ensure_tiled "$id"; done
-  if [ -n "$ed" ]; then
-    log place "place($trigger): rebuild stacked (editor open) — Zen TL / Ghostty BL / editor R"
-    [ -n "$zen" ] && warp_to "$zen" "$ed" west
-    [ -n "$gho" ] && warp_to "$gho" "${zen:-$ed}" south
-  else
-    log place "place($trigger): rebuild side-by-side (no editor) — Zen | Ghostty"
-    [ -n "$zen" ] && [ -n "$gho" ] && warp_to "$gho" "$zen" east
-  fi
-  yabai -m space "$target" --balance 2>/dev/null
+  # Sweep pre-existing strays under the editor (adopt carries all the guards,
+  # including the no-editor bail, so this is safe when no editor is open).
+  yabai -m query --windows --space "$target" 2>/dev/null \
+    | jq -r '.[]|select(.subrole=="AXStandardWindow" and ."is-floating"==false)|.id' \
+    | while read -r sid; do adopt "$sid"; done
 }
 
 # ------------------------------------------------------- display-change gate
@@ -169,9 +174,9 @@ on_display_change() {
   place_editors display-change
 }
 
-# SA capability — needed in BOTH the signal-dispatch path (place_editors gates
-# its focus-dependent rebuild on it) and the main load below, so compute it
-# before the dispatch case exits.
+# SA capability — computed once before the dispatch case below. It no longer
+# gates place_editors' rebuild; it now only gates load-time SA setup
+# (--load-sa, dock_did_restart) and the startup space --focus 3.
 if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
 
 # ----------------------------------------------------- dispatch (signal calls)

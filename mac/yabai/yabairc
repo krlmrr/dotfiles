@@ -319,7 +319,7 @@ yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yab
 yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created app="^Zen$"        action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=window_created app="$BROWSER_RE"  action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created app="$EDITOR_RE"   action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created app="^Ghostty$"    action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/mac/yabai/yabairc adopt \$YABAI_WINDOW_ID"

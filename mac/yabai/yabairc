@@ -103,7 +103,10 @@ adopt() {  # window_created (any app): tuck a stray under the editor on the
   id="$1"; [ -n "$id" ] || return 0
   win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
   app=$(echo "$win" | jq -r '.app')
-  case " $EDITOR_APPS Zen Ghostty " in *" $app "*) return 0 ;; esac
+  # Never adopt trio members: editors + Ghostty by app; the slot browser by id
+  # (a SECOND browser window has a different id and DOES get adopted).
+  case " $EDITOR_APPS Ghostty " in *" $app "*) return 0 ;; esac
+  [ "$id" = "$(browser_id)" ] && return 0
   echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
   target=$(editor_space); [ -n "$target" ] || return 0
   [ "$(echo "$win" | jq -r '.space')" = "$target" ] || return 0

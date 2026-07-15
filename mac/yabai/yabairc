@@ -62,6 +62,12 @@ move_editors() {  # move every editor window to space $1 (leaves the sticky PiP 
     | xargs -I{} yabai -m window {} --space "$1" 2>/dev/null
 }
 
+move_browsers() {  # move every browser window to space $1 (leaves the sticky PiP popout alone)
+  yabai -m query --windows 2>/dev/null \
+    | jq -r ".[]|select($browser_sel and .title!=\"Picture-in-Picture\")|.id" \
+    | xargs -I{} yabai -m window {} --space "$1" 2>/dev/null
+}
+
 editor_ids() {  # ids of all STANDARD editor windows, in query order (first = base)
   yabai -m query --windows 2>/dev/null \
     | jq -r ".[]|select($editor_sel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")|.id"
@@ -175,29 +181,29 @@ external_correct() {
 place_editors() {
   trigger="${1:-startup}"
   if [ -z "$(external_idx)" ]; then
-    log place "place($trigger): laptop only -> Zen:3 editors:4 Ghostty:5"
-    move Zen 3; move_editors 4; move Ghostty 5
+    log place "place($trigger): laptop only -> browsers:3 editors:4 Ghostty:5"
+    move_browsers 3; move_editors 4; move Ghostty 5
     return
   fi
 
   target=$(editor_space)
   [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
 
-  eds=$(editor_ids); ed=$(echo "$eds" | head -1); zen=$(win_id Zen); gho=$(win_id Ghostty)
-  for id in $eds $zen $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
+  eds=$(editor_ids); ed=$(echo "$eds" | head -1); browser=$(browser_id); gho=$(win_id Ghostty)
+  for id in $eds $browser $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
 
   if external_correct "$target"; then
     log place "place($trigger): trio correct on space $target — skip rebuild"
   else
     # Warp-based rebuild: tree-only ops, no space focus needed — runs in both SIP modes.
-    for id in $ed $zen $gho; do ensure_tiled "$id"; done
+    for id in $ed $browser $gho; do ensure_tiled "$id"; done
     if [ -n "$ed" ]; then
       log place "place($trigger): rebuild stacked (editor open) — Zen TL / Ghostty BL / editor R"
-      [ -n "$zen" ] && warp_to "$zen" "$ed" west
-      [ -n "$gho" ] && warp_to "$gho" "${zen:-$ed}" south
+      [ -n "$browser" ] && warp_to "$browser" "$ed" west
+      warp_to "$gho" "${browser:-$ed}" south
     else
       log place "place($trigger): rebuild side-by-side (no editor) — Zen | Ghostty"
-      [ -n "$zen" ] && [ -n "$gho" ] && warp_to "$gho" "$zen" east
+      [ -n "$browser" ] && [ -n "$gho" ] && warp_to "$gho" "$browser" east
     fi
     yabai -m space "$target" --balance 2>/dev/null
   fi

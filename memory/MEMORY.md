@@ -24,3 +24,4 @@
 - [yabai: Zen PiP masquerades as AXStandardWindow](project_yabai_pip_masquerade.md) — PiP popout reports AXStandardWindow + is-sticky; hijacked win_id → random red insert-overlay box + wrong editor layout. Fixed by excluding PiP by title in win_id/external_correct/move.
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
 - [yabai --insert parity trap](project_yabai_insert_parity.md) — armed points survive warps; never prime, verify+repair instead
+- [yabai browser array + incremental placement](project_yabai_browser_incremental.md) — Zen-hardcode in external_correct caused the constant misplacement/restarts (fixed by BROWSER_APPS); place_one moves only the new window on open; zero-motion impossible (window_created fires post-BSP); LAPTOP_W/H stale (3200×1800)

@@ -221,10 +221,15 @@ place_editors() {
 }
 
 # ------------------------------------------------- incremental single placement
-# window_created (any app): place ONLY the new window ($1) into its trio slot,
-# relative to a cross-role anchor, with a single warp — nothing else moves.
-# Strays and 2nd browsers fall through to adopt (tuck south under the editor).
-# Full-trio rebuilds stay in place_editors (startup/display-change only).
+# window_created (any app). Two classes of window:
+#  • Structural (editor, slot browser): their presence flips the trio's whole
+#    topology (browser|Ghostty side-by-side  <->  browser/Ghostty stacked in the
+#    left column + editor full-right). A single warp can't restructure that, so
+#    run the full place_editors rebuild — which self-skips when already correct,
+#    so it only shuffles when it genuinely must.
+#  • Append-only (Ghostty, strays, 2nd browser): a single incremental warp,
+#    then SELF-HEAL — re-check the trio and rebuild if the incremental result
+#    left it wrong, so a bad placement can never persist until the next restart.
 place_one() {
   id="$1"; [ -n "$id" ] || return 0
   win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
@@ -232,32 +237,32 @@ place_one() {
   app=$(echo "$win" | jq -r '.app')
   target=$(editor_space); [ -n "$target" ] || return 0
 
-  # Role -> anchor id + warp direction. Empty dir => not a positioned trio
-  # member (stray / 2nd browser) -> adopt.
-  anchor=""; dir=""
-  if [ "$id" = "$(browser_id)" ]; then
-    anchor=$(editor_ids | head -1); dir=west            # slot browser -> west of editor
-  else
-    case " $EDITOR_APPS " in
-      *" $app "*) anchor=$(browser_id); dir=east ;;      # editor -> east of browser
-      *) if [ "$app" = "Ghostty" ]; then                 # ghostty -> south of browser|editor
-           anchor=$(browser_id); [ -n "$anchor" ] || anchor=$(editor_ids | head -1); dir=south
-         fi ;;
-    esac
+  # Structural members -> full rebuild (place_editors skips if already correct).
+  is_editor=0; case " $EDITOR_APPS " in *" $app "*) is_editor=1 ;; esac
+  if [ "$is_editor" = 1 ] || [ "$id" = "$(browser_id)" ]; then
+    log one "place-one: $app $id structural -> place_editors rebuild"
+    place_editors window
+    return 0
   fi
 
-  if [ -n "$dir" ]; then
+  # Append-only: Ghostty stacks under the browser (or editor); everything else
+  # (strays, 2nd browser) tucks under the editor via adopt. One incremental warp.
+  if [ "$app" = "Ghostty" ]; then
     [ "$(echo "$win" | jq -r '.space')" = "$target" ] || yabai -m window "$id" --space "$target" 2>/dev/null
     ensure_tiled "$id"
+    anchor=$(browser_id); [ -n "$anchor" ] || anchor=$(editor_ids | head -1)
     if [ -n "$anchor" ]; then
-      log one "place-one: $app $id -> $dir of $anchor"
-      warp_to "$id" "$anchor" "$dir"
+      log one "place-one: Ghostty $id -> south of $anchor"
+      warp_to "$id" "$anchor" south
     else
-      log one "place-one: $app $id -> anchor absent, left as anchor"
+      log one "place-one: Ghostty $id -> anchor absent, left as anchor"
     fi
   else
     adopt "$id"
   fi
+
+  # Self-heal: never let a bad incremental result persist until a restart.
+  external_correct "$target" || { log one "place-one: incremental left trio wrong -> rebuild"; place_editors window; }
 }
 
 # ------------------------------------------------------- display-change gate

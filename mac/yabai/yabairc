@@ -72,6 +72,13 @@ win_id() {  # id of first STANDARD window of app $1 (exact name; skips phantoms
   yabai -m query --windows 2>/dev/null \
     | jq -r --arg a "$1" '.[]|select(.app==$a and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")|.id' | head -1
 }
+
+browser_id() {  # id of first STANDARD browser window (the top-left slot occupant;
+                # skips phantoms and the "Picture-in-Picture" popout)
+  yabai -m query --windows 2>/dev/null \
+    | jq -r ".[]|select($browser_sel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")|.id" | head -1
+}
+
 external_idx() {  # index of the non-laptop display, empty when undocked
   yabai -m query --displays 2>/dev/null \
     | jq -r --argjson w "$LAPTOP_W" --argjson h "$LAPTOP_H" \

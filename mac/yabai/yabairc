@@ -37,6 +37,25 @@ for a in $EDITOR_APPS; do editor_sel="$editor_sel${editor_sel:+ or }.app==\"$a\"
 editor_sel="($editor_sel)"
 EDITOR_RE="^($(echo "$EDITOR_APPS" | tr ' ' '|'))\$"
 
+# The browser set — whichever is open owns the top-left slot ("single browser
+# only": the first open one is the slot; extras get adopted). Multi-word names
+# (e.g. "Google Chrome") mean this list is NEWLINE-delimited, not space-split
+# like EDITOR_APPS. browser_sel (jq) and BROWSER_RE (signal regex) are generated.
+BROWSER_APPS='Zen
+Google Chrome
+Safari
+Arc'
+browser_sel=""; browser_alt=""
+while IFS= read -r a; do
+  [ -n "$a" ] || continue
+  browser_sel="$browser_sel${browser_sel:+ or }.app==\"$a\""
+  browser_alt="$browser_alt${browser_alt:+|}$a"
+done <<EOF
+$BROWSER_APPS
+EOF
+browser_sel="($browser_sel)"
+BROWSER_RE="^($browser_alt)\$"
+
 move_editors() {  # move every editor window to space $1 (leaves the sticky PiP popout alone)
   yabai -m query --windows 2>/dev/null \
     | jq -r ".[]|select($editor_sel and .title!=\"Picture-in-Picture\")|.id" \

@@ -340,9 +340,6 @@ yabai -m rule --add app="^Finder$" title="^(Copy|Move|Delete|Connecting)" manage
 yabai -m rule --add app="^Logi Options\+$" manage=off
 yabai -m rule --add app="^Herd$" manage=off
 yabai -m rule --add app="^Zed$" title="Settings$" manage=off
-# Lowercase "ghostty" is a roleless phantom helper window; case-sensitive so it
-# never matches the real "Ghostty".
-yabai -m rule --add app="^ghostty$" manage=off
 yabai -m rule --add title="^Picture-in-Picture$" manage=off
 yabai -m rule --add app="^TV$" manage=off
 yabai -m rule --add app="^LilyView$" manage=off

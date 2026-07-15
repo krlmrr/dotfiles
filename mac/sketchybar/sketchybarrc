@@ -11,8 +11,10 @@ $CONFIG_DIR/helpers/menubar-toggle &
 default=(
   padding_left=0
   padding_right=0
-  icon.font="SF Pro:Regular:13.0"
-  label.font="SF Pro:Regular:13.0"
+  # Match the native menu bar: .AppleSystemUIFont at 13pt uses the "Text" optical
+  # cut (SF Pro Text), not the "Display" cut plain "SF Pro" resolves to.
+  icon.font="SF Pro Text:Regular:13.0"
+  label.font="SF Pro Text:Regular:13.0"
   icon.color=0xffffffff
   label.color=0xffffffff
   icon.padding_left=4

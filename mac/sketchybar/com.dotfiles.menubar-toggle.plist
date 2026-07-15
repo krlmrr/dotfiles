@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.dotfiles.menubar-toggle</string>
+    <!-- Watches the cursor and toggles native menu bar <-> sketchybar. launchd
+         owns it (not sketchybarrc) so `sketchybar --reload` can't orphan it and
+         it restarts on crash/login. -->
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Users/karlm/.config/sketchybar/helpers/menubar-toggle</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/menubar-toggle.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/menubar-toggle.err.log</string>
+  </dict>
+</plist>

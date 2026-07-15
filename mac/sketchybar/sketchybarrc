@@ -3,9 +3,9 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 ##### Bar Appearance #####
 sketchybar --bar position=top notch_offset=3 height=24 blur_radius=0 color=0x00000000 topmost=window y_offset=3 display=all
 
-# Toggle between sketchybar and native menu bar on mouse hover
-pkill -x menubar-toggle 2>/dev/null
-$CONFIG_DIR/helpers/menubar-toggle &
+# Toggle between sketchybar and native menu bar on mouse hover: managed by
+# launchd (com.dotfiles.menubar-toggle), NOT launched here — so `sketchybar
+# --reload` can't orphan it. See mac/sketchybar/com.dotfiles.menubar-toggle.plist.
 
 ##### Changing Defaults #####
 default=(

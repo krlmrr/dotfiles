@@ -27,6 +27,13 @@ link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Supp
 # Sketchybar
 link "$DOTFILES_DIR/mac/sketchybar" ~/.config/sketchybar
 
+# menubar-toggle keepalive: launchd owns it so `sketchybar --reload` can't orphan
+# it (sketchybarrc no longer launches it). Symlink the agent and (re)bootstrap.
+link "$DOTFILES_DIR/mac/sketchybar/com.dotfiles.menubar-toggle.plist" ~/Library/LaunchAgents/com.dotfiles.menubar-toggle.plist
+pkill -x menubar-toggle 2>/dev/null || true
+launchctl bootout "gui/$(id -u)/com.dotfiles.menubar-toggle" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.dotfiles.menubar-toggle.plist 2>/dev/null || true
+
 # yabai + skhd (tiling window manager)
 link "$DOTFILES_DIR/mac/yabai/yabairc" ~/.yabairc
 link "$DOTFILES_DIR/mac/yabai/skhdrc" ~/.skhdrc
@@ -46,9 +53,5 @@ sudo visudo -c -f /etc/sudoers.d/yabai
 yabai --restart-service 2>/dev/null || yabai --start-service
 skhd --restart-service 2>/dev/null || skhd --start-service
 brew services restart sketchybar
-
-# IdeaVim (PhpStorm)
-link "$DOTFILES_DIR/mac/phpstorm/vimrc" ~/.vimrc
-link "$DOTFILES_DIR/mac/phpstorm/ideavimrc" ~/.ideavimrc
 
 echo "=== Mac setup complete ==="

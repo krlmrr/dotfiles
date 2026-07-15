@@ -154,8 +154,8 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
 }
 
 # True when the editor layout already matches the desired target on space $1:
-#   editor open  -> Zen-TL / Ghostty-BL (stacked left) / editor full-R
-#   editor closed-> Zen | Ghostty side by side (Zen left)
+#   editor open  -> browser-TL / Ghostty-BL (stacked left) / editor full-R
+#   editor closed-> browser | Ghostty side by side (browser left)
 # 0-or-1 editors present is trivially correct (nothing to arrange).
 external_correct() {
   yabai -m query --windows --space "$1" 2>/dev/null | jq -e '
@@ -201,11 +201,11 @@ place_editors() {
     # Warp-based rebuild: tree-only ops, no space focus needed — runs in both SIP modes.
     for id in $ed $browser $gho; do ensure_tiled "$id"; done
     if [ -n "$ed" ]; then
-      log place "place($trigger): rebuild stacked (editor open) — Zen TL / Ghostty BL / editor R"
+      log place "place($trigger): rebuild stacked (editor open) — browser TL / Ghostty BL / editor R"
       [ -n "$browser" ] && warp_to "$browser" "$ed" west
-      warp_to "$gho" "${browser:-$ed}" south
+      [ -n "$gho" ] && warp_to "$gho" "${browser:-$ed}" south
     else
-      log place "place($trigger): rebuild side-by-side (no editor) — Zen | Ghostty"
+      log place "place($trigger): rebuild side-by-side (no editor) — browser | Ghostty"
       [ -n "$browser" ] && [ -n "$gho" ] && warp_to "$gho" "$browser" east
     fi
     yabai -m space "$target" --balance 2>/dev/null

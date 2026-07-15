@@ -19,7 +19,13 @@ On window open, `place_editors`' full teardown-rebuild (re-warp browser+Ghostty 
 
 ## Why "zero visible motion" is impossible (don't retry)
 
-yabai fires `window_created` **after** BSP has already tiled the new window — the window always appears at BSP's guess first, then we move it. The only pre-creation lever is the insertion point, which can't be conditioned on which app is opening AND is the documented parity coin-flip trap ([[project-yabai-insert-parity]]). So one BSP→slot hop is unavoidable; best achievable is "appears → one clean move." Ghostty placement is order-sensitive (only correct if the browser is already open); accepted, self-heals on rebuild.
+yabai fires `window_created` **after** BSP has already tiled the new window — the window always appears at BSP's guess first, then we move it. The only pre-creation lever is the insertion point, which can't be conditioned on which app is opening AND is the documented parity coin-flip trap ([[project-yabai-insert-parity]]). So one BSP→slot hop is unavoidable; best achievable is "appears → one clean move."
+
+### Topology-flip fix (2026-07-15, commit b4e16cb) — why place_one is a HYBRID
+
+The first incremental `place_one` moved only the new window relative to a cross-role anchor. That broke on **editor open**: an editor's presence flips the trio's whole topology (browser|Ghostty **side-by-side** with no editor ↔ browser/Ghostty **stacked** in the left column + editor full-right). A single warp can't restructure that — a new editor got warped "east of browser" into a side-by-side layout and produced a **3-column wedge** (Zen|Code|Ghostty) that persisted until a restart, because only startup/display-change rebuild.
+
+Fix: `place_one` now splits windows into **structural** (editor, slot browser — presence changes topology) → run the full `place_editors` rebuild (which self-skips when already correct, so no gratuitous shuffle); and **append-only** (Ghostty, strays, 2nd browser) → single incremental warp, then **self-heal**: re-check `external_correct` and rebuild if the incremental result left the trio wrong. So a bad incremental placement can never persist to the next restart. Ghostty append stays smooth (no shuffle when it lands correct). Editor-open shuffles only when the layout is actually wrong.
 
 ## Latent, out of scope: LAPTOP_W/H stale
 

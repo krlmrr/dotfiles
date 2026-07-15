@@ -151,20 +151,20 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
 external_correct() {
   yabai -m query --windows --space "$1" 2>/dev/null | jq -e '
       (map(select(.subrole=="AXStandardWindow" and .title!="Picture-in-Picture"))) as $w
-    | ($w|map(select(.app=="Zen"))|first)     as $zen
-    | ($w|map(select('"$editor_sel"'))|first) as $ed
-    | ($w|map(select(.app=="Ghostty"))|first) as $gho
-    | ([$zen,$ed,$gho]|map(select(.!=null))|length) as $n
+    | ($w|map(select('"$browser_sel"'))|first) as $browser
+    | ($w|map(select('"$editor_sel"'))|first)  as $ed
+    | ($w|map(select(.app=="Ghostty"))|first)  as $gho
+    | ([$browser,$ed,$gho]|map(select(.!=null))|length) as $n
     | if $n <= 1 then true
       elif $ed then
-        ($zen and $gho)
-        and ($ed.frame.x > $zen.frame.x)
-        and (($zen.frame.x|floor) == ($gho.frame.x|floor))
-        and ($zen.frame.y < $gho.frame.y)
+        ($browser and $gho)
+        and ($ed.frame.x > $browser.frame.x)
+        and (($browser.frame.x|floor) == ($gho.frame.x|floor))
+        and ($browser.frame.y < $gho.frame.y)
       else
-        ($zen and $gho)
-        and ($zen.frame.x < $gho.frame.x)
-        and (($zen.frame.y|floor) == ($gho.frame.y|floor))
+        ($browser and $gho)
+        and ($browser.frame.x < $gho.frame.x)
+        and (($browser.frame.y|floor) == ($gho.frame.y|floor))
       end
   ' >/dev/null 2>&1
 }

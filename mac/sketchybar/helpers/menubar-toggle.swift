@@ -1,7 +1,10 @@
 import AppKit
 import Foundation
 
-let triggerZone: CGFloat = 10
+// Trigger anywhere the sketchybar bar is drawn, not just the top few pixels —
+// otherwise hovering the bar below ~10px (e.g. the right-side items) never
+// reveals the native menu bar. Matches sketchybarrc's bar: height 24 + y_offset 3.
+let triggerZone: CGFloat = 27
 let leaveZone: CGFloat = 50
 var state = "sketchy"
 

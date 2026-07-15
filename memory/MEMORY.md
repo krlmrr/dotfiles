@@ -25,3 +25,4 @@
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
 - [TrueNAS homelab "WozServer"](project_homelab_truenas.md) — DS1618+ died in a power surge; replaced by TrueNAS SCALE (RAIDZ2, tailnet-only via Tailscale host-net node + subnet router). Time Machine + Pi-hole + Home Assistant + Plex (Intel QSV transcode) all live; 7GB RAM ceiling. Dropped Cloudflare/acme.sh/GitLab.
 - [yabai --insert parity trap](project_yabai_insert_parity.md) — armed points survive warps; never prime, verify+repair instead
+- [yabai browser array + incremental placement](project_yabai_browser_incremental.md) — Zen-hardcode in external_correct caused the constant misplacement/restarts (fixed by BROWSER_APPS); place_one moves only the new window on open; zero-motion impossible (window_created fires post-BSP); LAPTOP_W/H stale (3200×1800)

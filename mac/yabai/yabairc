@@ -220,6 +220,46 @@ place_editors() {
     | while read -r sid; do adopt "$sid"; done
 }
 
+# ------------------------------------------------- incremental single placement
+# window_created (any app): place ONLY the new window ($1) into its trio slot,
+# relative to a cross-role anchor, with a single warp — nothing else moves.
+# Strays and 2nd browsers fall through to adopt (tuck south under the editor).
+# Full-trio rebuilds stay in place_editors (startup/display-change only).
+place_one() {
+  id="$1"; [ -n "$id" ] || return 0
+  win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
+  echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
+  app=$(echo "$win" | jq -r '.app')
+  target=$(editor_space); [ -n "$target" ] || return 0
+
+  # Role -> anchor id + warp direction. Empty dir => not a positioned trio
+  # member (stray / 2nd browser) -> adopt.
+  anchor=""; dir=""
+  if echo "$win" | jq -e "$browser_sel" >/dev/null 2>&1 && [ "$id" = "$(browser_id)" ]; then
+    anchor=$(editor_ids | head -1); dir=west            # slot browser -> west of editor
+  else
+    case " $EDITOR_APPS " in
+      *" $app "*) anchor=$(browser_id); dir=east ;;      # editor -> east of browser
+      *) if [ "$app" = "Ghostty" ]; then                 # ghostty -> south of browser|editor
+           anchor=$(browser_id); [ -n "$anchor" ] || anchor=$(editor_ids | head -1); dir=south
+         fi ;;
+    esac
+  fi
+
+  if [ -n "$dir" ]; then
+    [ "$(echo "$win" | jq -r '.space')" = "$target" ] || yabai -m window "$id" --space "$target" 2>/dev/null
+    ensure_tiled "$id"
+    if [ -n "$anchor" ]; then
+      log one "place-one: $app $id -> $dir of $anchor"
+      warp_to "$id" "$anchor" "$dir"
+    else
+      log one "place-one: $app $id -> anchor absent, left as anchor"
+    fi
+  else
+    adopt "$id"
+  fi
+}
+
 # ------------------------------------------------------- display-change gate
 # Re-place editors only when the set of displays actually changed (dock/undock
 # or resolution change), ignoring the duplicate/spurious events a dock fires.
@@ -245,6 +285,7 @@ if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
 case "$1" in
   display-change) on_display_change; exit 0 ;;
   place)          place_editors "${2:-window}"; exit 0 ;;
+  place-one)      place_one "$2"; exit 0 ;;
   adopt)          adopt "$2"; exit 0 ;;
 esac
 

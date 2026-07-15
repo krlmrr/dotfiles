@@ -11,10 +11,11 @@ $CONFIG_DIR/helpers/menubar-toggle &
 default=(
   padding_left=0
   padding_right=0
-  # Use the actual native menu bar font (.AppleSystemUIFont) so the optical cut,
-  # weight, and rendering match exactly rather than approximating with SF Pro.
-  icon.font=".AppleSystemUIFont:Regular:13.0"
-  label.font=".AppleSystemUIFont:Regular:13.0"
+  # Native menu bar font (.AppleSystemUIFont). Medium (not Regular) compensates
+  # for the font-smoothing macOS applies to the real menu bar's light-on-dark
+  # text, which sketchybar's own text rendering doesn't reproduce.
+  icon.font=".AppleSystemUIFont:Medium:13.0"
+  label.font=".AppleSystemUIFont:Medium:13.0"
   icon.color=0xffffffff
   label.color=0xffffffff
   icon.padding_left=4

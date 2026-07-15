@@ -27,8 +27,12 @@ The first incremental `place_one` moved only the new window relative to a cross-
 
 Fix: `place_one` now splits windows into **structural** (editor, slot browser — presence changes topology) → run the full `place_editors` rebuild (which self-skips when already correct, so no gratuitous shuffle); and **append-only** (Ghostty, strays, 2nd browser) → single incremental warp, then **self-heal**: re-check `external_correct` and rebuild if the incremental result left the trio wrong. So a bad incremental placement can never persist to the next restart. Ghostty append stays smooth (no shuffle when it lands correct). Editor-open shuffles only when the layout is actually wrong.
 
-## Latent, out of scope: LAPTOP_W/H stale
+## Display topology (corrected 2026-07-15 — earlier note was WRONG)
 
-`external_idx()` treats any display != 2056×1329 as external. The laptop currently reports **3200×1800**, so the "external present" (stacked-trio on space 3) path runs even single-display. Not a bug for current use (it produces the layout the user likes), but if display logic misbehaves, check `LAPTOP_W`/`LAPTOP_H` first.
+Daily driver is an **Apple Studio Display** (5120×2880 native, reported by yabai as **3200×1800** at "more space" scaling; usually the sole display, laptop in clamshell). `LAPTOP_W/H=2056×1329` correctly identifies the MacBook's built-in panel and is NOT stale. So the "external present → stacked trio on space 3" path is the **intended docked behavior** on the Studio Display, not an accident. Laptop-only (away from the Studio) → `external_idx` empty → apps break out to separate desktops 3/4/5.
+
+An earlier version of this note claimed 3200×1800 was "the laptop" and LAPTOP_W/H was stale — that misdiagnosis sent a whole debugging session chasing a phantom. 3200×1800 is the **Studio Display**.
+
+**Apple TV (AirPlay, 1920×1080):** connects rarely for casting fullscreen video. When present it's a 2nd/3rd display; the trio-placement logic doesn't distinguish it from a work monitor, so a cast can transiently scramble the Studio trio (recovered by one `yabairc place` or opening a trio window). Deliberately NOT handled (2026-07-15) — too rare to be worth a UUID/resolution exclusion.
 
 See [[project-yabai-wake-no-restart]], [[project-yabai-insert-parity]], [[project-yabai-pip-masquerade]], [[feedback-yabai-space2]], [[feedback-yabai-display-events]].

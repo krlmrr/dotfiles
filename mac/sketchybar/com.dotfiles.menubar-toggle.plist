@@ -11,6 +11,13 @@
     <array>
       <string>/Users/karlm/.config/sketchybar/helpers/menubar-toggle</string>
     </array>
+    <!-- launchd's default PATH lacks /opt/homebrew/bin, so the yabai/sketchybar
+         commands the toggle shells out to would be "command not found". -->
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>

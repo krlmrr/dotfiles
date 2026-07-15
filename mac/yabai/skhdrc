@@ -36,20 +36,11 @@ shift + ctrl + alt + cmd - down : yabai -m window --warp south
 shift + ctrl + alt + cmd - up : yabai -m window --warp north
 shift + ctrl + alt + cmd - right : yabai -m window --warp east
 
-# Switch desktop (ctrl for laptop, meh for Lily58)
-# ctrl - 1..5 intentionally NOT bound: macOS owns ^1..^5 (Mission Control >
-# Switch to Desktop). SIP-on, skhd's event tap would swallow the key and yabai's
-# `space --focus` no-ops (no scripting addition) = dead keys. SIP-off (SA loaded),
-# add `ctrl - N : yabai -m space --focus N` here so yabai focuses spaces directly.
-ctrl + alt + cmd - 1 : yabai -m space --focus 1
-ctrl + alt + cmd - 2 : yabai -m space --focus 2
-ctrl + alt + cmd - 3 : yabai -m space --focus 3
-ctrl + alt + cmd - 4 : yabai -m space --focus 4
-ctrl + alt + cmd - 5 : yabai -m space --focus 5
-ctrl + alt + cmd - 6 : yabai -m space --focus 6
-ctrl + alt + cmd - 7 : yabai -m space --focus 7
-ctrl + alt + cmd - 8 : yabai -m space --focus 8
-ctrl + alt + cmd - 9 : yabai -m space --focus 9
+# Switch desktop by number: not bound in skhd — macOS owns ^1..^5 (Mission
+# Control > Switch to Desktop). SIP-on, skhd's event tap would swallow the key and
+# yabai's `space --focus` no-ops (no scripting addition) = dead keys that do
+# nothing ^1..^5 doesn't. SIP-off (SA loaded), add
+# `ctrl - N : yabai -m space --focus N` here to let yabai focus spaces directly.
 
 # Sequential workspace navigation (macOS owns Ctrl+←/→ for switching)
 ctrl + alt + shift - h : yabai -m space --focus prev

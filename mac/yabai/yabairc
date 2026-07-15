@@ -235,7 +235,7 @@ place_one() {
   # Role -> anchor id + warp direction. Empty dir => not a positioned trio
   # member (stray / 2nd browser) -> adopt.
   anchor=""; dir=""
-  if echo "$win" | jq -e "$browser_sel" >/dev/null 2>&1 && [ "$id" = "$(browser_id)" ]; then
+  if [ "$id" = "$(browser_id)" ]; then
     anchor=$(editor_ids | head -1); dir=west            # slot browser -> west of editor
   else
     case " $EDITOR_APPS " in

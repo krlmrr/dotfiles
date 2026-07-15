@@ -366,6 +366,10 @@ yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yab
 yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/mac/yabai/yabairc place-one \$YABAI_WINDOW_ID"
+# Heal on returning to a space (e.g. closing a fullscreen video drops you back to
+# the trio's space with the tree disturbed). space_changed DOES fire SIP-on;
+# `place` self-skips via external_correct, so this is a no-op when already correct.
+yabai -m signal --add event=space_changed action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
 place_editors startup
 # Startup focus of the editor space needs the SA; under SIP-on switch with ^3.

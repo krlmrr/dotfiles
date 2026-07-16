@@ -166,10 +166,20 @@ external_correct() {
     | ([$browser,$ed,$gho]|map(select(.!=null))|length) as $n
     | if $n <= 1 then true
       elif $ed then
-        ($browser and $gho)
-        and ($ed.frame.x > $browser.frame.x)
-        and (($browser.frame.x|floor) == ($gho.frame.x|floor))
-        and ($browser.frame.y < $gho.frame.y)
+        if ($browser and $gho) then
+          # full trio: browser TL / Ghostty BL (stacked left) / editor R
+          ($ed.frame.x > $browser.frame.x)
+          and (($browser.frame.x|floor) == ($gho.frame.x|floor))
+          and ($browser.frame.y < $gho.frame.y)
+        elif $gho then
+          # editor + Ghostty, no browser: side by side, Ghostty left / editor right
+          ($ed.frame.x > $gho.frame.x)
+          and (($ed.frame.y|floor) == ($gho.frame.y|floor))
+        elif $browser then
+          # editor + browser, no Ghostty: side by side, browser left / editor right
+          ($ed.frame.x > $browser.frame.x)
+          and (($ed.frame.y|floor) == ($browser.frame.y|floor))
+        else true end
       else
         ($browser and $gho)
         and ($browser.frame.x < $gho.frame.x)
@@ -201,9 +211,13 @@ place_editors() {
     # Warp-based rebuild: tree-only ops, no space focus needed — runs in both SIP modes.
     for id in $ed $browser $gho; do ensure_tiled "$id"; done
     if [ -n "$ed" ]; then
-      log place "place($trigger): rebuild stacked (editor open) — browser TL / Ghostty BL / editor R"
-      [ -n "$browser" ] && warp_to "$browser" "$ed" west
-      [ -n "$gho" ] && warp_to "$gho" "${browser:-$ed}" south
+      log place "place($trigger): rebuild (editor open) — browser TL / Ghostty BL / editor R"
+      if [ -n "$browser" ]; then
+        warp_to "$browser" "$ed" west            # browser to the left of editor
+        [ -n "$gho" ] && warp_to "$gho" "$browser" south   # Ghostty below browser (left column)
+      elif [ -n "$gho" ]; then
+        warp_to "$gho" "$ed" west                # no browser: Ghostty beside editor, not below it
+      fi
     else
       log place "place($trigger): rebuild side-by-side (no editor) — browser | Ghostty"
       [ -n "$browser" ] && [ -n "$gho" ] && warp_to "$gho" "$browser" east
@@ -250,10 +264,14 @@ place_one() {
   if [ "$app" = "Ghostty" ]; then
     [ "$(echo "$win" | jq -r '.space')" = "$target" ] || yabai -m window "$id" --space "$target" 2>/dev/null
     ensure_tiled "$id"
-    anchor=$(browser_id); [ -n "$anchor" ] || anchor=$(editor_ids | head -1)
+    # Below the browser in the left column; or beside the editor when there's no
+    # browser (south of the editor would wrongly stack top/bottom — matches the
+    # place_editors rebuild).
+    anchor=$(browser_id); dir=south
+    [ -n "$anchor" ] || { anchor=$(editor_ids | head -1); dir=west; }
     if [ -n "$anchor" ]; then
-      log one "place-one: Ghostty $id -> south of $anchor"
-      warp_to "$id" "$anchor" south
+      log one "place-one: Ghostty $id -> $dir of $anchor"
+      warp_to "$id" "$anchor" "$dir"
     else
       log one "place-one: Ghostty $id -> anchor absent, left as anchor"
     fi

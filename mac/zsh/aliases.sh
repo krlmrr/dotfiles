@@ -28,6 +28,6 @@ brewup() {
     echo "yabai not upgraded — skipping SA reload, restart, and TCC cleanup"
   fi
 
-  open /Applications/Raycast.app/
+  open "/Applications/Raycast Beta.app/"
 }
 

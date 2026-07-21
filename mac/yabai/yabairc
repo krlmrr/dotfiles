@@ -37,14 +37,15 @@ for a in $EDITOR_APPS; do editor_sel="$editor_sel${editor_sel:+ or }.app==\"$a\"
 editor_sel="($editor_sel)"
 EDITOR_RE="^($(echo "$EDITOR_APPS" | tr ' ' '|'))\$"
 
-# The browser set — whichever is open owns the top-left slot ("single browser
-# only": the first open one is the slot; extras get adopted). Multi-word names
-# (e.g. "Google Chrome") mean this list is NEWLINE-delimited, not space-split
-# like EDITOR_APPS. browser_sel (jq) and BROWSER_RE (signal regex) are generated.
-BROWSER_APPS='Zen
-Google Chrome
+# The browser set for the WORK trio — highest-priority open one owns the
+# top-left slot; extras get adopted. Zen is deliberately NOT here: it's the
+# personal browser and lives alone on its own space (see ZEN_APP/zen_space).
+# Multi-word names (e.g. "Google Chrome") mean this list is NEWLINE-delimited,
+# not space-split like EDITOR_APPS. browser_sel (jq) and BROWSER_RE are generated.
+BROWSER_APPS='Google Chrome
 Safari
 Arc'
+ZEN_APP="Zen"
 browser_sel=""; browser_alt=""
 while IFS= read -r a; do
   [ -n "$a" ] || continue
@@ -107,14 +108,32 @@ editor_space() {  # space where editors live: 3rd space of the external display
   yabai -m query --spaces --display "$ext" 2>/dev/null | jq -r '.[2].index // empty'
 }
 
+zen_space() {  # Zen (personal browser) lives alone: 4th space of the external
+               # display when docked, space 3 laptop-only (with the other browsers)
+  ext=$(external_idx)
+  [ -z "$ext" ] && { echo 3; return; }
+  yabai -m query --spaces --display "$ext" 2>/dev/null | jq -r '.[3].index // empty'
+}
+
+place_zen() {  # move every Zen window to the Zen space (leaves the PiP popout alone)
+  zs=$(zen_space); [ -n "$zs" ] || return 0
+  yabai -m query --windows 2>/dev/null \
+    | jq -r --arg a "$ZEN_APP" '.[]|select(.app==$a and .title!="Picture-in-Picture" and .space!='"$zs"')|.id' \
+    | while read -r zid; do
+        log zen "place_zen: $zid -> space $zs"
+        yabai -m window "$zid" --space "$zs" 2>/dev/null
+      done
+}
+
 adopt() {  # window_created (any app): tuck a stray under the editor on the
            # editor space. Warp is tree-only, so it works SIP-on unfocused.
   id="$1"; [ -n "$id" ] || return 0
   win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
   app=$(echo "$win" | jq -r '.app')
   # Never adopt trio members: editors + Ghostty by app; the slot browser by id
-  # (a SECOND browser window has a different id and DOES get adopted).
-  case " $EDITOR_APPS Ghostty " in *" $app "*) return 0 ;; esac
+  # (a SECOND browser window has a different id and DOES get adopted). Zen is
+  # never adopted — it belongs on its own space (place_zen handles it).
+  case " $EDITOR_APPS Ghostty $ZEN_APP " in *" $app "*) return 0 ;; esac
   [ "$id" = "$(browser_id)" ] && return 0
   echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
   target=$(editor_space); [ -n "$target" ] || return 0
@@ -204,14 +223,15 @@ external_correct() {
 place_editors() {
   trigger="${1:-startup}"
   if [ -z "$(external_idx)" ]; then
-    log place "place($trigger): laptop only -> browsers:3 editors:4 Ghostty:5"
-    move_browsers 3; move_editors 4; move Ghostty 5
+    log place "place($trigger): laptop only -> browsers+Zen:3 editors:4 Ghostty:5"
+    move_browsers 3; place_zen; move_editors 4; move Ghostty 5
     return
   fi
 
   target=$(editor_space)
   [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
 
+  place_zen
   eds=$(editor_ids); ed=$(echo "$eds" | head -1); browser=$(browser_id); gho=$(win_id Ghostty)
   for id in $eds $browser $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
 
@@ -268,6 +288,13 @@ place_one() {
   echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
   app=$(echo "$win" | jq -r '.app')
   target=$(editor_space); [ -n "$target" ] || return 0
+
+  # Zen goes straight to its own space — never part of the trio.
+  if [ "$app" = "$ZEN_APP" ]; then
+    log one "place-one: Zen $id -> zen space"
+    place_zen
+    return 0
+  fi
 
   # Structural members -> full rebuild (place_editors skips if already correct).
   is_editor=0; case " $EDITOR_APPS " in *" $app "*) is_editor=1 ;; esac

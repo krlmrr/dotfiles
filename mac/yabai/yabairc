@@ -37,14 +37,16 @@ for a in $EDITOR_APPS; do editor_sel="$editor_sel${editor_sel:+ or }.app==\"$a\"
 editor_sel="($editor_sel)"
 EDITOR_RE="^($(echo "$EDITOR_APPS" | tr ' ' '|'))\$"
 
-# The browser set for the WORK trio — highest-priority open one owns the
-# top-left slot; extras get adopted. Zen is deliberately NOT here: it's the
-# personal browser and lives alone on its own space (see ZEN_APP/zen_space).
-# Multi-word names (e.g. "Google Chrome") mean this list is NEWLINE-delimited,
-# not space-split like EDITOR_APPS. browser_sel (jq) and BROWSER_RE are generated.
+# Browser PRIORITY list — highest-priority open one owns the trio's top-left
+# slot. Zen is LAST: it only takes the slot when no work browser is open
+# ("Chrome closed = not working, but keep the feel"); whenever it's NOT the
+# slot, place_zen exiles it to its own space (see zen_space). Multi-word names
+# (e.g. "Google Chrome") mean this list is NEWLINE-delimited, not space-split
+# like EDITOR_APPS. browser_sel (jq) and BROWSER_RE are generated.
 BROWSER_APPS='Google Chrome
 Safari
-Arc'
+Arc
+Zen'
 ZEN_APP="Zen"
 browser_sel=""; browser_alt=""
 while IFS= read -r a; do
@@ -115,10 +117,15 @@ zen_space() {  # Zen (personal browser) lives alone: 4th space of the external
   yabai -m query --spaces --display "$ext" 2>/dev/null | jq -r '.[3].index // empty'
 }
 
-place_zen() {  # move every Zen window to the Zen space (leaves the PiP popout alone)
+place_zen() {  # exile Zen windows to the Zen space — EXCEPT the slot window.
+               # When Zen holds the trio slot (no work browser open), the slot
+               # window stays for place_editors to arrange; extra Zen windows
+               # still go to the Zen space. Leaves the PiP popout alone.
   zs=$(zen_space); [ -n "$zs" ] || return 0
+  slot=$(browser_id)
   yabai -m query --windows 2>/dev/null \
-    | jq -r --arg a "$ZEN_APP" '.[]|select(.app==$a and .title!="Picture-in-Picture" and .space!='"$zs"')|.id' \
+    | jq -r --arg a "$ZEN_APP" --argjson zs "$zs" --argjson slot "${slot:-0}" \
+      '.[]|select(.app==$a and .title!="Picture-in-Picture" and .space!=$zs and .id!=$slot)|.id' \
     | while read -r zid; do
         log zen "place_zen: $zid -> space $zs"
         yabai -m window "$zid" --space "$zs" 2>/dev/null
@@ -289,9 +296,10 @@ place_one() {
   app=$(echo "$win" | jq -r '.app')
   target=$(editor_space); [ -n "$target" ] || return 0
 
-  # Zen goes straight to its own space — never part of the trio.
-  if [ "$app" = "$ZEN_APP" ]; then
-    log one "place-one: Zen $id -> zen space"
+  # Zen: slot window (no work browser open) -> structural rebuild pulls it into
+  # the trio; otherwise straight to its own space.
+  if [ "$app" = "$ZEN_APP" ] && [ "$id" != "$(browser_id)" ]; then
+    log one "place-one: Zen $id (not slot) -> zen space"
     place_zen
     return 0
   fi
@@ -425,6 +433,9 @@ yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yab
 yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
 yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+# Browser close re-places too: closing the work browser promotes Zen into the
+# slot (and closing Zen elsewhere is a harmless skip).
+yabai -m signal --add event=window_destroyed app="$BROWSER_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
 yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/mac/yabai/yabairc place-one \$YABAI_WINDOW_ID"
 # Heal on returning to a space (e.g. closing a fullscreen video drops you back to
 # the trio's space with the tree disturbed). space_changed DOES fire SIP-on;

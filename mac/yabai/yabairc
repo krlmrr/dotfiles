@@ -240,7 +240,19 @@ place_editors() {
 
   place_zen
   eds=$(editor_ids); ed=$(echo "$eds" | head -1); browser=$(browser_id); gho=$(win_id Ghostty)
-  for id in $eds $browser $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
+  # Only the FIRST (oldest) editor window joins the work trio. Extra editor
+  # windows are a second project — they live on the Zen/personal space, where
+  # bsp tiles them beside Zen. Closing the trio editor promotes the next one.
+  for id in $ed $browser $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
+  zs=$(zen_space)
+  if [ -n "$zs" ]; then
+    echo "$eds" | tail -n +2 | while read -r xid; do
+      [ -n "$xid" ] || continue
+      [ "$(yabai -m query --windows --window "$xid" 2>/dev/null | jq -r '.space')" = "$zs" ] && continue
+      log place "place($trigger): extra editor $xid -> personal space $zs"
+      yabai -m window "$xid" --space "$zs" 2>/dev/null
+    done
+  fi
 
   rebuilt=0
   if external_correct "$target"; then

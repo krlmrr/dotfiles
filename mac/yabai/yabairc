@@ -78,10 +78,12 @@ editor_ids() {  # ids of all STANDARD editor windows, oldest first (first = base
     | jq -r "[.[]|select($editor_sel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")]|sort_by(.id)|.[].id"
 }
 
-win_id() {  # id of first STANDARD window of app $1 (exact name; skips phantoms
-            # and the "Picture-in-Picture" popout, which reports AXStandardWindow)
+win_id() {  # id of the OLDEST standard window of app $1 (exact name; skips
+            # phantoms and the "Picture-in-Picture" popout). Query order is
+            # newest-first, so sort by id to keep the trio member stable when
+            # additional windows of the app open.
   yabai -m query --windows 2>/dev/null \
-    | jq -r --arg a "$1" '.[]|select(.app==$a and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")|.id' | head -1
+    | jq -r --arg a "$1" '[.[]|select(.app==$a and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")]|sort_by(.id)|first.id // empty'
 }
 
 browser_id() {  # id of the SLOT browser window (top-left slot occupant).
@@ -239,17 +241,26 @@ place_editors() {
   [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
 
   place_zen
-  eds=$(editor_ids); ed=$(echo "$eds" | head -1); browser=$(browser_id); gho=$(win_id Ghostty)
-  # Only the FIRST (oldest) editor window joins the work trio. Extra editor
-  # windows are a second project — they live on the Zen/personal space, where
-  # bsp tiles them beside Zen. Closing the trio editor promotes the next one.
+  browser=$(browser_id); gho=$(win_id Ghostty)
+  # LOCATION decides the trio editor: the oldest editor ALREADY ON the work
+  # space owns the desk — the user's placement is the truth, and editors are
+  # never dragged across desktops. Extra editors crowding the work space get
+  # decluttered to the Zen/personal space; editors elsewhere are untouched.
+  # Only when there's exactly ONE editor anywhere does it get adopted onto the
+  # work desk (fresh-start flow).
+  eds_on=$(yabai -m query --windows --space "$target" 2>/dev/null \
+    | jq -r "[.[]|select($editor_sel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")]|sort_by(.id)|.[].id")
+  ed=$(echo "$eds_on" | head -1)
+  if [ -z "$ed" ]; then
+    all=$(editor_ids)
+    [ "$(echo "$all" | grep -c .)" = 1 ] && ed=$all
+  fi
   for id in $ed $browser $gho; do [ -n "$id" ] && yabai -m window "$id" --space "$target" 2>/dev/null; done
   zs=$(zen_space)
   if [ -n "$zs" ]; then
-    echo "$eds" | tail -n +2 | while read -r xid; do
+    echo "$eds_on" | tail -n +2 | while read -r xid; do
       [ -n "$xid" ] || continue
-      [ "$(yabai -m query --windows --window "$xid" 2>/dev/null | jq -r '.space')" = "$zs" ] && continue
-      log place "place($trigger): extra editor $xid -> personal space $zs"
+      log place "place($trigger): extra editor $xid crowding work desk -> personal space $zs"
       yabai -m window "$xid" --space "$zs" 2>/dev/null
     done
   fi
@@ -327,6 +338,12 @@ place_one() {
   # Append-only: Ghostty stacks under the browser (or editor); everything else
   # (strays, 2nd browser) tucks under the editor via adopt. One incremental warp.
   if [ "$app" = "Ghostty" ]; then
+    # Only the FIRST (oldest) Ghostty window is trio-managed; extra Ghostty
+    # windows (second project's terminal) stay wherever they were opened.
+    if [ "$id" != "$(win_id Ghostty)" ]; then
+      log one "place-one: extra Ghostty $id — leaving it where it opened"
+      return 0
+    fi
     [ "$(echo "$win" | jq -r '.space')" = "$target" ] || yabai -m window "$id" --space "$target" 2>/dev/null
     ensure_tiled "$id"
     # Below the browser in the left column; or beside the editor when there's no

@@ -190,19 +190,25 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
   return 0
 }
 
-# True when the editor layout already matches the desired target on space $1:
+# True when the layout on space $1 matches the desired shape, with $2 as the
+# jq predicate selecting that space's browser:
 #   editor open  -> browser-TL / Ghostty-BL (stacked left) / editor full-R
 #   editor closed-> browser | Ghostty side by side (browser left)
-# 0-or-1 editors present is trivially correct (nothing to arrange).
-external_correct() {
+# 0-or-1 members present is trivially correct (nothing to arrange).
+layout_correct() {
   yabai -m query --windows --space "$1" 2>/dev/null | jq -e --arg apps "$BROWSER_APPS" '
       ($apps|split("\n")|map(select(length>0))) as $prio
     | (map(select(.subrole=="AXStandardWindow" and .title!="Picture-in-Picture"))) as $w
-    | ($w|map(select('"$browser_sel"'))|sort_by([(.app as $a | ($prio|index($a))), .id])|first) as $browser
+    | ($w|map(select('"$2"'))|sort_by([(.app as $a | (($prio|index($a)) // 99)), .id])|first) as $browser
     | ($w|map(select('"$editor_sel"'))|sort_by(.id)|first)  as $ed
     | ($w|map(select(.app=="Ghostty"))|first)  as $gho
     | ([$browser,$ed,$gho]|map(select(.!=null))|length) as $n
+    # members must reach the left edge of the display: a stale split (window
+    # moved away without a balance) leaves the group squeezed into one half,
+    # which shape checks alone cannot see
+    | (($w|map(.frame.x|floor)|min // 0) <= 20) as $covers
     | if $n <= 1 then true
+      elif ($covers|not) then false
       elif $ed then
         if ($browser and $gho) then
           # full trio: browser TL / Ghostty BL (stacked left) / editor R
@@ -224,6 +230,46 @@ external_correct() {
         and (($browser.frame.y|floor) == ($gho.frame.y|floor))
       end
   ' >/dev/null 2>&1
+}
+
+external_correct() {  # work-desk shape check (slot browser from BROWSER_APPS)
+  layout_correct "$1" "$browser_sel"
+}
+
+# Warp-based rebuild of the standard shape on the CURRENT space of the given
+# windows: browser TL / Ghostty BL / editor full-R (or the 2-member pairs).
+# Args: $1 editor id, $2 browser id, $3 ghostty id (any may be empty).
+arrange() {
+  a_ed="$1"; a_br="$2"; a_gh="$3"
+  for id in $a_ed $a_br $a_gh; do ensure_tiled "$id"; done
+  if [ -n "$a_ed" ]; then
+    if [ -n "$a_br" ]; then
+      warp_to "$a_br" "$a_ed" west
+      [ -n "$a_gh" ] && warp_to "$a_gh" "$a_br" south
+    elif [ -n "$a_gh" ]; then
+      warp_to "$a_gh" "$a_ed" west
+    fi
+  else
+    [ -n "$a_br" ] && [ -n "$a_gh" ] && warp_to "$a_gh" "$a_br" east
+  fi
+}
+
+# Personal desk (Zen space): same shape as the work desk — Zen left, editor
+# right, extra Ghostty under Zen. Only arranges what is ALREADY on the space
+# (nothing is pulled in); self-skips when correct.
+place_personal() {
+  zs=$(zen_space); [ -n "$zs" ] || return 0
+  [ "$zs" = "$(editor_space)" ] && return 0   # laptop-only: no distinct personal desk
+  if layout_correct "$zs" '(.app=="Zen")'; then return 0; fi
+  members=$(yabai -m query --windows --space "$zs" 2>/dev/null \
+    | jq -r '[.[]|select(.subrole=="AXStandardWindow" and .title!="Picture-in-Picture")]|sort_by(.id)')
+  p_ed=$(echo "$members"  | jq -r "[.[]|select($editor_sel)]|first.id // empty")
+  p_br=$(echo "$members"  | jq -r '[.[]|select(.app=="Zen")]|first.id // empty')
+  p_gh=$(echo "$members"  | jq -r '[.[]|select(.app=="Ghostty")]|first.id // empty')
+  log personal "place_personal: rebuild on space $zs (ed=$p_ed zen=$p_br gho=$p_gh)"
+  arrange "$p_ed" "$p_br" "$p_gh"
+  yabai -m space "$zs" --balance 2>/dev/null
+  return 0
 }
 
 # ------------------------------------------------------------- place editors
@@ -271,19 +317,8 @@ place_editors() {
   else
     rebuilt=1
     # Warp-based rebuild: tree-only ops, no space focus needed — runs in both SIP modes.
-    for id in $ed $browser $gho; do ensure_tiled "$id"; done
-    if [ -n "$ed" ]; then
-      log place "place($trigger): rebuild (editor open) — browser TL / Ghostty BL / editor R"
-      if [ -n "$browser" ]; then
-        warp_to "$browser" "$ed" west            # browser to the left of editor
-        [ -n "$gho" ] && warp_to "$gho" "$browser" south   # Ghostty below browser (left column)
-      elif [ -n "$gho" ]; then
-        warp_to "$gho" "$ed" west                # no browser: Ghostty beside editor, not below it
-      fi
-    else
-      log place "place($trigger): rebuild side-by-side (no editor) — browser | Ghostty"
-      [ -n "$browser" ] && [ -n "$gho" ] && warp_to "$gho" "$browser" east
-    fi
+    log place "place($trigger): rebuild — browser TL / Ghostty BL / editor R"
+    arrange "$ed" "$browser" "$gho"
   fi
 
   # Sweep pre-existing strays under the editor (adopt carries all the guards,
@@ -299,6 +334,9 @@ place_editors() {
   # split ratios if the balance ran before it. Skip-rebuild paths (space_changed
   # heal etc.) must NOT balance, or they'd stomp manual resizes on every visit.
   [ "$rebuilt" = 1 ] && yabai -m space "$target" --balance 2>/dev/null
+
+  # The personal desk gets the same shape (Zen left / editor right); self-skips.
+  place_personal
   return 0
 }
 
@@ -324,6 +362,7 @@ place_one() {
   if [ "$app" = "$ZEN_APP" ] && [ "$id" != "$(browser_id)" ]; then
     log one "place-one: Zen $id (not slot) -> zen space"
     place_zen
+    place_personal
     return 0
   fi
 
@@ -339,9 +378,11 @@ place_one() {
   # (strays, 2nd browser) tucks under the editor via adopt. One incremental warp.
   if [ "$app" = "Ghostty" ]; then
     # Only the FIRST (oldest) Ghostty window is trio-managed; extra Ghostty
-    # windows (second project's terminal) stay wherever they were opened.
+    # windows (second project's terminal) stay wherever they were opened —
+    # but if that's the personal desk, arrange them into its shape.
     if [ "$id" != "$(win_id Ghostty)" ]; then
-      log one "place-one: extra Ghostty $id — leaving it where it opened"
+      log one "place-one: extra Ghostty $id — stays on its space"
+      [ "$(echo "$win" | jq -r '.space')" = "$(zen_space)" ] && place_personal
       return 0
     fi
     [ "$(echo "$win" | jq -r '.space')" = "$target" ] || yabai -m window "$id" --space "$target" 2>/dev/null

@@ -287,7 +287,12 @@ place_editors() {
   [ -z "$target" ] && { log place "place($trigger): external present, no 3rd space"; return; }
 
   place_zen
-  browser=$(browser_id); gho=$(win_id Ghostty)
+  browser=$(browser_id)
+  # Ghostty follows the same location-is-truth rule as editors: the trio uses
+  # the oldest Ghostty ALREADY ON the work space and never drags one back from
+  # another desktop (place_one still routes a newly created first Ghostty here).
+  gho=$(yabai -m query --windows --space "$target" 2>/dev/null \
+    | jq -r '[.[]|select(.app=="Ghostty" and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")]|sort_by(.id)|first.id // empty')
   # LOCATION decides the trio editor: the oldest editor ALREADY ON the work
   # space owns the desk — the user's placement is the truth, and editors are
   # never dragged across desktops. Extra editors crowding the work space get

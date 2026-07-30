@@ -26,7 +26,7 @@ cd ~/Code/dotfiles && ./setup
 5. Builds `.zshrc` from shared + OS-specific aliases
 6. Runs OS-specific setup (mac or linux)
 7. Installs [Claude Code](https://claude.ai)
-8. Symlinks shared configs (nvim, ghostty, lazygit, zed)
+8. Symlinks shared configs (nvim, ghostty, lazygit, zed, jj)
 9. Configures git (prompts for name/email on first run)
 10. Installs fonts (FiraCode, FiraMono, MonoLisa)
 11. Configures COSMIC desktop (if detected)
@@ -47,6 +47,7 @@ dotfiles/
 │   ├── zed/
 │   ├── zsh/
 │   ├── git/
+│   ├── jj/
 │   ├── fonts/
 │   └── wallpapers/
 ├── mac/                  # macOS-specific

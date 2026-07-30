@@ -113,8 +113,9 @@ little. `lzj` sits beside the existing `lzg`.
 ### 6. Ignore + colocation
 
 - Add `.jj/` to `shared/git/gitignore_global`, so no repo needs a local ignore entry.
-  (`jj git init --colocate` also writes to `.git/info/exclude`; the global entry
-  makes it unconditional and covers repos colocated later.)
+  (`jj git init --colocate` does not touch `.git/info/exclude` — it writes its own
+  `.jj/.gitignore` containing `/*`. The global entry is still what keeps `.jj/`
+  out of git status for this repo and any repo colocated later.)
 - Run `jj git init --colocate` in this repo.
 
 ## Verification

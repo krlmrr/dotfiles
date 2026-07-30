@@ -16,6 +16,7 @@
 - [Raycast is the launcher](feedback_raycast_launcher.md) — Karl uses Raycast for launching apps and shell actions; prefer Raycast script commands over zsh aliases
 - [Clean up remote temp state](feedback_cleanup_remote_state.md) — Don't trust `--rm` under signal kills; verify and clean up containers/files/processes I create on remote hosts before declaring done
 - [Minimal comments](feedback_minimal_comments.md) — Don't add explanatory comment blocks just because code changed; make the minimal edit
+- [Key chords as cmd+X, never cmd-X](feedback_keybinding_notation.md) — Font ligatures turn `->` into `→`; hyphen-separated chords get misread as arrow keys
 
 ## Project
 - [yabai: never restart-service on wake](project_yabai_wake_no_restart.md) — restart-on-wake caused all post-wake breakage; sleep changes nothing. No system_woke signal; display events gated by display-changed.sh
@@ -23,5 +24,8 @@
 - [Migrating Linux PHP dev to Lerd (podman)](project_lerd_migration.md) — Docker + DDEV removed on 2026-05-13. Lerd not yet wired in; `a`/`d`/`lzd` aliases left as TODO markers.
 - [yabai: Zen PiP masquerades as AXStandardWindow](project_yabai_pip_masquerade.md) — PiP popout reports AXStandardWindow + is-sticky; hijacked win_id → random red insert-overlay box + wrong editor layout. Fixed by excluding PiP by title in win_id/external_correct/move.
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
+- [Laravel LSP in Zed via dev extension](project_laravel_lsp_zed.md) — pending PR #6996; when it merges, swap to the marketplace extension and revert the parked rustup changes in mac/Brewfile + mac/setup.sh
 - [yabai --insert parity trap](project_yabai_insert_parity.md) — armed points survive warps; never prime, verify+repair instead
 - [yabai browser array + incremental placement](project_yabai_browser_incremental.md) — Zen-hardcode in external_correct caused the constant misplacement/restarts (fixed by BROWSER_APPS); place_one moves only the new window on open; zero-motion impossible (window_created fires post-BSP); daily driver is the Studio Display (3200×1800 scaled), LAPTOP_W/H=2056×1329 is CORRECT; Apple TV casting can transiently scramble the trio (not handled, rare)
+- [jj git init --colocate scrambled .git/index](project_jj_colocate_index.md) — phantom Added/Deleted entries git-side after colocating; HEAD/refs/files unaffected; repair via `rm -f .git/index && git read-tree HEAD` (check for real staged changes first)
+- [jj conf.d layers over config.toml](project_jj_config_layering.md) — verified on jj 0.43.0; underpins the symlinked config.toml + generated conf.d/00-identity.toml split; jj skips git hooks so jj-made commits bypass the Brewfile-sorting pre-commit hook

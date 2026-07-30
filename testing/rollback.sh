@@ -10,6 +10,8 @@ rm -f ~/.config/ghostty
 rm -f ~/.config/lazygit
 rm -f ~/.config/zed
 rm -f ~/.gitignore_global
+rm -f ~/.config/jj/config.toml
+rm -rf ~/.config/jj/conf.d
 
 # Remove Flatpak Zed symlinks
 rm -f ~/.var/app/dev.zed.Zed/config/zed/settings.json

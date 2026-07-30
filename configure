@@ -55,6 +55,8 @@ if [ -n "$GIT_NAME" ] && [ -n "$GIT_EMAIL" ]; then
 name = "$GIT_NAME"
 email = "$GIT_EMAIL"
 EOF
+else
+    echo "Skipping jj identity — no git user.name/user.email configured, jj will refuse to commit until ~/.config/jj/conf.d/00-identity.toml is set"
 fi
 
 # Claude Code skills

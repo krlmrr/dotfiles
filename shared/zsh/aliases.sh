@@ -60,7 +60,6 @@ alias pip="pip3"
 
 # Apps
 alias code.="code ."
-alias ps.="phpstorm ."
 alias zed.="zed ."
 
 publish() {
@@ -77,4 +76,27 @@ publish() {
     git branch -M main 2>/dev/null
 
     gh repo create "krlmrr/$repo_name" "$visibility" --source=. --remote=origin --push
+}
+
+# Prune merged branches, update the default branch, optionally start a new one.
+# gsync              -> fetch, switch to default branch, fast-forward, prune merged locals
+# gsync feat/thing   -> ...then cut a fresh branch off origin's default branch
+gsync() {
+    git rev-parse --is-inside-work-tree &>/dev/null || { echo "Not a git repository."; return 1; }
+
+    git fetch --prune
+
+    # Default branch from origin/HEAD, falling back to main.
+    local default_branch
+    default_branch=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')
+    default_branch="${default_branch:-main}"
+
+    git checkout "$default_branch" && git merge --ff-only "origin/$default_branch"
+
+    # Delete only local branches whose upstream was deleted after merge ([gone]).
+    git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads \
+        | awk '$2 == "[gone]" { print $1 }' \
+        | while read -r branch; do git branch -D "$branch"; done
+
+    [ -n "$1" ] && git checkout -b "$1" "origin/$default_branch"
 }

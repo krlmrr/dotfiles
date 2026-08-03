@@ -30,8 +30,10 @@
     "agent_servers": {
         "claude-acp": {
             "default_config_options": {
-                "effort": "max",
-                "model": "claude-opus-4-8"
+                "fast": false,
+                "mode": "auto",
+                "effort": "high",
+                "model": "opus[1m]"
             },
             "type": "registry"
         }
@@ -42,6 +44,7 @@
     },
     "diff_view_style": "unified",
     "title_bar": {
+        "show_worktree_name": false,
         "show_user_picture": false,
         "show_onboarding_banner": false,
         "show_user_menu": false,
@@ -214,8 +217,33 @@
             ],
             "format_on_save": "on",
         },
+        // ESLint owns .vue and .js formatting (eslint.config.mjs). Zed's default
+        // for Vue is Prettier, which reformats the file and reintroduces every
+        // ESLint error on save. Same external-buffer pattern as PHP/Pint above.
+        // `;` not `&&` before the final cat: eslint exits non-zero on findings it
+        // cannot fix, and the buffer still has to come back.
+        "Vue.js": {
+            "formatter": {
+                "external": {
+                    "command": "bash",
+                    "arguments": [
+                        "-c",
+                        "cat > {buffer_path} && ./node_modules/.bin/eslint --fix --no-warn-ignored {buffer_path} >/dev/null 2>&1; cat {buffer_path}",
+                    ],
+                },
+            },
+            "format_on_save": "on",
+        },
         "JavaScript": {
-            "formatter": "language_server",
+            "formatter": {
+                "external": {
+                    "command": "bash",
+                    "arguments": [
+                        "-c",
+                        "cat > {buffer_path} && ./node_modules/.bin/eslint --fix --no-warn-ignored {buffer_path} >/dev/null 2>&1; cat {buffer_path}",
+                    ],
+                },
+            },
             "format_on_save": "on",
         },
         "TypeScript": {
@@ -276,6 +304,9 @@
     },
     "inlay_hints": {
         "enabled": true,
+        // Type hints render Vue's inferred defineProps object inline, which runs
+        // hundreds of columns wide. Parameter and other hints stay on.
+        "show_type_hints": false,
     },
     // Scrolloff equivalent
     "vertical_scroll_margin": 1,

@@ -74,8 +74,6 @@ if [ "$OS" = "mac" ]; then
     open -a Hammerspoon
     link "$DOTFILES_DIR/mac/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
     link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
-    link "$DOTFILES_DIR/mac/phpstorm/vimrc" ~/.vimrc
-    link "$DOTFILES_DIR/mac/phpstorm/ideavimrc" ~/.ideavimrc
 fi
 
 # Zen Browser user.js — deploy to every Zen root we find, since the user may

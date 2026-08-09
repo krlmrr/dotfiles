@@ -51,11 +51,10 @@ dotfiles/
 │   ├── fonts/
 │   └── wallpapers/
 ├── mac/                  # macOS-specific
-│   ├── setup.sh          # Casks, hammerspoon, vscode, phpstorm
+│   ├── setup.sh          # Casks, hammerspoon, vscode
 │   ├── zsh/
 │   ├── hammerspoon/
 │   ├── vscode/
-│   ├── phpstorm/
 │   └── zed-keymap.json
 └── linux/                # Linux-specific
     ├── setup.sh          # Shared linux (brew formulae, keyd, udev)

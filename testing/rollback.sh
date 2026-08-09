@@ -27,6 +27,11 @@ rm -f "$HOME/Library/Application Support/Code/User/settings.json" 2>/dev/null
 rm -f "$HOME/Library/Application Support/Code/User/keybindings.json" 2>/dev/null
 rm -f ~/.config/zed/keymap.json
 
+# Legacy: configure used to link these from the since-deleted mac/phpstorm/.
+# Machines that ran the old script still have them as dangling symlinks.
+rm -f ~/.vimrc
+rm -f ~/.ideavimrc
+
 # Remove arch-specific symlinks
 rm -f ~/.config/hypr/hyprland.conf
 rm -f ~/.config/hypr/hyprlock.conf

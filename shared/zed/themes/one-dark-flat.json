@@ -8,7 +8,7 @@
             "appearance": "dark",
             "style": {
                 "pane_group.border": "#61afef",
-                "border": "#2c313a",
+                "border": "#3e4451",
                 "border.variant": "#61afef",
                 "border.focused": "#61afef",
                 "border.selected": "#61afef",

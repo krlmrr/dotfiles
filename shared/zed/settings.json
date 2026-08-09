@@ -7,6 +7,7 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "cursor_shape": "bar",
     "active_pane_modifiers": {
         "inactive_opacity": 1.0
     },
@@ -23,7 +24,7 @@
         "vue": true,
         "zig": true,
     },
-    "cursor_blink": true,
+    "cursor_blink": false,
     "show_wrap_guides": false,
     "hide_mouse": "never",
     "word_diff_enabled": false,
@@ -94,9 +95,7 @@
     "notification_panel": {
         "dock": "left",
     },
-    "buffer_line_height": {
-        "custom": 2.799999952316284
-    },
+    "buffer_line_height": "comfortable",
     "git": {
         "inline_blame": {
             "enabled": false,

@@ -11,6 +11,16 @@ for t in qmk/qmk osx-cross/arm osx-cross/avr FelixKratz/formulae koekeishiya/for
 done
 brew bundle --file="$DOTFILES_DIR/mac/Brewfile"
 
+# Rust via rustup. The rustup formula is keg-only because it collides with the
+# `rust` formula, which links its own cargo/rustc into /opt/homebrew/bin — and
+# those can't see rustup's toolchain, so anything needing a non-native target
+# (e.g. Zed compiling a dev extension for wasm32-wasip2) fails with a confusing
+# "target may not be installed". Unlink rust, force-link rustup, then make sure
+# a toolchain exists; Zed adds targets itself once rustup is in charge.
+brew unlink rust 2>/dev/null || true
+brew link --force --overwrite rustup
+rustup toolchain list 2>/dev/null | grep -q '^stable-' || rustup default stable
+
 # Caps Lock → Control (at boot via LaunchDaemon, Hammerspoon adds tap-for-Escape)
 sudo cp "$DOTFILES_DIR/mac/CapsLockToControl.plist" /Library/LaunchDaemons/com.dotfiles.CapsLockToControl.plist
 sudo chown root:wheel /Library/LaunchDaemons/com.dotfiles.CapsLockToControl.plist

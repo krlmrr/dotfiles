@@ -791,7 +791,8 @@
       "Bash(pkill -f \"Discord Helper\")",
       "Bash(ssh-keygen -F REDACTED-HOST)",
       "Bash(ssh-keygen -F 100.80.17.60)",
-      "Bash(sh -n configure)"
+      "Bash(sh -n configure)",
+      "Bash(echo \"=== exit: $? ===\")"
     ]
   }
 }

@@ -2924,11 +2924,6 @@
         "when": "textInputFocus && !editorReadonly"
     },
     {
-        "key": "cmd+;",
-        "command": "-simple-project-switcher.switch",
-        "when": "!inQuickOpen"
-    },
-    {
         "key": "cmd+k e",
         "command": "-workbench.files.action.focusOpenEditorsView",
         "when": "workbench.explorer.openEditorsView.active"
@@ -5957,5 +5952,9 @@
     {
         "key": "shift+cmd+n",
         "command": "workbench.action.newWindow"
+    },
+    {
+        "key": "cmd+k a",
+        "command": "git.blame.toggleEditorDecoration"
     }
 ]

@@ -792,7 +792,23 @@
       "Bash(ssh-keygen -F REDACTED-HOST)",
       "Bash(ssh-keygen -F 100.80.17.60)",
       "Bash(sh -n configure)",
-      "Bash(echo \"=== exit: $? ===\")"
+      "Bash(echo \"=== exit: $? ===\")",
+      "Bash(ping -c 2 -W 2 192.168.1.105)",
+      "Bash(ping -c 2 -W 2 192.168.1.194)",
+      "Bash(grep -iA1 \"thingino\")",
+      "Bash(awk '/Other Local Wi-Fi Networks/,0')",
+      "Bash(command -v jq sketchybar yabai)",
+      "Bash(exit 1)",
+      "Bash(echo \"pgrep -x rc=$?\")",
+      "Bash(echo \"pgrep -f rc=$?\")",
+      "Bash(launchctl print *)",
+      "Bash(swiftc -O verify.swift -o verify)",
+      "Bash(./verify)",
+      "Bash(echo \"rc=$?\")",
+      "Bash(timeout 3 ./menubar-toggle)",
+      "Bash(echo \"fg exit=$?\")",
+      "Bash(codesign -dv ./menubar-toggle)",
+      "Bash(/private/tmp/claude-501/-Users-karlm-Code-dotfiles/f9e67ffd-eba0-4670-94f9-c7791ea5e547/scratchpad/desync)"
     ]
   }
 }

@@ -46,15 +46,14 @@ func distanceSquared(_ point: NSPoint, _ rect: NSRect) -> CGFloat {
     return horizontal * horizontal + vertical * vertical
 }
 
-// Bounds are inclusive because contains/NSMouseInRect exclude maxY, where the
-// cursor sits whenever it's in the menu bar (5d2d929). Matching X alone (fc3383f)
-// traded that for measuring mouseY off an overlapping screen's top edge. Falls back
-// to the nearest screen so an unresolvable point can't return nil and freeze the
-// state machine with the bar hidden.
+// Expanded by 1px because contains() uses half-open intervals and excludes maxY,
+// where the cursor sits whenever it's in the menu bar (5d2d929); matching X alone
+// (fc3383f) traded that for measuring mouseY off an overlapping screen's top edge.
+// Falls back to the nearest screen so an unresolvable point can't return nil and
+// freeze the state machine with the bar hidden.
 func screenUnderCursor(_ point: NSPoint) -> NSScreen? {
     if let hit = NSScreen.screens.first(where: {
-        point.x >= $0.frame.minX && point.x <= $0.frame.maxX &&
-        point.y >= $0.frame.minY && point.y <= $0.frame.maxY
+        $0.frame.insetBy(dx: -1, dy: -1).contains(point)
     }) {
         return hit
     }

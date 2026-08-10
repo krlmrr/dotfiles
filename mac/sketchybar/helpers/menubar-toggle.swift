@@ -10,6 +10,7 @@ var state = "sketchy"
 var fullscreen = false
 var checking = false
 var reconciling = false
+var mouseWasDown = false
 
 func run(_ cmd: String) {
     let task = Process()
@@ -48,9 +49,9 @@ func distanceSquared(_ point: NSPoint, _ rect: NSRect) -> CGFloat {
 
 // Expanded by 1px because contains() uses half-open intervals and excludes maxY,
 // where the cursor sits whenever it's in the menu bar (5d2d929); matching X alone
-// (fc3383f) traded that for measuring mouseY off an overlapping screen's top edge.
-// Falls back to the nearest screen so an unresolvable point can't return nil and
-// freeze the state machine with the bar hidden.
+// (fc3383f) traded that for measuring the distance off an overlapping screen's top
+// edge. Falls back to the nearest screen so an unresolvable point can't return nil
+// and freeze the state machine with the bar hidden.
 func screenUnderCursor(_ point: NSPoint) -> NSScreen? {
     if let hit = NSScreen.screens.first(where: {
         $0.frame.insetBy(dx: -1, dy: -1).contains(point)
@@ -62,17 +63,20 @@ func screenUnderCursor(_ point: NSPoint) -> NSScreen? {
     })
 }
 
-// nil inside the hysteresis band, so neither caller forces a change there.
-func unambiguousState(_ point: NSPoint) -> String? {
+func distanceFromTop(_ point: NSPoint) -> CGFloat? {
     guard let screen = screenUnderCursor(point) else { return nil }
-    let mouseY = screen.frame.maxY - point.y
-    if mouseY <= triggerZone { return "native" }
-    if mouseY > leaveZone { return "sketchy" }
+    return screen.frame.maxY - point.y
+}
+
+// nil inside the hysteresis band, so neither caller forces a change there.
+func unambiguousState(_ distance: CGFloat) -> String? {
+    if distance <= triggerZone { return "native" }
+    if distance > leaveZone { return "sketchy" }
     return nil
 }
 
 // Ask yabai (off the main thread) whether the focused window is native-fullscreen,
-// then flip sketchybar/menubar on any transition. Never blocks the 60Hz loop.
+// then flip sketchybar/menubar on any transition. Never blocks the cursor loop.
 func refreshFullscreen() {
     if checking { return }
     checking = true
@@ -106,7 +110,8 @@ func reconcile() {
         DispatchQueue.main.async {
             reconciling = false
             guard hidden == "on" || hidden == "off", !fullscreen else { return }
-            guard let want = unambiguousState(NSEvent.mouseLocation) else { return }
+            guard let distance = distanceFromTop(NSEvent.mouseLocation),
+                  let want = unambiguousState(distance) else { return }
             if (hidden == "on") != (want == "native") {
                 want == "native" ? showNative() : showSketchy()
             } else {
@@ -116,23 +121,62 @@ func reconcile() {
     }
 }
 
-// Own timers, not ticks off the cursor loop: macOS coalesces the 1/60s timer to
-// ~24Hz, which stretched tick-based intervals ~2.5x (reconcile fired at 5s, not 2s).
-Timer.scheduledTimer(withTimeInterval: 1.0 / 3.0, repeats: true) { _ in
-    refreshFullscreen()
-}
+func pollCursor() {
+    let mouseDown = NSEvent.pressedMouseButtons & 0x1 != 0
+    let clicked = mouseDown && !mouseWasDown
+    mouseWasDown = mouseDown
 
-Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { _ in
-    reconcile()
-}
-
-Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
     // In native fullscreen macOS owns the menu bar (auto-hide + hover reveal);
     // pause the cursor toggle so it can't pop sketchybar back over the app.
     if fullscreen { return }
 
-    guard let want = unambiguousState(NSEvent.mouseLocation), want != state else { return }
+    guard let distance = distanceFromTop(NSEvent.mouseLocation) else { return }
+
+    // A click below the bar is the user reaching for a window title bar, not the
+    // menu, so give the bar back immediately instead of waiting to clear leaveZone.
+    if clicked, state == "native", distance >= triggerZone {
+        showSketchy()
+        return
+    }
+
+    guard let want = unambiguousState(distance), want != state else { return }
     want == "native" ? showNative() : showSketchy()
 }
+
+// Leaving the bar hidden would strand the user with no status bar, so restore it
+// synchronously — run() is fire-and-forget and would race the exit.
+func restoreAndExit() -> Never {
+    _ = capture("yabai -m config menubar_opacity 0.0; sketchybar --bar hidden=off")
+    exit(0)
+}
+
+func repeatingTimer(_ interval: TimeInterval, _ handler: @escaping () -> Void) -> DispatchSourceTimer {
+    let timer = DispatchSource.makeTimerSource(queue: .main)
+    timer.schedule(deadline: .now() + interval, repeating: interval)
+    timer.setEventHandler(handler: handler)
+    timer.resume()
+    return timer
+}
+
+func trapSignal(_ sig: Int32) -> DispatchSourceSignal {
+    signal(sig, SIG_IGN)
+    let source = DispatchSource.makeSignalSource(signal: sig, queue: .main)
+    source.setEventHandler { restoreAndExit() }
+    source.resume()
+    return source
+}
+
+// Start from a known state rather than inheriting whatever the last run left.
+showSketchy()
+
+// DispatchSourceTimer rather than Timer: NSTimer gets coalesced well below its
+// requested rate under load (measured ~24Hz for 1/60s), which stretched every
+// interval derived from it.
+let signalSources = [trapSignal(SIGTERM), trapSignal(SIGINT)]
+let timers = [
+    repeatingTimer(1.0 / 60.0, pollCursor),
+    repeatingTimer(1.0 / 3.0, refreshFullscreen),
+    repeatingTimer(2.0, reconcile),
+]
 
 RunLoop.main.run()

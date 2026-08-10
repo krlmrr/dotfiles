@@ -120,7 +120,7 @@
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "window.titleSeparator": "/",
-    "workbench.preferredDarkColorTheme": "One Dark Pro Flat",
+    "workbench.preferredDarkColorTheme": "Artisan Theme",
     "workbench.preferredLightColorTheme": "Artisan Theme",
     "workbench.colorCustomizations": {
         "textMateRules": [

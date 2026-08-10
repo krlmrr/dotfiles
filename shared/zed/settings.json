@@ -31,7 +31,7 @@
     "agent_servers": {
         "claude-acp": {
             "default_config_options": {
-                "fast": false,
+                "fast": true,
                 "mode": "auto",
                 "effort": "high",
                 "model": "opus[1m]"
@@ -95,7 +95,9 @@
     "notification_panel": {
         "dock": "left",
     },
-    "buffer_line_height": "comfortable",
+    "buffer_line_height": {
+        "custom": 3.0
+    },
     "git": {
         "inline_blame": {
             "enabled": false,

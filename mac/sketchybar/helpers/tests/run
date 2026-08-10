@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# Regression tests for mac/sketchybar/helpers/menubar-toggle.
+#
+#   ./run                 zones, corners, hysteresis, desync recovery
+#   ./run --with-click    also posts a real click just below the bar, which lands
+#                         on whatever window is there (usually harmless)
+#   ./run --no-exit-test  skip the test that stops the launchd agent
+#
+# Tests run against the *installed* helper, so rebuild and restart it first:
+#   swiftc -O ../menubar-toggle.swift -o ../menubar-toggle
+#   launchctl kickstart -k "gui/$(id -u)/com.dotfiles.menubar-toggle"
+
+set -uo pipefail
+
+TESTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUILD_DIR="$(mktemp -d)"
+AGENT_LABEL="com.dotfiles.menubar-toggle"
+AGENT="gui/$(id -u)/$AGENT_LABEL"
+PLIST="$HOME/Library/LaunchAgents/$AGENT_LABEL.plist"
+HELPER="$HOME/.config/sketchybar/helpers/menubar-toggle"
+
+with_click=""
+run_exit_test=1
+for arg in "$@"; do
+    case "$arg" in
+        --with-click) with_click="--with-click" ;;
+        --no-exit-test) run_exit_test=0 ;;
+        *) echo "unknown option: $arg" >&2; exit 2 ;;
+    esac
+done
+
+manual_pid=""
+
+# Must run on every exit path: an early return that skipped the kill below once
+# orphaned a second toggle to launchd, leaving two of them fighting over the bar.
+cleanup() {
+    [ -n "$manual_pid" ] && kill -TERM "$manual_pid" 2>/dev/null
+    [ -x "$BUILD_DIR/cursor" ] && "$BUILD_DIR/cursor" centre
+    launchctl bootstrap "gui/$(id -u)" "$PLIST" 2>/dev/null
+    sketchybar --bar hidden=off 2>/dev/null
+    yabai -m config menubar_opacity 0.0 2>/dev/null
+    rm -rf "$BUILD_DIR"
+}
+trap cleanup EXIT
+
+instance_count() { pgrep -x menubar-toggle | wc -l | tr -d ' '; }
+
+cat > "$BUILD_DIR/cursor.swift" <<'SWIFT'
+import AppKit
+let bounds = CGDisplayBounds(CGMainDisplayID())
+let toBar = CommandLine.arguments.contains("bar")
+CGWarpMouseCursorPosition(CGPoint(x: bounds.midX, y: toBar ? 2 : bounds.midY))
+CGAssociateMouseAndMouseCursorPosition(1)
+SWIFT
+swiftc -O "$BUILD_DIR/cursor.swift" -o "$BUILD_DIR/cursor" 2>/dev/null
+
+bar_hidden() { sketchybar --query bar 2>/dev/null | jq -r .hidden; }
+
+echo "building tests..."
+swiftc -O "$TESTS_DIR/menubar-toggle-tests.swift" -o "$BUILD_DIR/tests" || exit 1
+echo
+
+echo "== cursor and state machine =="
+"$BUILD_DIR/tests" $with_click
+suite_status=$?
+echo
+
+exit_status=0
+if [ "$run_exit_test" -eq 1 ]; then
+    echo "== restores the bar on exit =="
+    # The launchd agent has KeepAlive, so it must be stopped or it would restart
+    # and restore the bar itself, masking whether the exiting process did it.
+    launchctl bootout "$AGENT" 2>/dev/null
+    # bootout can return before the process is gone, and a surviving agent would
+    # re-hide the bar after our instance restores it, reading as a failure.
+    for _ in $(seq 1 10); do
+        [ -z "$(pgrep -x menubar-toggle)" ] && break
+        sleep 1
+    done
+    if [ -n "$(pgrep -x menubar-toggle)" ]; then
+        echo "  [SKIP] restores on exit                       agent would not stop"
+        echo
+        echo "tests did not pass cleanly"
+        exit 1
+    fi
+
+    "$HELPER" &
+    manual_pid=$!
+    sleep 2
+
+    if [ "$(instance_count)" != "1" ]; then
+        echo "  [SKIP] restores on exit                       more than one instance running"
+        echo
+        echo "tests did not pass cleanly"
+        exit 1
+    fi
+
+    "$BUILD_DIR/cursor" bar
+    sleep 1
+
+    if [ "$(bar_hidden)" != "on" ]; then
+        echo "  [SKIP] restores on exit                       bar would not hide (mouse in use?)"
+        exit_status=1
+    else
+        kill -TERM "$manual_pid" 2>/dev/null
+        sleep 2
+        if [ -n "$(ps -p "$manual_pid" -o pid= 2>/dev/null)" ]; then
+            echo "  [FAIL] restores on exit                       process ignored SIGTERM"
+            kill -9 "$manual_pid" 2>/dev/null
+            exit_status=1
+        elif [ "$(bar_hidden)" = "off" ]; then
+            echo "  [PASS] restores on exit                       bar restored before exiting"
+            manual_pid=""
+        else
+            echo "  [FAIL] restores on exit                       bar left hidden"
+            exit_status=1
+        fi
+    fi
+    echo
+fi
+
+if [ "$suite_status" -eq 0 ] && [ "$exit_status" -eq 0 ]; then
+    echo "all tests passed"
+    exit 0
+fi
+echo "tests did not pass cleanly"
+exit 1

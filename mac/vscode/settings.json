@@ -421,5 +421,8 @@
     "workbench.browser.enableChatTools": true,
     "workbench.experimental.modernUI": true,
     "workbench.editor.limit.value": 3,
-    "terminal.integrated.minimumContrastRatio": 1,
+    // 1 disables VS Code's contrast correction entirely, which left things like
+    // Pest's PASS badge (dark default fg on ANSI green) at 3.3:1. 4.5 is the
+    // default and only adjusts colours that actually fail.
+    "terminal.integrated.minimumContrastRatio": 4.5,
 }

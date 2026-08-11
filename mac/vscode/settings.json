@@ -174,7 +174,7 @@
             "terminal.ansiBrightWhite": "#ffffff"
         }
     },
-    "workbench.iconTheme": "catppuccin-frappe",
+    "workbench.iconTheme": "catppuccin-latte",
     "window.systemColorTheme": "auto",
     "window.autoDetectColorScheme": true,
     "editor.autoClosingBrackets": "always",
@@ -240,6 +240,9 @@
     "files.saveConflictResolution": "overwriteFileOnDisk",
     "php.format.rules.catchOnNewLine": true,
     "php.format.rules.elseOnNewLine": true,
+    "php.highlight-todo.enable": false,
+    "iconThemeSync.light": "catppuccin-latte",
+    "iconThemeSync.dark": "catppuccin-frappe",
     "extensions.ignoreRecommendations": true,
     "editor.fontLigatures": "'calt', 'ss01'",
     "editor.tokenColorCustomizations": {
@@ -354,7 +357,6 @@
     "workbench.layoutControl.enabled": false,
     "workbench.navigationControl.enabled": false,
     "editor.autoClosingComments": "always",
-    "php.highlight-todo.enable": false,
     "chat.tools.terminal.autoApprove": {
         "mkdir": true,
         "./vendor/bin/pest": true,

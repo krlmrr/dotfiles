@@ -166,7 +166,7 @@
         "button": false,
     },
     "icon_theme": {
-        "mode": "system",
+        "mode": "light",
         "light": "Catppuccin Frappé",
         "dark": "Catppuccin Frappé",
     },
@@ -175,7 +175,7 @@
     "buffer_font_family": "MonoLisa",
     "buffer_font_size": 18.0,
     "theme": {
-        "mode": "system",
+        "mode": "light",
         "light": "Artisan Theme",
         "dark": "One Dark Flat",
     },

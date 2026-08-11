@@ -810,7 +810,9 @@
       "Bash(codesign -dv ./menubar-toggle)",
       "Bash(/private/tmp/claude-501/-Users-karlm-Code-dotfiles/f9e67ffd-eba0-4670-94f9-c7791ea5e547/scratchpad/desync)",
       "Bash(brew untap * b)",
-      "Bash(/private/tmp/claude-501/-Users-karlm-Code-dotfiles/f9e67ffd-eba0-4670-94f9-c7791ea5e547/scratchpad/verify)"
+      "Bash(/private/tmp/claude-501/-Users-karlm-Code-dotfiles/f9e67ffd-eba0-4670-94f9-c7791ea5e547/scratchpad/verify)",
+      "Bash(./run --with-click)",
+      "Bash(echo \"runner exit=$?\")"
     ]
   }
 }

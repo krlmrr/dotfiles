@@ -216,6 +216,18 @@
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
+    // Setting this replaces VS Code's built-in list, so the defaults are
+    // repeated here alongside zed.dev (needed for Zed theme schemas).
+    "json.schemaDownload.trustedDomains": {
+        "https://zed.dev/": true,
+        "https://schemastore.azurewebsites.net/": true,
+        "https://raw.githubusercontent.com/microsoft/vscode/": true,
+        "https://raw.githubusercontent.com/devcontainers/spec/": true,
+        "https://www.schemastore.org/": true,
+        "https://json.schemastore.org/": true,
+        "https://json-schema.org/": true,
+        "https://developer.microsoft.com/json-schemas/": true
+    },
     "git.blame.statusBarItem.enabled": false,
     "merge-conflict.codeLens.enabled": false,
     "editor.inlayHints.padding": true,

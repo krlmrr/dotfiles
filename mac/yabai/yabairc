@@ -201,19 +201,32 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
   w_s=$(win_space "$1")
   [ "$w_s" = "$(win_space "$2")" ] || { log warp "warp $1 onto $2 skipped — different spaces"; return 1; }
 
-  # Warp only when the two windows might not already be siblings. On a desk with
-  # just these two tiled windows they necessarily are, and the warp does nothing
-  # except make them visibly jump before the repair below puts them back — which
-  # is most of the bouncing seen when placing a window. Repair alone suffices.
+  # Decide whether the warp is needed from GEOMETRY, not just window count.
+  #   • >2 tiled windows      -> they may not be siblings, warp.
+  #   • identical frames      -> the window has just arrived on this desk and is
+  #                              not in the tree yet, sitting exactly on top of
+  #                              the target. Skipping here made arrange a no-op
+  #                              (sx==tx reads as "order fine"), macOS then tiled
+  #                              it in whatever order it liked, and a second pass
+  #                              swapped it — the extra visible flip. Warp forces
+  #                              siblinghood now instead.
+  #   • otherwise             -> already siblings and properly laid out; the warp
+  #                              would only make them jump before the repair puts
+  #                              them back, so skip it and repair in place.
+  geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
+  sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
+  tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
   w_n=$(yabai -m query --windows --space "$w_s" 2>/dev/null \
     | jq '[.[]|select(.subrole=="AXStandardWindow" and ."is-floating"==false)]|length')
-  if [ "${w_n:-0}" -gt 2 ]; then
+  w_overlap=0; [ "$sx" = "$tx" ] && [ "$sy" = "$ty" ] && w_overlap=1
+  if [ "${w_n:-0}" -gt 2 ] || [ "$w_overlap" = 1 ]; then
+    [ "$w_overlap" = 1 ] && log warp "  $1 overlaps $2 (x=$sx y=$sy) — not tiled yet, warping"
     yabai -m window "$1" --warp "$2" 2>/dev/null || { log warp "warp $1 onto $2 failed"; return 1; }
     # Let the tree settle before measuring: yabai applies the relayout
     # asynchronously, and reading too early returns pre-move frames.
     sleep 0.15
+    geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
   fi
-  geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
   sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
   tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
   toggled=0

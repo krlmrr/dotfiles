@@ -335,6 +335,20 @@ drag-then-switch sequence: two rebuilds and a repair swap → zero.
 Note this covers only the window the *config* moves. The window the user drags
 arrives before anything can arm for it, and relies on the overlap rule above.
 
+### Known behaviour: the quadrant moment
+
+A swap is two moves, not one, so for a beat the desk really does hold three
+windows — the arrival plus both incumbents — and BSP splits a column into
+quadrants. When reconcile moves the displaced window out, two remain and
+`--balance` restores halves. Reported as noticeable but liveable (user,
+2026-08-12).
+
+The delay is mostly waiting for `space_changed`, since `--space` moves land
+without a usable signal of their own. If it ever needs shortening, the first
+candidate is the 0.35s settle in `place_desks` — insert arming now prevents most
+post-hoc repairs, so it may be redundant. It fixed a real bug though, so remove it
+only against a measurement.
+
 ### SIP constraint worth knowing
 
 SIP is enabled and the scripting addition does not load, so `--toggle split` and

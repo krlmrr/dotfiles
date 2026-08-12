@@ -236,7 +236,7 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
     north) [ "$sy" -gt "$ty" ] && swap=1 ;;
     south) [ "$sy" -lt "$ty" ] && swap=1 ;;
   esac
-  [ "$swap" = 1 ] && { log warp "  $1->$2 $3: order wrong — swap"; yabai -m window "$1" --swap "$2" 2>/dev/null; }
+  [ "$swap" = 1 ] && { log warp "  $1->$2 $3: order wrong (sx=$sx sy=$sy tx=$tx ty=$ty) — swap"; yabai -m window "$1" --swap "$2" 2>/dev/null; }
   return 0
 }
 
@@ -394,6 +394,7 @@ place_desk() {
   else
     p_rebuilt=1
     log place "place($p_trigger): desk $p_s rebuild — browser TL / Ghostty BL / editor R (ed=$p_ed br=$p_br gho=$p_gh)"
+    log place "  measured: $(yabai -m query --windows --space "$p_s" 2>/dev/null | jq -r '[.[]|select(.subrole=="AXStandardWindow")]|sort_by(.id)|map("\(.id)/\(.app|.[0:4])@x\(.frame.x|floor)y\(.frame.y|floor)")|join(" ")')"
     arrange "$p_ed" "$p_br" "$p_gh"
   fi
 

@@ -145,7 +145,21 @@ loop.**
 This covers the reported bug directly: drag Chrome onto desk 4 where Zen holds the
 browser slot, and Zen moves to desk 3 rather than being left homeless.
 
-### Trigger — needs verification before implementation
+### Trigger — RESOLVED 2026-08-11
+
+**`window_moved` is not usable.** Verified live: it does not fire for a
+`yabai -m window --space` move at all, and when it does fire during a drag the
+window is still on its old space, so a desk-change test sees nothing. Every swap
+observed in testing was resolved by **`space_changed`**, exactly as the fallback
+below assumed. A Mission Control drag lands you on the destination desk, so the
+swap resolves as you arrive and reads as instant.
+
+The `window_moved` signal is still registered, gated by `on_moved` (one query,
+bails unless the desk actually changed), in case yabai's behaviour changes. The
+known gap: moving a window *onto the desk you are already on* fires nothing, so
+it waits for the next signal.
+
+### Original trigger analysis (superseded by the above)
 
 `space_changed`, `window_created` and `window_destroyed` fire reliably (the current
 config depends on them). **It is not established that yabai fires a usable signal
@@ -161,13 +175,25 @@ across spaces and watch `/tmp/yabai.log` for `window_moved` (and whether
 lower latency. If not, the reconciliation fallback stands and the known cost is that
 a drag performed *without* changing desks does not resolve until the next signal.
 
-### No origin desk
+### No origin desk — and the drag/open distinction
 
-If the arriving window has no recorded origin — freshly opened, or dragged from an
-unmanaged space — there is no desk to send the incumbent to. **Decision (user,
-2026-08-11): the newcomer takes the slot and the incumbent tiles underneath it.**
-The user's newest action wins; nothing is moved off a desk the user did not move it
-from.
+The original §7 scenarios 3 and 4 contradicted each other: 3 required a newly
+opened second editor NOT to take a held slot, 4 required an arriving editor with
+no origin TO take it. Both cannot hold. **Resolved during implementation by
+splitting on whether the window has an origin at all:**
+
+| Window | Meaning | Slot |
+| --- | --- | --- |
+| Seen on another desk before | **Drag** — deliberate | Newcomer takes it |
+| Never seen | **Fresh open** — incidental | Incumbent keeps it |
+
+A drag from a *managed* desk swaps (§4). A drag from an *unmanaged* space has
+nowhere to send the incumbent, so — **decision (user, 2026-08-11)** — the newcomer
+takes the slot and the incumbent tiles underneath. The user's newest deliberate
+action wins; nothing is moved off a desk the user did not move it from.
+
+This is why `SEEN_FILE` exists as a separate record: the slot file cannot supply an
+origin for a window that never held a slot.
 
 This requires relaxing `adopt()`'s guard. Today it skips **all** editors:
 
@@ -228,9 +254,11 @@ resulting layout.
 2. **Swap** — drag VS Code from desk 4 onto desk 3 where Zed holds the slot. Zed
    moves to desk 4; VS Code takes desk 3's slot.
 3. **No hijack** — open a second VS Code window on a desk with a held editor slot.
-   The incumbent keeps the slot; the newcomer tiles beneath it.
-4. **No origin** — open a fresh editor on an occupied desk. Newcomer takes the
-   slot, incumbent tiles beneath.
+   The incumbent keeps the slot; the newcomer tiles beneath it. *(never seen =
+   fresh open)*
+4. **No origin** — drag an editor in from an unmanaged space onto an occupied
+   desk. Newcomer takes the slot, incumbent tiles beneath. *(seen elsewhere =
+   drag)*
 5. **Two desks, one editor each** — one editor per desk with a browser each.
    Neither is moved. Close one; the survivor stays on its own desk. *(rule 5 fails
    today via single-editor adoption)*
@@ -239,6 +267,55 @@ resulting layout.
    `trio correct … skip rebuild` and no window movement.
 8. **Undocked** — unplug the external display; desks 3 and 4 are arranged from
    their contents, nothing is force-consolidated.
+
+## 8. As built — rules the design did not anticipate
+
+Every item here was found by running it live on 2026-08-11, undocked. Each one
+produced visible window bouncing before it was fixed.
+
+**Origins must be consumed the instant they are acted on.** The design wrote the
+seen-record once, at the end of `place_desks`. But a swap moves a window, which
+fires its own signals, which starts a *second* `place_desks` before the first
+reaches `seen_write` — and that second run reads the stale origin and swaps the
+window straight back, forever. `seen_set` now rewrites both windows' records
+inside the swap itself.
+
+**Placement is serialized** under `/tmp/yabai_place.lock` (with a one-minute stale
+guard). Signals arrive in bursts and two concurrent runs interleave their
+read-modify-write of the slot and seen files. Skipping is safe — the run holding
+the lock reaches the same final state.
+
+**One slot change per desk/role per reconcile pass**, and each candidate is
+re-verified as still being on the desk before it is acted on. The candidate list
+is captured before any swap; combined with the origin rewrite above, the loop
+would otherwise read the outgoing incumbent as a fresh arrival and swap it back
+within a single pass. Measured before the fix: **five swaps on one cross-desk
+move.** After: one.
+
+**`warp_to` never warps across spaces.** `--warp` relocates the window to the
+target's space, so a stale or off-desk target silently drags a window to another
+desk — the exact thing this design forbids. It now bails. Hit for real in testing,
+where a stale id pulled Chrome off its desk.
+
+**`warp_to` skips the warp on a two-window desk.** The warp exists only to make
+two windows siblings, which on a two-window desk they already are; issuing it
+anyway just makes them visibly jump before the repair puts them back. Browser +
+editor is the normal desk, so this is the common case. Worst case drops from three
+visible repositions to one. The settle delay now runs only after an operation
+actually moved something.
+
+**`adopt` bails when the window is already parked under the editor.** Without it,
+the desk sweep re-warped a correctly placed window on every single signal — the
+old app-based editor guard had been masking this.
+
+### SIP constraint worth knowing
+
+SIP is enabled and the scripting addition does not load, so `--toggle split` and
+`--swap` **silently do nothing on a desk that is not currently visible**. `--warp`
+is tree-only and works regardless. Consequence: shape repairs only take effect on
+the desk you are looking at, which is why all repositioning is witnessed. It also
+means desk state can only be verified while that desk is focused — relevant to
+anyone testing this later.
 
 ## Out of scope
 

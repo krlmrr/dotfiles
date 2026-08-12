@@ -147,17 +147,17 @@ browser slot, and Zen moves to desk 3 rather than being left homeless.
 
 ### Trigger — RESOLVED 2026-08-11
 
-**`window_moved` is not usable.** Verified live: it does not fire for a
-`yabai -m window --space` move at all, and when it does fire during a drag the
-window is still on its old space, so a desk-change test sees nothing. Every swap
-observed in testing was resolved by **`space_changed`**, exactly as the fallback
-below assumed. A Mission Control drag lands you on the destination desk, so the
-swap resolves as you arrive and reads as instant.
+**`window_moved` fires, but `space_changed` is what does the work.** Corrected
+after an initial wrong reading: `window_moved` *does* fire for a cross-desk move
+and `on_moved` logs it (`[moved] window 13601 moved desk 3 -> 4`). It is simply
+rarely the one that acts — `space_changed` from landing on the destination desk
+usually gets there first and takes the lock, so the `moved` run logs
+`busy — skip`. That is correct behaviour, not a failure: the run holding the lock
+reaches the same state.
 
-The `window_moved` signal is still registered, gated by `on_moved` (one query,
-bails unless the desk actually changed), in case yabai's behaviour changes. The
-known gap: moving a window *onto the desk you are already on* fires nothing, so
-it waits for the next signal.
+Both are registered. `on_moved` gates `window_moved` to one query, bailing unless
+the desk actually changed. Known gap: moving a window *onto the desk you are
+already on* changes no space, so it waits for whatever signal comes next.
 
 ### Original trigger analysis (superseded by the above)
 
@@ -308,14 +308,32 @@ actually moved something.
 the desk sweep re-warped a correctly placed window on every single signal — the
 old app-based editor guard had been masking this.
 
+**A swapped desk must settle before it is measured.** `place_desk` measured the
+destination immediately after the swap moved a window there, read pre-move frames,
+declared an already-correct desk wrong, and "repaired" it into being wrong —
+visible as a window flipping sides and back within half a second. `place_desks`
+now waits 0.35s when reconcile actually moved something.
+
 ### SIP constraint worth knowing
 
 SIP is enabled and the scripting addition does not load, so `--toggle split` and
 `--swap` **silently do nothing on a desk that is not currently visible**. `--warp`
-is tree-only and works regardless. Consequence: shape repairs only take effect on
-the desk you are looking at, which is why all repositioning is witnessed. It also
-means desk state can only be verified while that desk is focused — relevant to
-anyone testing this later.
+is tree-only and works regardless.
+
+This is the main remaining source of perceived churn, and it is inherent rather
+than a defect: when a swap pushes a window onto the desk you are *not* looking at,
+the repair there quietly fails. The work is deferred until `space_changed` fires
+as you switch to that desk — so repairs are not extra, they are saved up and
+always paid while you watch. A simulated drag where focus lands on the destination
+desk completes with one swap and zero rebuilds.
+
+It also means desk state can only be verified while that desk is focused —
+relevant to anyone testing this later. `yabai -m window --focus <id>` pulls focus
+to a window's desk and works without the scripting addition, which is how these
+sessions were driven.
+
+Note that `yabai -m window --space` fires no `space_changed`, so a synthetic move
+alone does not reproduce a drag. Pair it with a `--focus` on the destination.
 
 ## Out of scope
 

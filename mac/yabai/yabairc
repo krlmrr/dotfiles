@@ -371,6 +371,20 @@ reconcile() {
           slot_set "$r_s" "$r_role" "$r_c"; seen_set "$r_c" "$r_s"; r_inc="$r_c"
         elif is_managed "$r_org"; then
           log slot "reconcile: SWAP $r_role — $r_c ${r_org}->${r_s}, incumbent $r_inc ${r_s}->${r_org}"
+          # Arm the destination's insertion point BEFORE the move so the window
+          # lands on the correct side straight away. Repairing afterwards cannot
+          # work here: the destination desk is not visible (you are still on the
+          # desk you dragged from), --swap is a no-op there under SIP, and the
+          # correction is deferred until you switch — so you always arrive to a
+          # wrong layout that then flips in front of you.
+          # Browser goes west of the editor; an editor goes east of the browser.
+          if [ "$r_role" = browser ]; then r_anch=$(slot_get "$r_org" editor); r_dir=west
+          else                             r_anch=$(slot_get "$r_org" browser); r_dir=east
+          fi
+          if [ -n "$r_anch" ]; then
+            log slot "  arming insert: $r_anch <- $r_dir for incoming $r_inc"
+            yabai -m window "$r_anch" --insert "$r_dir" 2>/dev/null
+          fi
           yabai -m window "$r_inc" --space "$r_org" 2>/dev/null
           RECONCILE_MOVED=1
           slot_set "$r_org" "$r_role" "$r_inc"

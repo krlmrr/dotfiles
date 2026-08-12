@@ -11,10 +11,15 @@
 #   initiative. The single exception is the desk SWAP (see reconcile), which
 #   only ever fires as the echo of a drag the user just performed.
 
-WARP_SETTLE=0.15   # settle after a warp/split-toggle before re-measuring.
-                   # Swept 0/0.05/0.10/0.15 on 2026-08-12: 0 failed 1 of 8 cycles,
-                   # so it is NOT free. Note the harness used scripted moves, not
-                   # Mission Control drags — retest properly before lowering it.
+# No settle after a warp/split-toggle. warp_to detects the "arrived but not yet
+# tiled" state directly (identical frames) rather than waiting a fixed time for
+# it, which is what these delays were really standing in for. Swept
+# 0/0.05/0.10/0.15 on 2026-08-12; 0 passed 8 of 8 uninterrupted cycles. An
+# earlier failure at 0 was the user switching desks mid-run, not the setting.
+# Caveat: the harness drove moves with `yabai -m window --space` plus a scripted
+# focus, which is NOT a Mission Control drag. Restore a delay here if real drags
+# ever land a desk in the wrong order.
+WARP_SETTLE=0
 LOG=/tmp/yabai.log
 SELF="$HOME/Code/dotfiles/mac/yabai/yabairc"
 LAPTOP_W=2056          # MBP 16" reports 2056x1329 in yabai points; used to

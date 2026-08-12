@@ -2,6 +2,13 @@
     // =====================================================
     // ACTIVE KEYBINDINGS
     // =====================================================
+    // Open Claude Code and focus its input (not in the terminal, where
+    // ctrl+a is beginning-of-line)
+    {
+        "key": "ctrl+a",
+        "command": "claude-vscode.focus",
+        "when": "!terminalFocus"
+    },
     // Add semicolon at end of line (;; in normal mode)
     {
         "key": "; ;",
@@ -5956,5 +5963,55 @@
     {
         "key": "cmd+k a",
         "command": "git.blame.toggleEditorDecoration"
+    },
+    {
+        "key": "ctrl+alt+f",
+        "command": "-claude-vscode.toggleFocusView",
+        "when": "claude-vscode.sideBarActive || activeWebviewPanelId == 'claudeVSCodePanel'"
+    },
+    {
+        "key": "ctrl+a",
+        "command": "-vscode-neovim.send",
+        "when": "editorTextFocus && neovim.ctrlKeysNormal.a && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+a",
+        "command": "-vscode-neovim.send",
+        "when": "editorTextFocus && neovim.ctrlKeysInsert.a && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "alt+k",
+        "command": "-claude-vscode.insertAtMention",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "cmd+escape",
+        "command": "-claude-vscode.terminal.open.keyboard",
+        "when": "config.claudeCode.useTerminal"
+    },
+    {
+        "key": "shift+cmd+t",
+        "command": "-claude-vscode.reopenClosedSession",
+        "when": "claude-vscode.lastClosedWasSession && config.claudeCode.enableReopenClosedSessionShortcut"
+    },
+    {
+        "key": "shift+cmd+escape",
+        "command": "-claude-vscode.editor.open",
+        "when": "!config.claudeCode.useTerminal"
+    },
+    {
+        "key": "alt+cmd+k",
+        "command": "-claude-code.insertAtMentioned",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "cmd+escape",
+        "command": "-claude-vscode.focus",
+        "when": "editorTextFocus && !config.claudeCode.useTerminal"
+    },
+    {
+        "key": "cmd+escape",
+        "command": "-claude-vscode.blur",
+        "when": "!config.claudeCode.useTerminal && !editorTextFocus"
     }
 ]

@@ -352,14 +352,17 @@ arrives before anything can arm for it, and relies on the overlap rule above.
 A swap is two moves, not one, so for a beat the desk really does hold three
 windows — the arrival plus both incumbents — and BSP splits a column into
 quadrants. When reconcile moves the displaced window out, two remain and
-`--balance` restores halves. Reported as noticeable but liveable (user,
-2026-08-12).
+`--balance` restores halves. Lasts roughly half a second; reported as
+noticeable but liveable (user, 2026-08-12).
 
-The delay is mostly waiting for `space_changed`, since `--space` moves land
-without a usable signal of their own. If it ever needs shortening, the first
-candidate is the 0.35s settle in `place_desks` — insert arming now prevents most
-post-hoc repairs, so it may be redundant. It fixed a real bug though, so remove it
-only against a measurement.
+It is **not** signal latency. Measured on a real Mission Control drag, the swap
+fired 0.05s after landing on the destination desk (`00:44:36.95` switch →
+`00:44:37` swap). Both settle delays have since been removed and made no
+difference to it. The window is inherent: a swap is two moves, so the desk really
+does hold three windows until the incumbent leaves, and yabai has no atomic
+cross-space exchange.
+
+The only remaining lever is the scripting addition — see the SIP note below.
 
 ### SIP constraint worth knowing
 

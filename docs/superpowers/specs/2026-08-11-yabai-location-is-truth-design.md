@@ -308,11 +308,23 @@ actually moved something.
 the desk sweep re-warped a correctly placed window on every single signal — the
 old app-based editor guard had been masking this.
 
-**A swapped desk must settle before it is measured.** `place_desk` measured the
-destination immediately after the swap moved a window there, read pre-move frames,
-declared an already-correct desk wrong, and "repaired" it into being wrong —
-visible as a window flipping sides and back within half a second. `place_desks`
-now waits 0.35s when reconcile actually moved something.
+**A swapped desk must not be measured before it has re-tiled** — but a timer is
+the wrong instrument. `place_desk` measured the destination immediately after the
+swap, read pre-move frames, declared an already-correct desk wrong, and "repaired"
+it into being wrong. A 0.35s settle delay was added first; it was a blunt proxy
+for "the window is not in the tree yet", which `warp_to` now detects directly via
+identical frames.
+
+**Removed 2026-08-12 after measurement.** Swept 0 / 0.05 / 0.10 / 0.20 / 0.35s,
+three drag-then-switch cycles each: byte-identical results at every value. The
+overlap check had superseded it. Confirmed by the user as noticeably faster with
+no delay.
+
+**`--insert` arming is not reliable.** It worked at 00:25:26 and did not at
+00:33:13 or 00:34:00 under an identical sequence — matching the existing warning in
+`warp_to` that arming is "a parity coin flip". It is kept because when it lands it
+removes the correction entirely, and the overlap warp catches the cases where it
+does not. Do not build anything on the assumption that it took.
 
 **A just-arrived window is not in the tree yet — it overlaps its target.** The
 "skip the warp on a two-window desk" optimisation assumed the pair were already

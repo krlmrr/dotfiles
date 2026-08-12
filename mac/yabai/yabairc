@@ -460,11 +460,10 @@ place_desks() {
 
   RECONCILE_MOVED=0
   reconcile
-  # A swap moves a window to another desk; that desk does not re-tile instantly.
-  # Measuring it straight away reads pre-move frames, so shape_correct calls a
-  # correct desk wrong and the "repair" swaps it INTO being wrong — visible as a
-  # window flipping sides and back. Let the destination settle first.
-  [ "$RECONCILE_MOVED" = 1 ] && sleep 0.35
+  # No settle delay here: warp_to now detects the "arrived but not yet tiled"
+  # state directly (identical frames) instead of waiting a fixed time for it.
+  # Swept 0 / 0.05 / 0.10 / 0.20 / 0.35s over three drag-then-switch cycles each
+  # on 2026-08-12 — byte-identical results, so the delay had nothing left to do.
   for d_s in $(desk_spaces); do place_desk "$d_s" "$trigger"; done
   seen_write   # after all moves have settled — this is next run's origin record
 

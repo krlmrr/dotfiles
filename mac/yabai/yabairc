@@ -195,22 +195,40 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
              # same-dir --insert toggles it off (verified live), so arming is a
              # parity coin flip. Warp, then verify geometry and repair with
              # --toggle split (wrong axis) and --swap (wrong order) instead.
-  yabai -m window "$1" --warp "$2" 2>/dev/null || { log warp "warp $1 onto $2 failed"; return 1; }
-  # Let the tree settle before measuring: yabai applies the relayout
-  # asynchronously, and reading too early returns pre-move frames — which made
-  # the repair below act on stale geometry and take two full passes to converge.
-  sleep 0.15
+  # Never warp across desks. --warp moves the window to the target's space, so a
+  # stale/off-desk target would silently relocate a window the user placed —
+  # exactly the cross-desk drag this config exists to stop.
+  w_s=$(win_space "$1")
+  [ "$w_s" = "$(win_space "$2")" ] || { log warp "warp $1 onto $2 skipped — different spaces"; return 1; }
+
+  # Warp only when the two windows might not already be siblings. On a desk with
+  # just these two tiled windows they necessarily are, and the warp does nothing
+  # except make them visibly jump before the repair below puts them back — which
+  # is most of the bouncing seen when placing a window. Repair alone suffices.
+  w_n=$(yabai -m query --windows --space "$w_s" 2>/dev/null \
+    | jq '[.[]|select(.subrole=="AXStandardWindow" and ."is-floating"==false)]|length')
+  if [ "${w_n:-0}" -gt 2 ]; then
+    yabai -m window "$1" --warp "$2" 2>/dev/null || { log warp "warp $1 onto $2 failed"; return 1; }
+    # Let the tree settle before measuring: yabai applies the relayout
+    # asynchronously, and reading too early returns pre-move frames.
+    sleep 0.15
+  fi
   geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
   sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
   tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  toggled=0
   case "$3" in
-    west|east)   [ "$sy" -ne "$ty" ] && yabai -m window "$1" --toggle split 2>/dev/null ;;
-    north|south) [ "$sx" -ne "$tx" ] && yabai -m window "$1" --toggle split 2>/dev/null ;;
+    west|east)   [ "$sy" -ne "$ty" ] && { log warp "  $1->$2 $3: axis wrong (sy=$sy ty=$ty) — toggle split"; yabai -m window "$1" --toggle split 2>/dev/null; toggled=1; } ;;
+    north|south) [ "$sx" -ne "$tx" ] && { log warp "  $1->$2 $3: axis wrong (sx=$sx tx=$tx) — toggle split"; yabai -m window "$1" --toggle split 2>/dev/null; toggled=1; } ;;
   esac
-  sleep 0.15
-  geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
-  sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
-  tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  # Only re-measure when something actually moved — an unconditional settle
+  # delay taxed every correct layout with the cost of a broken one.
+  if [ "$toggled" = 1 ]; then
+    sleep 0.15
+    geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
+    sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
+    tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  fi
   swap=0
   case "$3" in
     west)  [ "$sx" -gt "$tx" ] && swap=1 ;;
@@ -218,7 +236,7 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
     north) [ "$sy" -gt "$ty" ] && swap=1 ;;
     south) [ "$sy" -lt "$ty" ] && swap=1 ;;
   esac
-  [ "$swap" = 1 ] && yabai -m window "$1" --swap "$2" 2>/dev/null
+  [ "$swap" = 1 ] && { log warp "  $1->$2 $3: order wrong — swap"; yabai -m window "$1" --swap "$2" 2>/dev/null; }
   return 0
 }
 

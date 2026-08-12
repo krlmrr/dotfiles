@@ -342,8 +342,14 @@ reconcile() {
         fi
       fi
 
+      # ONE slot change per desk/role per pass, and re-verify each candidate is
+      # still here. The list is captured before any swap, so without both guards
+      # the loop walks a stale list and — because a swap rewrites the outgoing
+      # incumbent's origin to the other desk — reads that incumbent as a fresh
+      # arrival and swaps it straight back, ping-ponging within one pass.
       for r_c in $(candidates "$r_s" "$r_role"); do
         [ "$r_c" = "$r_inc" ] && continue
+        [ "$(win_space "$r_c")" = "$r_s" ] || continue
         r_org=$(seen_get "$r_c")
         [ -n "$r_org" ] || continue          # never seen -> freshly opened, no hijack
         [ "$r_org" = "$r_s" ] && continue    # already lived here
@@ -362,6 +368,7 @@ reconcile() {
           log slot "reconcile: desk $r_s $r_role slot <- $r_c (dragged from unmanaged $r_org; $r_inc tiles beneath)"
           slot_set "$r_s" "$r_role" "$r_c"; seen_set "$r_c" "$r_s"; r_inc="$r_c"
         fi
+        break   # one slot change per desk/role per pass — see above
       done
 
       if [ -z "$r_inc" ]; then

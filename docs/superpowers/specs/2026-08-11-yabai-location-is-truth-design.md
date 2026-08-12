@@ -314,6 +314,27 @@ declared an already-correct desk wrong, and "repaired" it into being wrong —
 visible as a window flipping sides and back within half a second. `place_desks`
 now waits 0.35s when reconcile actually moved something.
 
+**A just-arrived window is not in the tree yet — it overlaps its target.** The
+"skip the warp on a two-window desk" optimisation assumed the pair were already
+siblings, which is false the moment a window lands. `arrange` then measured
+`sx == tx`, read it as "order is fine", and did nothing; macOS tiled the arrival
+in whatever order it liked and a second pass swapped it. The warp decision is now
+made from geometry — warp when the frames are identical or when >2 tiled windows
+could mean they are not siblings, otherwise repair in place.
+
+**The destination's insert point is armed before a swap moves a window there.**
+This is the fix that actually resolved the reported bouncing. The swapped-out
+window was landing wherever macOS chose on a desk that is *not visible*, where
+`--swap` is a no-op (see below), so the correction was deferred until the user
+switched to that desk — meaning they *always* arrived to a wrong layout that then
+flipped in front of them. Arming `--insert` on the destination anchor (browser
+west of that desk's editor, editor east of its browser) makes it land correctly to
+begin with, so there is no correction left to defer. Measured on the
+drag-then-switch sequence: two rebuilds and a repair swap → zero.
+
+Note this covers only the window the *config* moves. The window the user drags
+arrives before anything can arm for it, and relies on the overlap rule above.
+
 ### SIP constraint worth knowing
 
 SIP is enabled and the scripting addition does not load, so `--toggle split` and

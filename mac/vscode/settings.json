@@ -120,7 +120,7 @@
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
     "window.titleSeparator": "/",
-    "workbench.preferredDarkColorTheme": "Artisan Theme",
+    "workbench.preferredDarkColorTheme": "One Dark Pro Flat",
     "workbench.preferredLightColorTheme": "Artisan Theme",
     "workbench.colorCustomizations": {
         "textMateRules": [
@@ -174,7 +174,7 @@
             "terminal.ansiBrightWhite": "#ffffff"
         }
     },
-    "workbench.iconTheme": "catppuccin-latte",
+    "workbench.iconTheme": "catppuccin-frappe",
     "window.systemColorTheme": "auto",
     "window.autoDetectColorScheme": true,
     "editor.autoClosingBrackets": "always",
@@ -427,4 +427,5 @@
     // Pest's PASS badge (dark default fg on ANSI green) at 3.3:1. 4.5 is the
     // default and only adjusts colours that actually fail.
     "terminal.integrated.minimumContrastRatio": 4.5,
+    "claudeCode.focusView": false,
 }

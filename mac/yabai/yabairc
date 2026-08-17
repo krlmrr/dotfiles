@@ -27,6 +27,7 @@ LAPTOP_H=1329          # tell the laptop panel from an external display.
 SIG_FILE=/tmp/yabai_display_sig
 SLOT_FILE=/tmp/yabai_slots   # "<space>:<role>:<window_id>" — sticky incumbents
 SEEN_FILE=/tmp/yabai_seen    # "<window_id>:<space>" — last known desk, per candidate
+STUCK_FILE=/tmp/yabai_stuck  # "<src>:<dst>:<dir>:<sx>,<sy>,<tx>,<ty>" — repairs that achieved nothing
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] ${2:-}" >> "$LOG"; }
 
@@ -199,6 +200,37 @@ pair_geom() {  # echo "sx sy tx ty" (floored) for window ids $1 $2; empty on mis
     | "\($a.x|floor) \($a.y|floor) \($b.x|floor) \($b.y|floor)"' 2>/dev/null
 }
 
+# yabai reports pre-op frames for an off-screen desk, so geometry is only
+# trustworthy while the space is visible.
+space_visible() {
+  yabai -m query --spaces --space "$1" 2>/dev/null | jq -e '."is-visible"' >/dev/null 2>&1
+}
+
+# True when a window at $2/$3 sits correctly $1 (west/east/north/south) of $4/$5.
+dir_ok() {
+  case "$1" in
+    west)  [ "$3" -eq "$5" ] && [ "$2" -lt "$4" ] ;;
+    east)  [ "$3" -eq "$5" ] && [ "$2" -gt "$4" ] ;;
+    north) [ "$2" -eq "$4" ] && [ "$3" -lt "$5" ] ;;
+    south) [ "$2" -eq "$4" ] && [ "$3" -gt "$5" ] ;;
+    *)     false ;;
+  esac
+}
+
+stuck_clear() { [ -f "$STUCK_FILE" ] && sed -i '' "/^$1:$2:$3:/d" "$STUCK_FILE" 2>/dev/null; return 0; }
+
+# Echo the pair geometry once it differs from $3; fail if it never does. Polled,
+# not slept: "cannot observe the move yet" and "the move never happened" read
+# identically, and only waiting tells them apart.
+wait_moved() {
+  for _try in 1 2 3 4 5 6 7 8 9 10; do
+    moved=$(pair_geom "$1" "$2")
+    [ -n "$moved" ] && [ "$moved" != "$3" ] && { echo "$moved"; return 0; }
+    sleep 0.05
+  done
+  return 1
+}
+
 warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
              # No --insert priming: the armed point survives successful warps and
              # same-dir --insert toggles it off (verified live), so arming is a
@@ -225,6 +257,10 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
   geom=$(pair_geom "$1" "$2"); [ -n "$geom" ] || return 1
   sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
   tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  # A repair proven useless at this exact geometry is not retried — one pair the
+  # tree cannot satisfy otherwise restacks the desk on every single arrival.
+  w_key="$1:$2:$3:$sx,$sy,$tx,$ty"
+  grep -qxF "$w_key" "$STUCK_FILE" 2>/dev/null && return 1
   w_n=$(yabai -m query --windows --space "$w_s" 2>/dev/null \
     | jq '[.[]|select(.subrole=="AXStandardWindow" and ."is-floating"==false)]|length')
   w_overlap=0; [ "$sx" = "$tx" ] && [ "$sy" = "$ty" ] && w_overlap=1
@@ -238,6 +274,14 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
   fi
   sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
   tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  # Both repairs below decide from geometry, so off-screen they fire blind and land
+  # the pair wrong. This, not the settle delay, is why post-warp frames sometimes
+  # read pre-warp; no WARP_SETTLE value fixes it. The arrival run does the shape.
+  if ! space_visible "$w_s"; then
+    log warp "  $1->$2 $3: desk $w_s off screen — geometry repair deferred to arrival"
+    return 0
+  fi
+  w_pre="$sx $sy $tx $ty"
   toggled=0
   case "$3" in
     west|east)   [ "$sy" -ne "$ty" ] && { log warp "  $1->$2 $3: axis wrong (sy=$sy ty=$ty) — toggle split"; yabai -m window "$1" --toggle split 2>/dev/null; toggled=1; } ;;
@@ -259,6 +303,18 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
     south) [ "$sy" -lt "$ty" ] && swap=1 ;;
   esac
   [ "$swap" = 1 ] && { log warp "  $1->$2 $3: order wrong (sx=$sx sy=$sy tx=$tx ty=$ty) — swap"; yabai -m window "$1" --swap "$2" 2>/dev/null; }
+
+  # Park ONLY on "moved nothing at all" — "moved but still wrong" is progress the
+  # next pass can finish, and parking that would freeze a layout mid-move.
+  if [ "$toggled" = 0 ] && [ "$swap" = 0 ]; then stuck_clear "$1" "$2" "$3"; return 0; fi
+  if ! geom=$(wait_moved "$1" "$2" "$w_pre"); then
+    log warp "  $1->$2 $3: repair moved nothing — parked until geometry changes"
+    echo "$w_key" >> "$STUCK_FILE"
+    return 0
+  fi
+  sx=$(echo "$geom" | cut -d' ' -f1); sy=$(echo "$geom" | cut -d' ' -f2)
+  tx=$(echo "$geom" | cut -d' ' -f3); ty=$(echo "$geom" | cut -d' ' -f4)
+  dir_ok "$3" "$sx" "$sy" "$tx" "$ty" && stuck_clear "$1" "$2" "$3"
   return 0
 }
 
@@ -522,7 +578,7 @@ on_display_change() {
   [ "$sig" = "$prev" ] && { log dpy "  no change, skip"; return; }
   printf '%s' "$sig" > "$SIG_FILE"
   # Desk indices differ docked vs undocked, and slot records are keyed by space.
-  rm -f "$SLOT_FILE" "$SEEN_FILE" 2>/dev/null
+  rm -f "$SLOT_FILE" "$SEEN_FILE" "$STUCK_FILE" 2>/dev/null
   place_desks display-change
 }
 
@@ -542,6 +598,19 @@ esac
 
 # ============================================================ yabai load (no arg)
 log load "config loading"
+
+# Parked repairs describe the OLD tree; a fresh yabai rebuilds it, so every pair
+# gets one more honest attempt.
+rm -f "$STUCK_FILE" 2>/dev/null
+
+# Windows yabai cannot read AX for report role/subrole "" — they keep their old tile
+# geometry and are invisible to every predicate here, so the layout logic chases a
+# shape it cannot see. Total loss means nothing is managed at all; only a restart
+# clears it. Silent either way, hence the count.
+ax_dead=$(yabai -m query --windows 2>/dev/null | jq '[.[]|select(.role=="" and .subrole=="")]|length')
+if [ "${ax_dead:-0}" -gt 0 ]; then
+  log load "WARNING: $ax_dead window(s) unreadable (no AX role/subrole) — $(yabai -m query --windows 2>/dev/null | jq -r '[.[]|select(.role=="" and .subrole=="")|"\(.id)/\(.app)"]|join(" ")')"
+fi
 
 # Scripting addition: load only if SIP allows it; otherwise run tiling-only.
 if [ "$HAS_SA" = 1 ]; then

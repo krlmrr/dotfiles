@@ -478,7 +478,7 @@ reconcile() {
 # ----------------------------------------------------------------- place desks
 # Arrange ONE desk from whatever is already on it. Never pulls a window in.
 place_desk() {
-  p_s="$1"; p_trigger="$2"
+  p_s="$1"; p_trigger="$2"; p_new="$3"
   p_ed=$(slot_get "$p_s" editor); p_br=$(slot_get "$p_s" browser); p_gh=$(ghostty_on "$p_s")
   p_rebuilt=0
   if shape_correct "$p_s" "$p_ed" "$p_br" "$p_gh"; then
@@ -490,12 +490,10 @@ place_desk() {
     arrange "$p_ed" "$p_br" "$p_gh"
   fi
 
-  # Sweep non-slot windows under the editor (adopt carries all the guards,
-  # including the no-editor bail). The tail-of-pipe subshell isolates adopt's
-  # variable reassignments from this function — keep the loop in the pipeline.
-  yabai -m query --windows --space "$p_s" 2>/dev/null \
-    | jq -r '.[]|select(.subrole=="AXStandardWindow" and ."is-floating"==false)|.id' \
-    | while read -r sid; do adopt "$sid"; done
+  # Tuck the NEWLY CREATED window under the editor — only that one, only at
+  # creation. Sweeping every window here dragged deliberately-placed windows back
+  # under the editor on every arrival. Placement is the user's; creation is ours.
+  if [ -n "$p_new" ] && [ "$(win_space "$p_new")" = "$p_s" ]; then adopt "$p_new"; fi
 
   # Balance LAST and only after a rebuild: the sweep can move a window out of one
   # column into another, which skews the split ratios if the balance ran before
@@ -506,7 +504,7 @@ place_desk() {
 }
 
 place_desks() {
-  trigger="${1:-startup}"
+  trigger="${1:-startup}"; new_win="$2"   # $2 = the window just created, if any
   # Serialize. Signals arrive in bursts (a swap's own window_moved, plus
   # space_changed, plus window_created) and two concurrent runs interleave their
   # read-modify-write of the slot/seen files. Skipping is safe: the run holding
@@ -529,7 +527,7 @@ place_desks() {
   # state directly (identical frames) instead of waiting a fixed time for it.
   # Swept 0 / 0.05 / 0.10 / 0.20 / 0.35s over three drag-then-switch cycles each
   # on 2026-08-12 — byte-identical results, so the delay had nothing left to do.
-  for d_s in $(desk_spaces); do place_desk "$d_s" "$trigger"; done
+  for d_s in $(desk_spaces); do place_desk "$d_s" "$trigger" "$new_win"; done
   seen_write   # after all moves have settled — this is next run's origin record
 
   rmdir "$PLOCK" 2>/dev/null
@@ -547,7 +545,7 @@ place_one() {
   o_s=$(echo "$win" | jq -r '.space')
   is_managed "$o_s" || { log one "place-one: $id on unmanaged space $o_s — left alone"; return 0; }
   log one "place-one: $(echo "$win" | jq -r '.app') $id on desk $o_s"
-  place_desks window
+  place_desks window "$id"
 }
 
 # --------------------------------------------------------------- moved gate

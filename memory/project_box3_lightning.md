@@ -1,0 +1,240 @@
+---
+name: project_box3_lightning
+description: Box 3 took a lightning hit but boots fine — its serial "silence" was TX/RX reversed, not damage
+metadata:
+  type: project
+---
+
+"Box 3" among the router units took a lightning/surge hit ("not the good kind"),
+but as of 2026-08-18 it **boots stock Asus firmware and runs normally** — the
+main board survived. Do not treat it as dead.
+
+The lightning was a red herring for a whole debugging session. Box 3 read as
+totally silent on serial (UART pin idle high, zero bytes across a full power
+cycle) and that was misread as surge damage. **The wires were TX/RX reversed** —
+every reading was probing box 3's own RX pin, which idles high and never
+transmits, a perfect impostor for a dead board.
+
+Doctrine learned: reversed TX/RX is indistinguishable from a dead board from the
+host side. Confirm orientation BEFORE reasoning about the board's health, and
+don't let a dramatic backstory (lightning, power surge) raise the prior on
+hardware death — it crowds out the boring explanation.
+
+What the rig proved good along the way, all still valid: adapter TX+RX work
+(loopback echoes verbatim), a jumper's continuity can be tested with no meter by
+touching it to GND (4.5KB of noise = intact wire, ~2 bytes = broken), and 115200
+is the console baud for these MT7988 boxes.
+
+Stock Asus firmware uses serial as an **output-only kernel console** — a CR gets
+no prompt, there is no getty. For an interactive prompt, interrupt U-Boot during
+its `bootdelay=2` window (`~/bt6/uboot_break.py`) or enable SSH/telnet in the web
+UI.
+
+Still untested on box 3: Ethernet. Lightning typically enters via the WAN port,
+so the ports are the most plausible casualty even though the SoC is fine.
+
+Related: [[project_serial_macos_termios]].
+
+## LAN ports "dead" = repeater/media-bridge mode, not damage (2026-08-18)
+
+WAN tested fine while all LAN ports appeared dead. Not lightning damage and not
+the switch. The serial console showed box 3 running in an AP-client mode:
+
+- `wpa_cli -i apcli0 / apclix0 scan|disconnect` looping — `apcli*` interfaces
+  exist only in repeater / media-bridge mode, stuck hunting a vanished upstream AP.
+- `udhcpc_lan:: leasefail` — a DHCP *client* on LAN. A router serves DHCP there;
+  only a bridged box tries to get a lease.
+
+In those modes the port roles change and LAN stays unusable until the upstream
+association succeeds, which it never does. Fix: factory reset (hold reset ~10s)
+to return to router mode.
+
+Note the kernel log showed NO switch or PHY errors — an earlier theory about the
+`eth2` null MAC in U-Boot indicating an uninitialized switch was unsupported.
+
+## Correction (2026-08-18, later): the LAN jacks really are dead
+
+The repeater-mode explanation above does NOT account for the dead LAN ports.
+Karl reported from the start that WAN worked and no LAN did; that direct report
+was correct and I over-rode it with the apcli0/leasefail theory.
+
+Evidence: in U-Boot (no Asus firmware running, so mode config is irrelevant) the
+WAN jack negotiates a clean 1000baseT link, while LAN 1 gives
+`status: inactive / media: autoselect (none)` — no PHY link at all, and U-Boot's
+`ping` never puts a single ARP frame on the wire (confirmed by tcpdump on the Mac:
+42 packets captured, all the Mac's own ARPs for its gateway, zero from box 3).
+
+Caveat kept honest: U-Boot may hold the internal switch in reset, so "no link in
+U-Boot" alone isn't proof of damage. But combined with the same symptom under
+stock firmware, switch/PHY damage is now the leading explanation — and the
+lightning finally has something it plausibly did explain.
+
+Consequence: no Ethernet path to box 3 for TFTP. Transfers must go over serial
+(`loady 0x44000000` + YMODEM at 115200).
+
+Lesson: when the user reports hardware behaviour they have tested, treat it as
+evidence and don't substitute a tidier theory for it.
+
+## Root cause found: all four LAN PHYs fail analog calibration (2026-08-18)
+
+Booted the OpenWrt BT6 initramfs from RAM on box 3 (YMODEM over serial, see
+below) and the kernel log named the fault:
+
+    MediaTek MT7988 PHY mt7530-0:00: cal_cycle failed: -110
+    MediaTek MT7988 PHY mt7530-0:00: Calibration cycle timeout
+    MediaTek MT7988 PHY mt7530-0:00: cal 4 failed
+    MediaTek MT7988 PHY mt7530-0:00: probe ... failed with error -5
+
+Identical for :01, :02, :03. The mt7530 switch MAC block is HEALTHY — the driver
+reaches all four PHYs over MDIO and creates lan1..lan3 — but every PHY times out
+in its analog calibration cycle, so none ever links.
+
+Proven to be hardware, not the device tree, by comparison with yesterday's
+`~/bt6/logs/bt6-p3-test.log` from a different unit on the same driver and same DTS
+lineage (both show only lan1-3, so same DTS): there the PHYs bind cleanly
+(`PHY [mt7530-0:01] driver [MediaTek MT7988 PHY] (irq=111)`) and `lan1: Link is
+Up - 1Gbps/Full`. Same software calibrates fine elsewhere. **Flashing does not
+fix box 3's LAN ports.**
+
+All four failing identically at the same step implicates a SHARED analog resource
+— common supply rail, reference clock, or the external precision resistor setting
+PHY bias current — not four independently fried PHYs. Board-level repairable in
+principle; not a firmware problem. (`mtk-xsphy: failed to get ref_clk(id-1)`
+also appears earlier in the log.)
+
+Box 3 remains useful: the WAN port is a separate MT7988 2.5GbE PHY and links
+fine, and the radios work. An AP or wireless bridge needs one port — so box 3 can
+be that, just never a router or switch.
+
+## Serial transfer route that works (no Ethernet needed)
+
+`~/bt6/ysend.py <file> "loady 0x44000000"` — self-contained YMODEM-1K sender
+using `serial.open_port` (avoids the termios trap; do NOT hand a raw fd to `sz`).
+12MB moves in ~1096s at a flat 11300 B/s, which is the 115200 ceiling. Verify
+afterwards with `printenv filesize` (hex byte count) and `md.l 0x44000000 4`
+(expect `edfe0dd0` = FIT magic byte-swapped). Then `bootm 0x44000000` runs it from
+RAM, writing nothing.
+
+Reach the U-Boot prompt with `~/bt6/uboot_break.py` (spams `4`, menu option 4)
+during a power-cycle. Stock Asus firmware echoes serial input but runs no getty,
+so there is no prompt until U-Boot or OpenWrt.
+
+## Box 3 now runs OpenWrt from flash (2026-08-18)
+
+Flashed successfully via sysupgrade. State after:
+
+- rootfs `ubi0_5`, overlay `ubi0_6` (ubifs) — booting from flash, not RAM.
+- `linux` volume 6,475,776 (was 68,059,136 stock).
+- **nvram / Factory / Factory2 MD5s unchanged by the flash** and identical to the
+  `flash/unit-C/` backups: `4a87273d…`, `04f767c0…`, `04f767c0…`. sysupgrade does
+  not touch those volumes on this device.
+- Image used: `openwrt-…-bt6-squashfs-sysupgrade.bin`, sha256 `f1c151b0…`
+  (matches published sums). Stock upstream — does NOT include the lan3 DTS fix,
+  which is moot here since box 3's LAN PHYs never calibrate.
+- Benign noise in the log: `ubirmvol: cannot find UBI volume "rootfs"/"rootfs_data"`
+  (nothing to remove pre-flash), `Watchdog does not have CARDRESET support`,
+  `WARNING: CASN page check failed` (U-Boot NAND param page).
+
+### The delivery route that worked, with no Ethernet
+
+Box 3's radio joined the house Wi-Fi as a station and pulled the image over the
+air — far faster than serial:
+
+1. `iw phy phy0 interface add wlan0 type managed; ip link set wlan0 up`
+2. wpa_supplicant conf in /tmp, `wpa_supplicant -B -i wlan0 -c /tmp/wpa.conf -Dnl80211`
+3. `udhcpc -i wlan0`
+4. **Delete OpenWrt's default `br-lan` 192.168.1.1/24** — it collides with the
+   house 192.168.1.0/24 and wins the route, sending traffic out the dead LAN
+   ports. `ip addr del 192.168.1.1/24 dev br-lan; ip link set br-lan down`.
+   Without this the box cannot reach the LAN despite an active Wi-Fi lease.
+5. `python3 -m http.server` on the Mac, `wget` on the box, verify sha256, then
+   `sysupgrade -T` to validate and `sysupgrade -n` to write.
+
+Also corrected: `phy0` reports `Radios: 0 1 2` — all three bands present. An
+earlier worry that only one radio came up was wrong.
+
+Still to do: configure the radios (OpenWrt ships them disabled) to make box 3 an
+AP on the working WAN port.
+
+## Box 1 (unit-A) mesh support installed (2026-08-18)
+
+Box 1 was already flashed to the same OpenWrt snapshot as box 3
+(`r0-1a77cc5`, `wpad-basic-mbedtls-2026.08.07~831364bf-r2`) and reachable
+directly via SSH at 192.168.1.1 over the shared L2 segment on en7 (Mac at
+192.168.1.210) — no serial adapter needed for this box, since it only needed a
+package swap, not a flash.
+
+Repeated the box-3 recipe over SSH instead of the serial console:
+1. wlan0 station joins "Hey Siri!" (same SSID/psk as box 3), `udhcpc`, static
+   resolv.conf (1.1.1.1/8.8.8.8) since udhcpc -q doesn't write one.
+2. `apk update`, then `apk del wpad-basic-mbedtls` immediately followed by
+   `apk add wpad-mesh-mbedtls` **in the same SSH session** — no gap where the
+   box has no wpad binary (the box-3 attempt to pre-fetch and install from a
+   local .apk file failed with `UNTRUSTED signature`; installing straight from
+   the signed feed is the reliable path).
+3. Tore down wlan0/wpa_supplicant afterward.
+
+Box 2 (unit-B) still needs the same treatment — still stock Asus firmware as of
+last check (only `ubi-linux-STOCK.bin` backed up, no OPENWRT backup), so it
+needs the full flash procedure done for box 3 before this package swap applies.
+
+Same wpad swap procedure should work identically for box 2 once it's on
+OpenWrt: `apk del wpad-basic-mbedtls && apk add wpad-mesh-mbedtls` as one
+session, over whatever link (WAN/LAN/Wi-Fi) is fastest to reach it.
+
+## Box 2 mesh support installed (2026-08-18)
+
+Box 2 was ALSO already on the same OpenWrt snapshot (`r0-1a77cc5`,
+`wpad-basic-mbedtls`) despite `flash/unit-B/` only having a STOCK backup on
+disk — that backup predates whenever box 2 got flashed, so don't infer a box's
+current firmware state from the presence/absence of an OPENWRT backup file.
+Always check the live box (SSH or serial) before assuming.
+
+MAC bc:fc:e7:2f:84:54, reachable at 192.168.1.1 same as the others (each unit
+defaults to that address on br-lan when alone on a segment). Same recipe as
+box 1 applied verbatim (wlan0 join "Hey Siri!" -> apk del/add in one session ->
+teardown). Installed and verified identically.
+
+**All three boxes (1, 2, 3) now have wpad-mesh-mbedtls installed.** None have
+mesh (802.11s) actually configured yet — that's still a uci wireless config
+task, plus deciding the mesh ID/key and which radio carries the backhaul.
+
+## Mesh (802.11s) configured on box 1 (2026-08-18)
+
+Generated identity, saved to `~/bt6/mesh-credentials.env` (chmod 600, not
+committed anywhere): mesh ID `OpenWrt-Mesh-4a1e2b`, SAE key
+`DqaHLGRpdnNGIGDYSzuzQ7Jx`. Backhaul on radio2 (6GHz), channel 5, EHT80.
+
+**Prerequisite discovered:** radio2's `country` was `'00'` (world regdomain) by
+default, under which 6GHz is not permitted at all — `iw phy0 info` showed zero
+6GHz frequencies. Setting `uci set wireless.radio2.country='US'` (then `wifi up
+radio2`) is what makes the 5925-7125 MHz range and channels appear. Without this
+step, mesh_id/key config on a 6GHz radio silently has no channel to sit on.
+US 6GHz is LPI/indoor-only: 12 dBm max, NO-OUTDOOR tag in the reg rules.
+
+uci config applied (per box, radio device name may differ — verify with
+`uci show wireless.radioN.band` first):
+    uci set wireless.radioN.country='US'
+    uci set wireless.radioN.channel='5'
+    uci set wireless.radioN.htmode='EHT80'
+    uci set wireless.radioN.disabled='0'
+    uci set wireless.mesh_radioN=wifi-iface
+    uci set wireless.mesh_radioN.device='radioN'
+    uci set wireless.mesh_radioN.mode='mesh'
+    uci set wireless.mesh_radioN.mesh_id='OpenWrt-Mesh-4a1e2b'
+    uci set wireless.mesh_radioN.encryption='sae'
+    uci set wireless.mesh_radioN.key='DqaHLGRpdnNGIGDYSzuzQ7Jx'
+    uci set wireless.mesh_radioN.network='lan'
+    uci set wireless.mesh_radioN.mesh_fwding='1'
+    uci commit wireless && wifi reload
+
+Verified via `logread`: `phy0.2-mesh0` came up, `MESH-GROUP-STARTED
+ssid="OpenWrt-Mesh-4a1e2b"`, bridged into br-lan (forwarding state). Same
+config still needs applying to boxes 2 and 3, then confirm they peer with each
+other (mesh neighbours show up via `iw dev <mesh-iface> mesh_peer_status` /
+`iw dev <mesh-iface> station dump` once more than one node is up).
+
+**Security note found in passing, not yet addressed:** dropbear logged `Auth
+succeeded with blank password for 'root'` — no root password set (stock
+first-boot OpenWrt state). Set one on all three before leaving them on the
+network unattended.

@@ -238,3 +238,21 @@ other (mesh neighbours show up via `iw dev <mesh-iface> mesh_peer_status` /
 succeeded with blank password for 'root'` — no root password set (stock
 first-boot OpenWrt state). Set one on all three before leaving them on the
 network unattended.
+
+## Box 3 set aside (2026-08-18)
+
+Karl inspected the board visually and sees nothing obviously wrong, and isn't
+concerned about pursuing a fix right now — deprioritized, not abandoned. Don't
+push to re-open this without being asked.
+
+Also newly discovered blocker if picked back up later: box 3's WAN port is
+firewalled by OpenWrt's default config (WAN zone drops unsolicited inbound,
+including ping/SSH) — so even with a DHCP lease from another box's router
+function, it's unreachable over the network. Every prior network-shell
+interaction with box 3 this session was actually over the SERIAL CONSOLE, not
+SSH; box 3 has never been reached over the network at all. Re-adding the
+USB-TTL serial adapter is the only clean way back in.
+
+Mesh status as it stands: boxes 1 and 2 are confirmed peered and passing
+traffic over the 6GHz backhaul (see the earlier mesh section). Box 3 never got
+mesh configured.

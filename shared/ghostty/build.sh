@@ -19,6 +19,12 @@ if [ "$OS" = "mac" ]; then
     append "keybind = cmd+shift+h=goto_split:left" ~/.config/ghostty/config
     append "keybind = cmd+shift+l=goto_split:right" ~/.config/ghostty/config
 
+    # Ghostty tabs on macOS are native NSWindow tabs — one real AXStandardWindow
+    # per tab — so yabai tiles each tab as its own window and the desk splits in
+    # half behind an invisible tab. No config makes them non-native; unbind
+    # instead. Use splits (cmd+d) or a real window (cmd+n).
+    append "keybind = cmd+t=unbind" ~/.config/ghostty/config
+
     # macOS also reads from Application Support
     mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
     cp ~/.config/ghostty/config "$HOME/Library/Application Support/com.mitchellh.ghostty/config"

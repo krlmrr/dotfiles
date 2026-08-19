@@ -256,3 +256,163 @@ USB-TTL serial adapter is the only clean way back in.
 Mesh status as it stands: boxes 1 and 2 are confirmed peered and passing
 traffic over the 6GHz backhaul (see the earlier mesh section). Box 3 never got
 mesh configured.
+
+## Box 2 converted to dumb AP (2026-08-18)
+
+network.lan: proto static, ipaddr 192.168.1.2/24, gateway/dns 192.168.1.1 (box1).
+dhcp.lan: ignore=1, dhcpv4/dhcpv6/ra=disabled. No longer claims .1 or runs its own
+DHCP server, resolving the conflict with box1 once mesh-bridged. Config
+verified live via SSH at 192.168.1.2 after reboot.
+
+Box 1 stays at 192.168.1.1 as the real router/DHCP server, unchanged.
+
+**Root cause of a long false alarm this session:** the Mac's dock enumerates the
+SAME physical port as different macOS network services across replugs (en7,
+a registered "Thunderbolt Ethernet Slot 0" service vs en13, unregistered) — and
+BOTH sometimes show status:active simultaneously (one stale). Plain `ping` with
+no interface binding silently goes out whichever interface macOS's routing
+table currently prefers for the (ambiguous, overlaps-home-LAN) 192.168.1.0/24
+subnet — sometimes the wrong one — producing a false "no reply" even when the
+target is perfectly reachable. `sudo tcpdump -i en7 -nn` proved box2 was alive
+and correctly configured (its own ARPs for gateway .1 were visible) the whole
+time; only the Mac's own unbound ping was going out the wrong interface.
+**Lesson: when ping to a box on this bench setup mysteriously fails despite a
+good link, use `ping -b <iface>` (explicit interface bind) or tcpdump before
+concluding the box itself is unreachable — don't trust unbound ping's interface
+choice on this dual-subnet setup.** networksetup's manual-IP command also needs
+the exact service name from `networksetup -listallnetworkservices` — the
+hardware port label ("Thunderbolt Ethernet Slot 0, Port 2") and the service
+name ("Thunderbolt Ethernet Slot 0") differ.
+
+## Mesh + dumb-AP topology confirmed working end to end (2026-08-18)
+
+After power-cycling box 1 (with box 2 already converted to dumb AP), the mesh
+re-peered automatically within seconds: `plink: ESTAB`, -14dBm, ~2Gbps
+bidirectional (EHT-MCS 12/13, 80MHz). Box 2 pings box 1 (192.168.1.1) through
+the bridge with 0% loss, confirming box2's static-IP/gateway config correctly
+routes through box1 rather than conflicting with it. This is the target
+topology working as intended: box1 = router/DHCP, box2 = dumb AP peered over
+6GHz mesh. Box 3 remains outside this (deprioritized, see above).
+
+## Reproducible bug: box1 breaks IPv4 entirely when moved to 10.10.10.x (2026-08-18)
+
+Confirmed TWICE, identically: setting `network.lan.ipaddr='10.10.10.1'` (from
+the default 192.168.1.1) + `uci commit network` + reboot leaves box1 with:
+- IPv6 working fine (router advertisement, DNS via RA all reach the Mac)
+- IPv4 completely dead: ARP resolves correctly (kernel-level, confirms the
+  interface really holds the new address) but ICMP ping, SSH, LuCI (http/https),
+  and DHCPv4 all get no response at all. Not an interface-selection artifact on
+  the Mac side — confirmed via `sudo tcpdump` showing the ARP reply arrive
+  correctly, followed by zero ICMP replies to real echo requests.
+- A factory reset (external reset button, ~10s) reliably restores it to a
+  working 192.168.1.1 default both times this was hit.
+
+Root cause NOT diagnosed — no serial access to box1 was available either time
+(user declined reconnecting it). Suspect dnsmasq or firewall(fw4) choking on
+the address change specifically, since IPv6 (odhcpd, a separate daemon) is
+unaffected while IPv4 (dnsmasq + presumably nftables input rules) is fully
+dead. Untested whether ANY non-192.168.1.x range triggers it, or specifically
+10.10.10.0/24.
+
+**Decision: do not retry moving box1 off 192.168.1.1.** Both boxes stay on
+192.168.1.x. If revisited later, only attempt with serial connected to box1 so
+the actual failure can be observed (dmesg, service status, uci) instead of
+inferring from outside.
+
+## Custom BT6 firmware built successfully via local Docker (2026-08-18/19)
+
+After tracing three separate real bugs, a from-scratch OpenWrt build for the
+BT6 succeeded locally (no GitHub Actions wait) via Docker/OrbStack on Apple
+Silicon. Output in `~/bt6/docker-build/out/`:
+`openwrt-mediatek-filogic-asus_zenwifi-bt6-squashfs-sysupgrade.bin` (14M),
+matching `-factory.bin` (12M), both sha256-verified against `sha256sums`.
+Confirmed baked in: `kmod-tun-6.18.44-r1.apk` (built against the exact running
+kernel), `wpad-mesh-mbedtls`, `cgi-io`. `tailscale` deliberately excluded (see
+below) - not baked in.
+
+### The three real bugs hit, in order, all worth remembering for next time
+
+1. **OpenWrt's build refuses to run `configure` as root.** GitHub's CI runner
+   uses a non-root user; a bare `ubuntu:24.04` container runs everything as
+   root by default. Fix: create an unprivileged `builder` user, `chown -R` the
+   work tree, run every OpenWrt command (`feeds`, `make`) via `sudo -u builder`.
+   Symptom: `tools/tar` host-tool build fails with "you should not run
+   configure as root".
+
+2. **Ubuntu's generic `awk` can silently resolve to `mawk` instead of `gawk`**
+   even after `apt-get install gawk` succeeds, if something else in the same
+   transaction re-registers the alternative. OpenWrt's feed scanner
+   (`include/scan.awk`) uses gawk's `asort()` extension; under mawk it fails
+   with `function asort never defined` - but only during feed
+   indexing/scanning, and the FAILURE ITSELF can be silent (no error surfaces
+   up through `feeds update -a`'s output for the specific feed it broke).
+   Fix: `update-alternatives --set awk /usr/bin/gawk` explicitly, don't trust
+   install order.
+
+3. **The real, hardest-to-find one: `feeds update` doesn't force re-indexing
+   a feed whose git commit hasn't changed.** The very first (mawk-broken) run
+   produced an empty `feeds/packages.index` (0 lines) for the "packages" feed.
+   Every subsequent retry reused that same git clone (unchanged HEAD), so
+   `feeds update -a` silently skipped re-scanning it and kept serving the
+   stale empty index - even after the awk bug was fixed. Symptom: `feeds
+   install -a` reports "Installing all packages from feed packages." (looks
+   successful, exit code 0) but creates zero symlinks under
+   `package/feeds/packages/`, and any package from that feed (we hit
+   `cgi-io`, a hard dependency of `luci-base`) fails at the very end of a
+   FULL build with `ERROR: unable to select packages: cgi-io (no such
+   package)` - a maximally expensive place to discover a feed-indexing bug.
+   Fix: `rm feeds/packages.index` (and any other affected `feeds/<name>.index`)
+   to force a real re-scan; compare index line counts against a known-good
+   feed (`luci.index` had 70k+ lines; the broken `packages.index` had 0) as a
+   fast health check.
+
+### tailscale deliberately NOT baked in - real upstream ARM64 limitation
+
+Building `tailscale` requires bootstrapping Go from source, which requires
+`golang-bootstrap`. That package's `BOOTSTRAP_GO_VALID_OS_ARCH` list (its
+legacy C-based bootstrap compiler, distinct from the modern Go toolchain's own
+`HOST_GO_VALID_OS_ARCH` which DOES include linux/arm64) only lists
+`linux/386`, `linux/amd64`, `linux/arm` - never `linux/arm64`. This is a real,
+long-standing Go/OpenWrt limitation for ARM64 BUILD HOSTS (irrelevant to the
+TARGET architecture) - GitHub's x86_64 CI runners never hit it, which is why
+building this same repo via its `.github/workflows/build.yml` would not need
+this workaround. Since `kmod-tun` has no such issue and is the *only* thing
+`tailscale`'s LuCI install ever reported missing, `apk add tailscale` on the
+live device after flashing this build should now succeed on its own - it's a
+plain userspace binary with no kernel-version dependency, it only needed the
+kernel module to exist at runtime.
+
+Still to do: flash box1 (or box2) with this new image, confirm LAN ports and
+mesh still work post-flash (should be identical since dts/config.seed for
+those didn't change), then `apk add tailscale` live and confirm it installs
+cleanly this time.
+
+## Box 2 sysupgrade over SSH reliably fails; LuCI upload is the fix (2026-08-19)
+
+Flashing the new custom image onto box 2 via SSH-triggered `sysupgrade` failed
+identically on every attempt (5+ tries): mesh-relayed, direct-wired, `&`
+backgrounded on the remote shell, and even `setsid sysupgrade ...` (genuine
+session detachment) - all produced the same
+`Command failed: ubus call system sysupgrade {...} (Connection failed)`,
+always right after `Commencing upgrade. Closing all shell sessions.` A live
+`logread -f` capture showed the actual mechanism: `dropbear[1624]: Early exit:
+Terminated by signal` - the SSH daemon itself gets killed as part of that
+step, and whatever spawned `sysupgrade` dies with it before the `do_stage2`
+handoff completes. `setsid` did not fix it, meaning the kill isn't purely a
+session/process-group signal - likely a broader by-name/PID-file service stop
+that catches the sysupgrade invocation regardless of its session.
+
+Box 1's flash succeeded because Karl did it manually through **LuCI's own web
+upload** (System > Backup/Flash Firmware), not over SSH - that path isn't tied
+to a killable SSH session at all and never hits this race.
+
+**Lesson: don't try to trigger `sysupgrade` on this device over SSH. Use
+LuCI's upload UI.** Every SSH-triggered attempt left box 2 in a recoverable
+state though (config/mesh/services all intact after each failed attempt, one
+required a manual power-cycle after a raw manual `ubus call system sysupgrade`
+test left dropbear/services down without the script's own reboot-on-failure
+fallback - avoid raw manual ubus calls entirely, they lack that safety net).
+
+Still to do: flash box 2 via LuCI upload with
+`~/bt6/docker-build/out/openwrt-mediatek-filogic-asus_zenwifi-bt6-squashfs-sysupgrade.bin`
+(same file already confirmed working on box 1) whenever Karl gets to it.

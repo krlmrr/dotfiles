@@ -52,7 +52,7 @@ link "$DOTFILES_DIR/lazygit" "$HOME/Library/Application Support/lazygit"
 mkdir -p ~/.config/zed
 link "$DOTFILES_DIR/zed/settings.json" ~/.config/zed/settings.json
 link "$DOTFILES_DIR/zed/themes" ~/.config/zed/themes
-link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
+link "$DOTFILES_DIR/zed-keymap.json" ~/.config/zed/keymap.json
 
 # Jujutsu — config.toml is symlinked (live), but jj refuses to commit without an
 # identity and that is machine-specific, so generate it into conf.d/ from the git
@@ -82,9 +82,9 @@ link "$DOTFILES_DIR/ghostty/themes" ~/.config/ghostty/themes
 link "$DOTFILES_DIR/ghostty/config" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 link "$DOTFILES_DIR/ghostty/themes" "$HOME/Library/Application Support/com.mitchellh.ghostty/themes"
 
-link "$DOTFILES_DIR/mac/hammerspoon" ~/.hammerspoon
+link "$DOTFILES_DIR/hammerspoon" ~/.hammerspoon
 open -a Hammerspoon
-link "$DOTFILES_DIR/mac/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
-link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
+link "$DOTFILES_DIR/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
+link "$DOTFILES_DIR/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
 
 echo "Done!"

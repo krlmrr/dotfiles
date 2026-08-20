@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regression tests for mac/sketchybar/helpers/menubar-toggle.
+# Regression tests for sketchybar/helpers/menubar-toggle.
 #
 #   ./run                 zones, corners, hysteresis, desync recovery
 #   ./run --with-click    also posts a real click just below the bar, which lands

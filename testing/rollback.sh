@@ -37,9 +37,10 @@ if [ -f ~/.zshrc ]; then
     echo "Removed .zshrc (oh-my-zsh will regenerate on next login)"
 fi
 
-# Reset .gitconfig
+# Reset .gitconfig and the generated identity include
 echo "Resetting .gitconfig..."
 rm -f ~/.gitconfig
+rm -f ~/.config/git/identity
 
 echo "=== Rollback complete ==="
 echo "Note: Installed packages (brew) were left in place."

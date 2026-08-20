@@ -21,13 +21,11 @@ if [ -z "$GIT_EMAIL" ]; then
     read -p "Git email: " GIT_EMAIL
 fi
 
-# Git config
-rm -f ~/.gitconfig
-cp "$DOTFILES_DIR/shared/git/gitconfig" ~/.gitconfig
-link "$DOTFILES_DIR/shared/git/gitignore_global" ~/.gitignore_global
-git config --global core.excludesfile ~/.gitignore_global
-git config --global user.name "$GIT_NAME"
-git config --global user.email "$GIT_EMAIL"
+# Git identity — written to the generated include, not ~/.gitconfig (which is
+# a symlink into this repo). ./configure regenerates this file too.
+mkdir -p ~/.config/git
+git config --file ~/.config/git/identity user.name "$GIT_NAME"
+git config --file ~/.config/git/identity user.email "$GIT_EMAIL"
 
 # Homebrew
 if ! command -v brew &> /dev/null; then

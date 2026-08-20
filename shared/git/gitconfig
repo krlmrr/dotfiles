@@ -5,3 +5,5 @@
 	required = true
 [pull]
 	rebase = false
+[include]
+	path = ~/.config/git/identity

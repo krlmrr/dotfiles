@@ -7,7 +7,7 @@ while true; do sudo -v; sleep 30; done 2>/dev/null &
 SUDO_PID=$!
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$DOTFILES_DIR/shared/functions.sh"
+source "$DOTFILES_DIR/functions.sh"
 
 echo "Setting up dotfiles from $DOTFILES_DIR"
 
@@ -35,7 +35,7 @@ fi
 
 # Shared formulae
 echo "Installing shared brew formulae..."
-brew bundle --file="$DOTFILES_DIR/shared/Brewfile"
+brew bundle --file="$DOTFILES_DIR/Brewfile.shared"
 
 # SSH + GitHub auth
 source "$DOTFILES_DIR/scripts/ssh-setup.sh"
@@ -82,7 +82,7 @@ fi
 # not in subfolders, so flatten the .ttf/.otf files out of their per-family dirs.
 echo "Installing fonts..."
 mkdir -p ~/Library/Fonts
-find "$DOTFILES_DIR/shared/fonts" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
+find "$DOTFILES_DIR/fonts" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
     -exec cp {} ~/Library/Fonts/ \;
 
 # Suppress the "Last login:" banner on new shells

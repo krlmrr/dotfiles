@@ -2,7 +2,7 @@
 set -e
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$DOTFILES_DIR/shared/functions.sh"
+source "$DOTFILES_DIR/functions.sh"
 
 echo "Configuring dotfiles from $DOTFILES_DIR"
 
@@ -10,8 +10,8 @@ echo "Configuring dotfiles from $DOTFILES_DIR"
 # machine-specific and `git config --global` writes to ~/.gitconfig, which is
 # now this repo's file — so keep the identity in a separate generated file that
 # gitconfig [include]s, exactly as the jj block below does with conf.d/.
-link "$DOTFILES_DIR/shared/git/gitconfig" ~/.gitconfig
-link "$DOTFILES_DIR/shared/git/gitignore_global" ~/.gitignore_global
+link "$DOTFILES_DIR/git/gitconfig" ~/.gitconfig
+link "$DOTFILES_DIR/git/gitignore_global" ~/.gitignore_global
 mkdir -p ~/.config/git
 # Read the identity from the generated include. `git config --global` cannot see
 # it: --global reads ~/.gitconfig only and does NOT resolve [include] directives,
@@ -36,28 +36,28 @@ else
 fi
 
 # Git hooks
-link "$DOTFILES_DIR/shared/git/hooks/pre-commit" "$DOTFILES_DIR/.git/hooks/pre-commit"
+link "$DOTFILES_DIR/git/hooks/pre-commit" "$DOTFILES_DIR/.git/hooks/pre-commit"
 
 # zshrc — symlinked, so edits are live; it sources zsh/aliases.sh itself
 link "$DOTFILES_DIR/zsh/zshrc" ~/.zshrc
 
 # Shared configs
-link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
-link "$DOTFILES_DIR/shared/lazygit" "$HOME/Library/Application Support/lazygit"
-# Zed config — symlink files individually, not the whole shared/zed/ directory.
-# Linking the directory makes ~/.config/zed → shared/zed, which means any later
+link "$DOTFILES_DIR/nvim" ~/.config/nvim
+link "$DOTFILES_DIR/lazygit" "$HOME/Library/Application Support/lazygit"
+# Zed config — symlink files individually, not the whole zed/ directory.
+# Linking the directory makes ~/.config/zed → zed/, which means any later
 # `link X ~/.config/zed/keymap.json` writes a symlink INTO the repo at
-# shared/zed/keymap.json — that's how a Mac-path keymap symlink ended up
-# committed to shared/zed/ in the past.
+# zed/keymap.json — that's how a Mac-path keymap symlink ended up
+# committed to zed/ in the past.
 mkdir -p ~/.config/zed
-link "$DOTFILES_DIR/shared/zed/settings.json" ~/.config/zed/settings.json
-link "$DOTFILES_DIR/shared/zed/themes" ~/.config/zed/themes
+link "$DOTFILES_DIR/zed/settings.json" ~/.config/zed/settings.json
+link "$DOTFILES_DIR/zed/themes" ~/.config/zed/themes
 link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
 
 # Jujutsu — config.toml is symlinked (live), but jj refuses to commit without an
 # identity and that is machine-specific, so generate it into conf.d/ from the git
 # identity instead of committing it.
-link "$DOTFILES_DIR/shared/jj/config.toml" ~/.config/jj/config.toml
+link "$DOTFILES_DIR/jj/config.toml" ~/.config/jj/config.toml
 if [ -n "$GIT_NAME" ] && [ -n "$GIT_EMAIL" ]; then
     mkdir -p ~/.config/jj/conf.d
     cat > ~/.config/jj/conf.d/00-identity.toml <<EOF
@@ -71,10 +71,10 @@ else
 fi
 
 # Claude Code skills
-link "$DOTFILES_DIR/shared/claude/skills/general" ~/.claude/skills/general
-link "$DOTFILES_DIR/shared/claude/skills/laravel" ~/.claude/skills/laravel
-link "$DOTFILES_DIR/shared/claude/skills/feature" ~/.claude/skills/feature
-link "$DOTFILES_DIR/shared/claude/skills/vue" ~/.claude/skills/vue
+link "$DOTFILES_DIR/claude/skills/general" ~/.claude/skills/general
+link "$DOTFILES_DIR/claude/skills/laravel" ~/.claude/skills/laravel
+link "$DOTFILES_DIR/claude/skills/feature" ~/.claude/skills/feature
+link "$DOTFILES_DIR/claude/skills/vue" ~/.claude/skills/vue
 
 # Ghostty — symlinked in both locations macOS reads from, so edits are live
 link "$DOTFILES_DIR/ghostty/config" ~/.config/ghostty/config

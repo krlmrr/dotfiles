@@ -33,10 +33,6 @@ if ! command -v brew &> /dev/null; then
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-# Shared formulae
-echo "Installing shared brew formulae..."
-brew bundle --file="$DOTFILES_DIR/Brewfile.shared"
-
 # SSH + GitHub auth
 source "$DOTFILES_DIR/scripts/ssh-setup.sh"
 

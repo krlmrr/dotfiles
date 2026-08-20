@@ -1,0 +1,38 @@
+title = "  "
+theme = dark:One Half Dark,light:artisan
+palette = 6=#7aa2f7
+palette = 14=#7aa2f7
+
+font-family = MonoLisa
+font-style = Medium
+font-style-italic = Medium Italic
+font-style-bold = Medium
+font-style-bold-italic = Medium Italic
+window-padding-balance = true
+
+window-save-state = always
+
+cursor-style = bar
+confirm-close-surface = false
+shell-integration-features = sudo
+keybind = shift+enter=text:\x1b\r
+# ctrl+shift+w was hijacked by GTK when this repo still targeted Linux; the
+# binding stayed because muscle memory did. Kept as-is deliberately.
+keybind = ctrl+shift+x=close_surface
+
+# Custom
+split-divider-color = #2C313A
+
+macos-titlebar-proxy-icon = hidden
+font-size = 18
+window-padding-y = 8,0
+window-padding-x = 8,8
+macos-option-as-alt = true
+keybind = cmd+shift+h=goto_split:left
+keybind = cmd+shift+l=goto_split:right
+
+# Ghostty tabs on macOS are native NSWindow tabs — one real AXStandardWindow
+# per tab — so yabai tiles each tab as its own window and the desk splits in
+# half behind an invisible tab. No config makes them non-native; unbind
+# instead. Use splits (cmd+d) or a real window (cmd+n).
+keybind = cmd+t=unbind

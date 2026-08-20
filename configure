@@ -57,8 +57,11 @@ link "$DOTFILES_DIR/shared/claude/skills/laravel" ~/.claude/skills/laravel
 link "$DOTFILES_DIR/shared/claude/skills/feature" ~/.claude/skills/feature
 link "$DOTFILES_DIR/shared/claude/skills/vue" ~/.claude/skills/vue
 
-# Build Ghostty config
-bash "$DOTFILES_DIR/buildghostty"
+# Ghostty — symlinked in both locations macOS reads from, so edits are live
+link "$DOTFILES_DIR/ghostty/config" ~/.config/ghostty/config
+link "$DOTFILES_DIR/ghostty/themes" ~/.config/ghostty/themes
+link "$DOTFILES_DIR/ghostty/config" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+link "$DOTFILES_DIR/ghostty/themes" "$HOME/Library/Application Support/com.mitchellh.ghostty/themes"
 
 link "$DOTFILES_DIR/mac/hammerspoon" ~/.hammerspoon
 open -a Hammerspoon

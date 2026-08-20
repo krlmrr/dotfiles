@@ -6,7 +6,10 @@ echo "=== Rolling back dotfiles ==="
 # Remove symlinked configs
 echo "Removing symlinked configs..."
 rm -f ~/.config/nvim
-rm -f ~/.config/ghostty
+rm -f ~/.config/ghostty/config
+rm -f ~/.config/ghostty/themes
+rm -f "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+rm -f "$HOME/Library/Application Support/com.mitchellh.ghostty/themes"
 rm -f ~/.config/lazygit
 rm -f ~/.config/zed
 rm -f ~/.gitignore_global

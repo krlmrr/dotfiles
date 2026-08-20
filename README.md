@@ -1,6 +1,6 @@
 # dotfiles
 
-Cross-platform dotfiles for macOS and Linux (Debian/Ubuntu + Arch + Fedora).
+macOS-only dotfiles.
 
 ## Quick Start
 
@@ -17,91 +17,57 @@ cd ~/Code/dotfiles && ./setup
 
 ## What It Does
 
-`setup` detects the OS and runs the appropriate setup chain:
+`setup` runs the full setup chain:
 
-1. Installs system packages (Linux only)
-2. Installs [Homebrew](https://brew.sh) + shared formulae (gcc, gh, neovim, lazygit, ripgrep, fd)
-3. Installs [Oh My Zsh](https://ohmyz.sh) + plugins (autosuggestions, syntax-highlighting)
-4. Sets zsh as default shell
-5. Builds `.zshrc` from shared + OS-specific aliases
-6. Runs OS-specific setup (mac or linux)
+1. Installs [Homebrew](https://brew.sh) + formulae (gcc, gh, neovim, lazygit, ripgrep, fd)
+2. Installs [Oh My Zsh](https://ohmyz.sh) + plugins (autosuggestions, syntax-highlighting)
+3. Sets zsh as default shell
+4. Installs Homebrew casks (Ghostty, Arc, Zed, VS Code, OrbStack, Raycast, Slack, Discord, Figma, TablePlus, and more)
+5. Configures caps lock remapping (ctrl/esc) via a LaunchDaemon (hidutil) and Hammerspoon
+6. Symlinks Hammerspoon, VS Code, Sketchybar, yabai/skhd configs and starts the window-manager stack
 7. Installs [Claude Code](https://claude.ai)
-8. Symlinks shared configs (nvim, ghostty, lazygit, zed, jj)
-9. Configures git (prompts for name/email on first run)
-10. Installs fonts (FiraCode, FiraMono, MonoLisa)
-11. Configures COSMIC desktop (if detected)
+8. Installs fonts (FiraCode, FiraMono, MonoLisa) by copying them into `~/Library/Fonts`
+9. Runs `./configure`, which symlinks the rest of the configs (zsh, git, jj, nvim, ghostty, lazygit, zed, claude skills) and generates the git/jj identity files
 
 ## Structure
 
 ```
 dotfiles/
 ├── setup                 # Entry point
-├── buildzshrc            # Rebuild .zshrc without full setup
+├── configure             # Symlinks/generates configs; run again standalone
+├── functions.sh          # Helpers (link, brew_install, brew_install_cask)
+├── install               # Bootstrap installer (curl | bash)
+├── release               # Tag + trigger GitHub release Action
+├── Brewfile              # Homebrew formulae + casks
 ├── testing/
 │   └── rollback.sh       # Undo symlinks and configs
-├── shared/               # Cross-platform
-│   ├── functions.sh      # Helpers (link, OS/distro detection)
-│   ├── nvim/
-│   ├── ghostty/
-│   ├── lazygit/
-│   ├── zed/
-│   ├── zsh/
-│   ├── git/
-│   ├── jj/
-│   ├── fonts/
-│   └── wallpapers/
-├── mac/                  # macOS-specific
-│   ├── setup.sh          # Casks, hammerspoon, vscode
-│   ├── zsh/
-│   ├── hammerspoon/
-│   ├── vscode/
-│   └── zed-keymap.json
-└── linux/                # Linux-specific
-    ├── setup.sh          # Shared linux (brew formulae, keyd, udev)
-    ├── shared/
-    │   └── zsh/
-    ├── deb/
-    │   ├── setup.sh      # Docker, keyd, DDEV, Ghostty, Chromium, Zen, 1Password, PHP
-    │   └── cleanup.sh    # Remove unwanted default apps
-    ├── arch/
-    │   ├── setup.sh      # Docker, keyd, Hyprland, SDDM
-    │   ├── hypr/
-    │   ├── waybar/
-    │   ├── rofi/
-    │   ├── mako/
-    │   └── sddm/
-    └── fedora/
-        ├── setup.sh      # RPM Fusion, Docker, keyd (COPR), DDEV, Ghostty, Chromium, 1Password, Discord, PHP
-        └── cleanup.sh    # Remove unwanted default apps
+├── scripts/
+│   └── ssh-setup.sh
+├── zsh/
+├── ghostty/
+├── git/
+├── nvim/
+├── lazygit/
+├── zed/
+├── jj/
+├── claude/
+├── fonts/
+├── wallpapers/
+├── hammerspoon/
+├── vscode/
+├── raycast/
+├── sketchybar/
+├── yabai/
+├── keyboard_settings/
+├── memory/
+└── docs/
 ```
-
-## Platform Details
-
-### macOS
-
-Installs apps via Homebrew casks: Ghostty, Arc, Zed, VS Code, OrbStack, Raycast, Slack, Discord, Figma, TablePlus, and more.
-
-Configures caps lock remapping (ctrl/esc) via a LaunchDaemon (hidutil) and Hammerspoon.
-
-### Linux (Debian/Ubuntu)
-
-Installs Docker, DDEV, Ghostty (PPA), Ungoogled Chromium (PPA), Zen Browser, 1Password, keyd, and PHP/Laravel CLI.
-
-Configures keyd for caps lock remapping (ctrl/esc), udev rules for Keychron Q8 (Via), and COSMIC desktop (dock, panel, theme, mouse, shortcuts).
-
-### Linux (Arch)
-
-Installs Docker, keyd, DDEV (AUR), Hyprland, Waybar, Rofi, Mako, and SDDM.
-
-### Linux (Fedora)
-
-Targets the Fedora COSMIC spin. Enables RPM Fusion (free + nonfree), then installs Docker, keyd (COPR `alternateved/keyd`), DDEV (official RPM repo), Ghostty, Ungoogled Chromium (COPR `wojnilowicz/ungoogled-chromium`), 1Password (official RPM repo), Discord (RPM Fusion nonfree), Slack/Zed/Zen Browser (Flathub), and PHP/Laravel CLI. Same COSMIC config and Keychron udev rule as Debian.
 
 ## Useful Commands
 
 ```bash
-# Rebuild .zshrc after changing aliases
-~/Code/dotfiles/buildzshrc && source ~/.zshrc
+# Reload .zshrc after changing aliases (it's symlinked, so edits are already live)
+source ~/.zshrc
 
 # Undo all symlinks and configs (leaves packages installed)
 ~/Code/dotfiles/testing/rollback.sh

@@ -37,9 +37,6 @@ else
     echo "Skipping git identity — no user.name/user.email found; set them with 'git config --file ~/.config/git/identity user.name \"…\"'"
 fi
 
-# Git hooks
-link "$DOTFILES_DIR/git/hooks/pre-commit" "$DOTFILES_DIR/.git/hooks/pre-commit"
-
 # zshrc — symlinked, so edits are live; it sources zsh/aliases.sh itself
 link "$DOTFILES_DIR/zsh/zshrc" ~/.zshrc
 

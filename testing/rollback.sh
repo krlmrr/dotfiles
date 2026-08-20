@@ -13,11 +13,6 @@ rm -f ~/.gitignore_global
 rm -f ~/.config/jj/config.toml
 rm -rf ~/.config/jj/conf.d
 
-# Remove Flatpak Zed symlinks
-rm -f ~/.var/app/dev.zed.Zed/config/zed/settings.json
-rm -f ~/.var/app/dev.zed.Zed/config/zed/themes
-rm -f ~/.var/app/dev.zed.Zed/config/zed/keymap.json
-
 # Remove mac-specific symlinks
 rm -f ~/.hammerspoon
 rm -f ~/.config/sketchybar
@@ -32,15 +27,6 @@ rm -f ~/.config/zed/keymap.json
 rm -f ~/.vimrc
 rm -f ~/.ideavimrc
 
-# Remove arch-specific symlinks
-rm -f ~/.config/hypr/hyprland.conf
-rm -f ~/.config/hypr/hyprlock.conf
-rm -f ~/.config/hypr/hypridle.conf
-rm -f ~/.config/hypr/scripts
-rm -f ~/.config/waybar
-rm -f ~/.config/rofi
-rm -f ~/.config/mako
-
 # Restore default .zshrc
 echo "Resetting .zshrc..."
 if [ -f ~/.zshrc ]; then
@@ -53,5 +39,5 @@ echo "Resetting .gitconfig..."
 rm -f ~/.gitconfig
 
 echo "=== Rollback complete ==="
-echo "Note: Installed packages (brew, apt, etc.) were left in place."
+echo "Note: Installed packages (brew) were left in place."
 echo "Run 'source ~/.zshrc' or restart your terminal."

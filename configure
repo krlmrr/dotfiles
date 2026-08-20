@@ -24,11 +24,7 @@ bash "$DOTFILES_DIR/buildzshrc"
 
 # Shared configs
 link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim
-if [ "$OS" = "mac" ]; then
-    link "$DOTFILES_DIR/shared/lazygit" "$HOME/Library/Application Support/lazygit"
-else
-    link "$DOTFILES_DIR/shared/lazygit" ~/.config/lazygit
-fi
+link "$DOTFILES_DIR/shared/lazygit" "$HOME/Library/Application Support/lazygit"
 # Zed config — symlink files individually, not the whole shared/zed/ directory.
 # Linking the directory makes ~/.config/zed → shared/zed, which means any later
 # `link X ~/.config/zed/keymap.json` writes a symlink INTO the repo at
@@ -37,11 +33,7 @@ fi
 mkdir -p ~/.config/zed
 link "$DOTFILES_DIR/shared/zed/settings.json" ~/.config/zed/settings.json
 link "$DOTFILES_DIR/shared/zed/themes" ~/.config/zed/themes
-if [ "$OS" = "mac" ]; then
-    link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
-else
-    link "$DOTFILES_DIR/linux/shared/zed-keymap.json" ~/.config/zed/keymap.json
-fi
+link "$DOTFILES_DIR/mac/zed-keymap.json" ~/.config/zed/keymap.json
 
 # Jujutsu — config.toml is symlinked (live), but jj refuses to commit without an
 # identity and that is machine-specific, so generate it into conf.d/ from the git
@@ -68,41 +60,9 @@ link "$DOTFILES_DIR/shared/claude/skills/vue" ~/.claude/skills/vue
 # Build Ghostty config
 bash "$DOTFILES_DIR/buildghostty"
 
-# OS-specific configs
-if [ "$OS" = "mac" ]; then
-    link "$DOTFILES_DIR/mac/hammerspoon" ~/.hammerspoon
-    open -a Hammerspoon
-    link "$DOTFILES_DIR/mac/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
-    link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
-fi
-
-# Zen Browser user.js — deploy to every Zen root we find, since the user may
-# have stale Flatpak data alongside a native install (or vice versa) and we
-# don't want one orphaned tree to shadow the active one.
-#
-# Also import mkcert's root CA into each Zen profile's NSS DB so HTTPS dev
-# certs (Lerd, mkcert-generated) are trusted. `mkcert -install` covers Firefox
-# but not Zen's ~/.zen paths, so do it ourselves with certutil — same tool
-# mkcert uses internally. Idempotent: skips profiles where the CA is already
-# imported.
-MKCERT_ROOT_CA=""
-if command -v mkcert &>/dev/null; then
-    MKCERT_ROOT_CA="$(mkcert -CAROOT)/rootCA.pem"
-    [ -f "$MKCERT_ROOT_CA" ] || MKCERT_ROOT_CA=""
-fi
-for ZEN_ROOT in \
-    "$HOME/.var/app/app.zen_browser.zen/.zen" \
-    "$HOME/.zen" \
-    "$HOME/.config/zen"; do
-    [ -d "$ZEN_ROOT" ] || continue
-    find "$ZEN_ROOT" -maxdepth 1 -type d -name "*.*" | while read -r profile_dir; do
-        cp "$DOTFILES_DIR/shared/zen/user.js" "$profile_dir/user.js"
-        if [ -n "$MKCERT_ROOT_CA" ] && command -v certutil &>/dev/null; then
-            if ! certutil -L -d "sql:$profile_dir" 2>/dev/null | grep -q "mkcert development CA"; then
-                certutil -A -d "sql:$profile_dir" -t "C,," -n "mkcert development CA" -i "$MKCERT_ROOT_CA" 2>/dev/null || true
-            fi
-        fi
-    done
-done
+link "$DOTFILES_DIR/mac/hammerspoon" ~/.hammerspoon
+open -a Hammerspoon
+link "$DOTFILES_DIR/mac/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
+link "$DOTFILES_DIR/mac/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
 
 echo "Done!"

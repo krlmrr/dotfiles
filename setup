@@ -11,27 +11,6 @@ source "$DOTFILES_DIR/shared/functions.sh"
 
 echo "Setting up dotfiles from $DOTFILES_DIR"
 
-# Install core system packages (Linux)
-if [ "$OS" = "linux" ]; then
-    ensure_ca_trust
-    echo "Updating system..."
-    sudo $PKG_UPDATE
-    ensure_ca_trust  # dnf upgrade can re-break the bundle on Fedora; re-verify before any further dnf calls
-    if [ -n "$PKG_UPGRADE" ]; then
-        sudo $PKG_UPGRADE
-    fi
-    echo "Installing system packages..."
-    if [ "$DISTRO" = "arch" ]; then
-        sudo pacman -S --needed --noconfirm base-devel
-        pacman_install git curl wget unzip zsh wl-clipboard
-    elif [ "$DISTRO" = "fedora" ]; then
-        sudo dnf group install -y development-tools
-        dnf_install git curl wget unzip zsh wl-clipboard
-    else
-        apt_install git curl wget unzip zsh build-essential wl-clipboard
-    fi
-fi
-
 # Git user info (only prompt if not already set)
 GIT_NAME="$(git config --global user.name 2>/dev/null || true)"
 GIT_EMAIL="$(git config --global user.email 2>/dev/null || true)"
@@ -54,13 +33,6 @@ git config --global user.email "$GIT_EMAIL"
 if ! command -v brew &> /dev/null; then
     echo "Installing Homebrew..."
     NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    if [ "$OS" = "linux" ]; then
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        if ! grep -q 'linuxbrew/.linuxbrew/bin/brew shellenv' ~/.bashrc 2>/dev/null; then
-            echo '' >> ~/.bashrc
-            echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
-        fi
-    fi
 fi
 
 # Shared formulae
@@ -92,21 +64,15 @@ if [ -n "$ZSH_PATH" ]; then
     if ! grep -qxF "$ZSH_PATH" /etc/shells; then
         echo "$ZSH_PATH" | sudo tee -a /etc/shells > /dev/null
     fi
-    CURRENT_SHELL="$(getent passwd "$USER" | cut -d: -f7)"
+    CURRENT_SHELL="$(dscl . -read "/Users/$USER" UserShell | awk '{print $2}')"
     if [ "$CURRENT_SHELL" != "$ZSH_PATH" ]; then
         echo "Setting zsh as default shell..."
         chsh -s "$ZSH_PATH"
     fi
 fi
 
-# OS-specific setup (installs)
-if [ "$OS" = "mac" ]; then
-    echo "Running Mac setup..."
-    source "$DOTFILES_DIR/mac/setup.sh"
-else
-    echo "Running Linux setup..."
-    source "$DOTFILES_DIR/linux/setup.sh"
-fi
+echo "Running Mac setup..."
+source "$DOTFILES_DIR/mac/setup.sh"
 
 # Claude Code
 if ! command -v claude &> /dev/null; then
@@ -114,19 +80,12 @@ if ! command -v claude &> /dev/null; then
     curl -fsSL https://claude.ai/install.sh | bash
 fi
 
-# Fonts
+# Fonts — macOS fontd only activates fonts placed *directly* in ~/Library/Fonts,
+# not in subfolders, so flatten the .ttf/.otf files out of their per-family dirs.
 echo "Installing fonts..."
-if [ "$OS" = "mac" ]; then
-    # macOS fontd only activates fonts placed *directly* in ~/Library/Fonts, not
-    # in subfolders, so flatten the .ttf/.otf files out of their per-family dirs.
-    mkdir -p ~/Library/Fonts
-    find "$DOTFILES_DIR/shared/fonts" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
-        -exec cp {} ~/Library/Fonts/ \;
-else
-    mkdir -p ~/.local/share/fonts
-    cp -r "$DOTFILES_DIR/shared/fonts/"* ~/.local/share/fonts/
-    fc-cache -fv
-fi
+mkdir -p ~/Library/Fonts
+find "$DOTFILES_DIR/shared/fonts" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
+    -exec cp {} ~/Library/Fonts/ \;
 
 # Suppress the "Last login:" banner on new shells
 touch ~/.hushlogin
@@ -136,12 +95,3 @@ bash "$DOTFILES_DIR/configure"
 
 kill "$SUDO_PID" 2>/dev/null || true
 echo "Done!"
-
-if [ "$OS" = "linux" ]; then
-    echo "A reboot is required to apply all changes."
-    read -p "Reboot now? [y/N] " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo reboot
-    fi
-fi

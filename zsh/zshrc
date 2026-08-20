@@ -18,3 +18,7 @@ setopt HIST_IGNORE_SPACE
 export HOMEBREW_NO_ENV_HINTS=1
 
 export PATH="$HOME/.local/bin:$PATH:$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin"
+
+# Aliases and functions. Sourced rather than concatenated at build time — the
+# whole file is symlinked to ~/.zshrc now, so edits are live.
+source "$HOME/Code/dotfiles/zsh/aliases.sh"

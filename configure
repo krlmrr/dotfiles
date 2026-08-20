@@ -19,8 +19,8 @@ git config --global core.excludesfile ~/.gitignore_global
 # Git hooks
 link "$DOTFILES_DIR/shared/git/hooks/pre-commit" "$DOTFILES_DIR/.git/hooks/pre-commit"
 
-# Build .zshrc
-bash "$DOTFILES_DIR/buildzshrc"
+# zshrc — symlinked, so edits are live; it sources zsh/aliases.sh itself
+link "$DOTFILES_DIR/zsh/zshrc" ~/.zshrc
 
 # Shared configs
 link "$DOTFILES_DIR/shared/nvim" ~/.config/nvim

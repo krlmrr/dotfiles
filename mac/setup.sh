@@ -64,4 +64,10 @@ yabai --restart-service 2>/dev/null || yabai --start-service
 skhd --restart-service 2>/dev/null || skhd --start-service
 brew services restart sketchybar
 
+# Prune Adobe/Google background agents and any launchd plists left orphaned by
+# a `brew uninstall` that skipped `brew services stop`. Runs with `bash` (not
+# sourced) so its exit status can't trip setup's `set -e`, and as the invoking
+# user because it needs the gui/$UID domain — it calls sudo itself where needed.
+bash "$DOTFILES_DIR/mac/prune-login-items.sh" || true
+
 echo "=== Mac setup complete ==="

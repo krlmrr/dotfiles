@@ -19,10 +19,12 @@ yabairc placement logic):
 
 `ghostty +show-config --default` exposes no knob to make tabs non-native.
 
-**Fix in place:** `keybind = cmd+t=unbind` in the mac branch of
-`shared/ghostty/build.sh`. Ghostty builds its macOS menu from the keybind table,
-so this also strips File ▸ New Tab's shortcut. Use splits or `cmd+n` instead.
-Ghostty config is *built*, so this needs `./buildghostty` — see
+**Fix in place:** `keybind = cmd+t=unbind` in `ghostty/config`. Ghostty builds
+its macOS menu from the keybind table, so this also strips File ▸ New Tab's
+shortcut. Use splits or `cmd+n` instead.
+(Was the mac branch of `shared/ghostty/build.sh` until v2.0.0 flattened the repo;
+that build script and `./buildghostty` are gone — the config is symlinked to both
+`~/.config/ghostty/config` and the app-support path, so edits are live.) See
 [[project_yabai_ax_loss]] for the separate phantom-window issue that shows up in
 the same queries (app name lowercased to `ghostty`, empty role/subrole,
 `--window <id>` cannot find them).

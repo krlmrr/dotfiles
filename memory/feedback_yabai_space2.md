@@ -4,7 +4,7 @@ description: Space 2 (chat) must stay float across all restarts via manage=off r
 type: feedback
 ---
 
-Space 2 (label `chat`) is configured as `layout float` in `mac/yabai/yabairc` and intentionally hosts chat apps (Slack, Discord, Telegram, Messages, Microsoft Teams, Tuple). It must NEVER appear in yabai window-management fixes, diagnostics, or filters.
+Space 2 (label `chat`) is configured as `layout float` in `yabai/yabairc` and intentionally hosts chat apps (Slack, Discord, Telegram, Messages, Microsoft Teams, Tuple). It must NEVER appear in yabai window-management fixes, diagnostics, or filters.
 
 ## What actually makes space 2 stay floating across restarts
 

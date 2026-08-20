@@ -11,7 +11,9 @@ rm -f ~/.config/ghostty/themes
 rm -f "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 rm -f "$HOME/Library/Application Support/com.mitchellh.ghostty/themes"
 rm -f ~/.config/lazygit
-rm -f ~/.config/zed
+rm -f ~/.config/zed/settings.json
+rm -f ~/.config/zed/themes
+rm -f ~/.config/zed/keymap.json
 rm -f ~/.gitignore_global
 rm -f ~/.config/jj/config.toml
 rm -rf ~/.config/jj/conf.d
@@ -23,7 +25,6 @@ rm -f ~/.yabairc
 rm -f ~/.skhdrc
 rm -f "$HOME/Library/Application Support/Code/User/settings.json" 2>/dev/null
 rm -f "$HOME/Library/Application Support/Code/User/keybindings.json" 2>/dev/null
-rm -f ~/.config/zed/keymap.json
 
 # Legacy: configure used to link these from the since-deleted mac/phpstorm/.
 # Machines that ran the old script still have them as dangling symlinks.

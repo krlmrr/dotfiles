@@ -11,9 +11,15 @@ source "$DOTFILES_DIR/functions.sh"
 
 echo "Setting up dotfiles from $DOTFILES_DIR"
 
-# Git user info (only prompt if not already set)
-GIT_NAME="$(git config --global user.name 2>/dev/null || true)"
-GIT_EMAIL="$(git config --global user.email 2>/dev/null || true)"
+# Git user info (only prompt if not already set). Read the generated include
+# first — `git config --global` can't see it, since --global reads ~/.gitconfig
+# only and does not resolve the [include] once ~/.gitconfig is a symlink into
+# this repo — so on every re-run after the first it would look unset and
+# re-prompt. Fall back to --global for a machine that hasn't been migrated yet.
+GIT_NAME="$(git config --file ~/.config/git/identity --get user.name 2>/dev/null || true)"
+GIT_EMAIL="$(git config --file ~/.config/git/identity --get user.email 2>/dev/null || true)"
+[ -z "$GIT_NAME" ]  && GIT_NAME="$(git config --global --get user.name 2>/dev/null || true)"
+[ -z "$GIT_EMAIL" ] && GIT_EMAIL="$(git config --global --get user.email 2>/dev/null || true)"
 if [ -z "$GIT_NAME" ]; then
     read -p "Git name: " GIT_NAME
 fi
@@ -23,9 +29,11 @@ fi
 
 # Git identity — written to the generated include, not ~/.gitconfig (which is
 # a symlink into this repo). ./configure regenerates this file too.
+# Guarded: a blank answer at the prompt above must never overwrite a good
+# existing value.
 mkdir -p ~/.config/git
-git config --file ~/.config/git/identity user.name "$GIT_NAME"
-git config --file ~/.config/git/identity user.email "$GIT_EMAIL"
+[ -n "$GIT_NAME" ]  && git config --file ~/.config/git/identity user.name "$GIT_NAME"
+[ -n "$GIT_EMAIL" ] && git config --file ~/.config/git/identity user.email "$GIT_EMAIL"
 
 # Homebrew
 if ! command -v brew &> /dev/null; then
@@ -70,7 +78,7 @@ echo "Installing Mac packages..."
 # Homebrew refuses to load formulae from third-party taps until they're trusted.
 # Tap + trust every non-official tap the Brewfile uses (including osx-cross/{arm,avr}
 # pulled in transitively by qmk) before bundling, or the install aborts on a fresh Mac.
-for t in qmk/qmk osx-cross/arm osx-cross/avr FelixKratz/formulae koekeishiya/formulae; do
+for t in qmk/qmk osx-cross/arm osx-cross/avr FelixKratz/formulae koekeishiya/formulae anomalyco/tap antoniorodr/memo oven-sh/bun; do
   brew tap "$t"
   brew trust "$t"
 done

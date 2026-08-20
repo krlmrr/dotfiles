@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Auto-sort Brewfile entries and re-stage
-for brewfile in shared/Brewfile mac/Brewfile linux/Brewfile; do
+for brewfile in Brewfile; do
     git diff --cached --name-only | grep -q "^$brewfile$" || continue
     [ -f "$brewfile" ] || continue
     for prefix in brew cask; do

@@ -106,132 +106,25 @@ healthCheck:start()
 pcall(function() require("hs.ipc") end)
 
 -- ── Move window to a space AND follow it ────────────────────────────────────
--- COSMIC-style "send to workspace and go there". macOS won't do it in one step
--- with SIP on: `yabai -m window --space N` is public API and works, but
--- `yabai -m space --focus N` needs the scripting addition, which SIP blocks.
--- So yabai moves the window and macOS does its own switching — we just post the
--- ctrl+N that System Settings ▸ Keyboard ▸ Shortcuts ▸ Mission Control already
--- binds ("Switch to Desktop N", enabled for 1-6 here).
+-- REMOVED 2026-08-21, pending a rethink. See git history for the attempts.
 --
--- These chords used to live in skhdrc as move-without-follow; they were removed
--- there because skhd's event tap would swallow the key before hs.hotkey saw it.
--- ctrl+shift+7..9 are still skhd's (move only) — desktops 7+ have no native
--- switch shortcut to follow with.
+-- The goal: ctrl+shift+N moves the focused window to desktop N and takes you
+-- with it. yabai can do the move (public API, works with SIP on) but not the
+-- follow (`space --focus` needs the blocked scripting addition).
 --
--- Everything is pcall-wrapped: a failure here must never break the Caps Lock
--- eventtaps above, which matter far more than this does.
-local YABAI = "/opt/homebrew/bin/yabai"
-
--- Follow by posting macOS's own "Switch to Desktop N" shortcut through System
--- Events, so Apple does the switching and you get the normal side-scroll.
+-- What was tried, and why each failed:
+--   hs.eventtap.keyStroke posting ctrl+N — no-op; synthetic events do not
+--     trigger macOS symbolichotkeys at all.
+--   hs.spaces.gotoSpace — works for any index, but drives the Mission Control
+--     interface, so every switch flashes it. Not native-feeling.
+--   osascript + System Events posting ctrl+N — works when fired from a script
+--     with no modifiers held, but NOT from the hotkey: while ctrl+shift is
+--     physically down the synthetic ctrl+N merges with the real modifier state,
+--     macOS sees ctrl+shift+N, and nothing matches. Confirmed directly.
+--   Polling for shift release before posting — this is where it went wrong.
+--     Every press spawns a poll chain that fires a keystroke at an
+--     indeterminate later moment, which produced stray space switches and made
+--     plain ctrl+N appear broken.
 --
--- Three mechanisms were tried; this is the only one that both works and looks
--- native:
---   * hs.eventtap.keyStroke — silently does nothing. Synthetic events do not
---     trigger symbolichotkeys.
---   * hs.spaces.gotoSpace — works, and handles any index, but drives the
---     Mission Control interface, so every switch flashes Mission Control.
---   * osascript + System Events — works, and gives the real native animation.
---     Costs an interpreter spawn per press, and is capped at desktop 8 because
---     macOS has no ctrl+9 (symbolichotkeys stop at 125).
---
--- The window id comes from hs.window.focusedWindow(), not yabai: run from
--- Hammerspoon, `yabai -m window --space N` and `yabai -m query --windows
--- --window` both exit 0 having done nothing, because yabai reports no focused
--- window in that context. yabai's window ids are CGWindowIDs, so passing the id
--- explicitly sidesteps that.
--- Keycodes for macOS's own "Switch to Desktop N" shortcuts (symbolichotkeys
--- 118-126 = desktops 1-9, all ctrl+N and all enabled here). 127 is desktop 10
--- (ctrl+0) and is disabled, so 10+ has no native shortcut to post.
-local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
-
-local function flatSpaces()
-    local flat = {}
-    for _, scr in ipairs(hs.screen.allScreens()) do
-        for _, id in ipairs(hs.spaces.spacesForScreen(scr:getUUID()) or {}) do
-            table.insert(flat, id)
-        end
-    end
-    return flat
-end
-
-local function currentIndex(flat)
-    local focused = hs.spaces.focusedSpace()
-    for i, id in ipairs(flat) do
-        if id == focused then return i end
-    end
-end
-
--- Post the native shortcut, but only once SHIFT is physically released.
--- This is the subtle one: while ctrl+shift is still held, the synthetic ctrl+N
--- merges with the real modifier state and macOS sees ctrl+shift+N, which
--- matches no shortcut — so nothing happens and the window looks like it moved
--- without following. Verified directly: `key code 19 using control down`
--- switches space, `using {control down, shift down}` does not.
--- Physical ctrl still being held is fine — that is part of the chord we want.
--- Switch to a space. Prefers macOS's own "Switch to Desktop N" shortcut so the
--- animation is the native side-scroll; falls back to hs.spaces.gotoSpace only
--- where no such shortcut exists (desktop 10+ — 127/ctrl+0 is disabled).
--- gotoSpace works for any index but drives the Mission Control interface, so it
--- flashes; that is why it is the fallback and not the default.
---
--- The shift wait is the subtle part: while ctrl+shift is physically held, a
--- synthetic ctrl+N merges with the real modifier state and macOS sees
--- ctrl+shift+N, which matches nothing — the window moves and the view never
--- follows. Verified directly: `key code 19 using control down` switches space,
--- `using {control down, shift down}` does not. Physical ctrl still being held is
--- fine, it is part of the chord we want.
-local function gotoIndex(idx, attempts)
-    local kc = KEYCODE[idx]
-    if not kc then -- no native shortcut (desktop 10+): accept the flash
-        local flat = flatSpaces()
-        if flat[idx] then hs.spaces.gotoSpace(flat[idx]) end
-        return
-    end
-    attempts = attempts or 0
-    if hs.eventtap.checkKeyboardModifiers().shift and attempts < 50 then
-        hs.timer.doAfter(0.03, function() gotoIndex(idx, attempts + 1) end)
-        return -- give up after ~1.5s rather than firing into a held chord
-    end
-    hs.execute(string.format(
-        [[osascript -e 'tell application "System Events" to key code %d using control down']], kc), true)
-end
-
--- target is a number, or "prev"/"next" resolved against the current space.
-local function moveAndFollow(target)
-    return function()
-        local ok, err = pcall(function()
-            local win = hs.window.focusedWindow()
-            if not win then return end
-            local flat = flatSpaces()
-            local idx = target
-            if target == "prev" or target == "next" then
-                local cur = currentIndex(flat)
-                if not cur then return end
-                idx = (target == "prev") and (cur - 1) or (cur + 1)
-            end
-            if idx < 1 or idx > #flat then
-                hs.alert.show("No space " .. tostring(idx), 0.7)
-                return
-            end
-            hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), idx), true)
-            gotoIndex(idx)
-        end)
-        if not ok then
-            hs.printf("moveAndFollow(%s) failed: %s", tostring(target), tostring(err))
-        end
-    end
-end
-
-local moveFollowKeys = {}
-pcall(function()
-    for i = 1, 9 do
-        table.insert(moveFollowKeys,
-            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i)))
-    end
-    -- Plain ctrl+1..9 are macOS's own shortcuts and are deliberately NOT bound
-    -- here: binding them would intercept the native switch and replace a smooth
-    -- side-scroll with the Mission Control fallback.
-    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
-    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
-end)
+-- Anything further needs a mechanism that does not synthesize keystrokes and
+-- does not go through Mission Control. Unresolved.

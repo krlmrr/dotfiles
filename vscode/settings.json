@@ -392,8 +392,8 @@
     "workbench.startupEditor": "none",
     // Custom CSS
     "vscode_custom_css.imports": [
-        "file:///Users/karlm/Code/dotfiles/mac/vscode/custom.css",
-        "file:///Users/karlm/Code/dotfiles/mac/vscode/custom.js"
+        "file:///Users/karlm/Code/dotfiles/vscode/custom.css",
+        "file:///Users/karlm/Code/dotfiles/vscode/custom.js"
     ],
     "claudeCode.preferredLocation": "sidebar",
     "claudeCode.diffEnabled": false,
@@ -428,4 +428,5 @@
     // default and only adjusts colours that actually fail.
     "terminal.integrated.minimumContrastRatio": 4.5,
     "claudeCode.focusView": false,
+    "zenMode.hideLineNumbers": false,
 }

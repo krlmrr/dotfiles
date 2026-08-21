@@ -5,7 +5,7 @@ sketchybar --bar position=top notch_offset=3 height=24 blur_radius=0 color=0x000
 
 # Toggle between sketchybar and native menu bar on mouse hover: managed by
 # launchd (com.dotfiles.menubar-toggle), NOT launched here — so `sketchybar
-# --reload` can't orphan it. See mac/sketchybar/com.dotfiles.menubar-toggle.plist.
+# --reload` can't orphan it. See sketchybar/com.dotfiles.menubar-toggle.plist.
 
 ##### Changing Defaults #####
 default=(

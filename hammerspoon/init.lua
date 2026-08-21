@@ -82,10 +82,10 @@ hs.hotkey.bind({"alt"}, "g", function()
     if output:match("%d+") then
         hs.execute("yabai --stop-service &", true)
         hs.execute("skhd --stop-service &", true)
-        hs.execute("/Users/karlm/Code/dotfiles/mac/yabai/show-dock.sh &", true)
+        hs.execute("/Users/karlm/Code/dotfiles/yabai/show-dock.sh &", true)
         hs.alert.show("Tiling off")
     else
-        hs.execute("/Users/karlm/Code/dotfiles/mac/yabai/hide-dock.sh &", true)
+        hs.execute("/Users/karlm/Code/dotfiles/yabai/hide-dock.sh &", true)
         hs.execute("yabai --start-service &", true)
         hs.execute("skhd --start-service &", true)
         hs.alert.show("Tiling on")

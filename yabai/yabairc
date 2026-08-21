@@ -21,7 +21,7 @@
 # ever land a desk in the wrong order.
 WARP_SETTLE=0
 LOG=/tmp/yabai.log
-SELF="$HOME/Code/dotfiles/mac/yabai/yabairc"
+SELF="$HOME/Code/dotfiles/yabai/yabairc"
 LAPTOP_W=2056          # MBP 16" reports 2056x1329 in yabai points; used to
 LAPTOP_H=1329          # tell the laptop panel from an external display.
 SIG_FILE=/tmp/yabai_display_sig
@@ -671,22 +671,22 @@ yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 # Placement signals. `window --space` works SIP-on (yabai 7.1.25) and the layout
 # rebuild is warp-based (tree-only), so placement runs fully in both modes. Only
 # `space --focus` still needs the SA — just the startup focus below is gated.
-yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/mac/yabai/yabairc display-change"
-yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_destroyed app="$BROWSER_RE" action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
-yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/mac/yabai/yabairc place-one \$YABAI_WINDOW_ID"
+yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
+yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
+yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
+yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
+yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/yabai/yabairc place"
+yabai -m signal --add event=window_destroyed app="$BROWSER_RE" action="\$HOME/Code/dotfiles/yabai/yabairc place"
+yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/yabai/yabairc place-one \$YABAI_WINDOW_ID"
 # Heal on returning to a space, and — more importantly — this is what resolves a
 # SWAP: dragging a window across spaces via Mission Control normally lands you on
 # the destination desk, which fires space_changed. place_desks self-skips via
 # shape_correct, so this is a no-op when nothing has changed.
-yabai -m signal --add event=space_changed action="\$HOME/Code/dotfiles/mac/yabai/yabairc place"
+yabai -m signal --add event=space_changed action="\$HOME/Code/dotfiles/yabai/yabairc place"
 # Direct swap trigger when yabai reports the move itself (lower latency than
 # waiting for space_changed; harmless duplicate when it doesn't fire). Gated by
 # on_moved so within-space drags and resizes cost one query, not a placement.
-yabai -m signal --add event=window_moved action="\$HOME/Code/dotfiles/mac/yabai/yabairc moved \$YABAI_WINDOW_ID"
+yabai -m signal --add event=window_moved action="\$HOME/Code/dotfiles/yabai/yabairc moved \$YABAI_WINDOW_ID"
 yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
 place_desks startup
 # Startup focus of the editor space needs the SA; under SIP-on switch with ^3.

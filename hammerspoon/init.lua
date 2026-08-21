@@ -123,10 +123,22 @@ pcall(function() require("hs.ipc") end)
 local YABAI = "/opt/homebrew/bin/yabai"
 local FOLLOW_DELAY = 0.05 -- let the move land before the space switch
 
+-- macOS only has "Switch to Desktop N" shortcuts for 1-8 (symbolichotkeys
+-- 118-125); there is no ctrl+9, so space 9 can be moved to but not followed.
+local MAX_FOLLOWABLE = 8
+
+-- Spaces get created and removed here, so a target may simply not exist. yabai
+-- says "could not locate space with mission-control index 'N'" and exits
+-- non-zero; in that case skip the follow rather than switching to nowhere.
 local function moveAndFollow(target, followKey)
     return function()
         local ok, err = pcall(function()
-            hs.execute(YABAI .. " -m window --space " .. target, true)
+            local out, success = hs.execute(YABAI .. " -m window --space " .. target, true)
+            if not success then
+                hs.alert.show("No space " .. tostring(target), 0.7)
+                return
+            end
+            if not followKey then return end -- move-only (space 9)
             hs.timer.doAfter(FOLLOW_DELAY, function()
                 pcall(function() hs.eventtap.keyStroke({ "ctrl" }, followKey, 0) end)
             end)
@@ -139,9 +151,11 @@ end
 
 local moveFollowKeys = {}
 pcall(function()
-    for i = 1, 6 do
+    for i = 1, 9 do
+        -- 1-8 move and follow; 9 moves only (no native shortcut to follow with)
+        local followKey = (i <= MAX_FOLLOWABLE) and tostring(i) or nil
         table.insert(moveFollowKeys,
-            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i, tostring(i))))
+            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i, followKey)))
     end
     table.insert(moveFollowKeys,
         hs.hotkey.bind({ "ctrl", "shift" }, "left", moveAndFollow("prev", "left")))

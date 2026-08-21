@@ -47,11 +47,9 @@ shift + ctrl + alt + cmd - right : yabai -m window --warp east
 # (hammerspoon/init.lua, "Move window to a space AND follow it") because they
 # also post macOS's own ctrl+N to follow the window. skhd's event tap swallows
 # the chord before hs.hotkey can see it, so they cannot be bound in both places.
-# 7..9 stay here, move-only: desktops 7+ have no native "Switch to Desktop"
-# shortcut enabled, so there is nothing to follow with.
-ctrl + shift - 7 : yabai -m window --space 7
-ctrl + shift - 8 : yabai -m window --space 8
-ctrl + shift - 9 : yabai -m window --space 9
+# All of ctrl+shift+1..9 and ctrl+shift+left/right are Hammerspoon's now.
+# 1-8 move and follow; 9 moves only, since macOS has no "Switch to Desktop 9"
+# shortcut (symbolichotkeys stop at 8).
 shift + ctrl + alt + cmd - 1 : yabai -m window --space 1
 shift + ctrl + alt + cmd - 2 : yabai -m window --space 2
 shift + ctrl + alt + cmd - 3 : yabai -m window --space 3

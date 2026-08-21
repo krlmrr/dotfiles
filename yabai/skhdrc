@@ -58,29 +58,29 @@ shift + ctrl + alt + cmd - right : yabai -m window --warp east
 #
 # `&&` matters: if the target space does not exist yabai exits non-zero and the
 # follow is skipped, rather than switching to nowhere.
-ctrl + shift - left  : yabai -m window --space prev && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow left
-ctrl + shift - right : yabai -m window --space next && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow right
+# ctrl + shift - left  : yabai -m window --space prev && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow left
+# ctrl + shift - right : yabai -m window --space next && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow right
 
-ctrl + shift - 1 : yabai -m window --space 1 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 1
-ctrl + shift - 2 : yabai -m window --space 2 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 2
-ctrl + shift - 3 : yabai -m window --space 3 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 3
-ctrl + shift - 4 : yabai -m window --space 4 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 4
-ctrl + shift - 5 : yabai -m window --space 5 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 5
-ctrl + shift - 6 : yabai -m window --space 6 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 6
-ctrl + shift - 7 : yabai -m window --space 7 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 7
-ctrl + shift - 8 : yabai -m window --space 8 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 8
-ctrl + shift - 9 : yabai -m window --space 9 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 9
+# ctrl + shift - 1 : yabai -m window --space 1 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 1
+# ctrl + shift - 2 : yabai -m window --space 2 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 2
+# ctrl + shift - 3 : yabai -m window --space 3 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 3
+# ctrl + shift - 4 : yabai -m window --space 4 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 4
+# ctrl + shift - 5 : yabai -m window --space 5 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 5
+# ctrl + shift - 6 : yabai -m window --space 6 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 6
+# ctrl + shift - 7 : yabai -m window --space 7 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 7
+# ctrl + shift - 8 : yabai -m window --space 8 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 8
+# ctrl + shift - 9 : yabai -m window --space 9 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 9
 
 # Lily58 "meh" equivalents — same move-and-follow behaviour
-shift + ctrl + alt + cmd - 1 : yabai -m window --space 1 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 1
-shift + ctrl + alt + cmd - 2 : yabai -m window --space 2 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 2
-shift + ctrl + alt + cmd - 3 : yabai -m window --space 3 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 3
-shift + ctrl + alt + cmd - 4 : yabai -m window --space 4 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 4
-shift + ctrl + alt + cmd - 5 : yabai -m window --space 5 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 5
-shift + ctrl + alt + cmd - 6 : yabai -m window --space 6 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 6
-shift + ctrl + alt + cmd - 7 : yabai -m window --space 7 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 7
-shift + ctrl + alt + cmd - 8 : yabai -m window --space 8 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 8
-shift + ctrl + alt + cmd - 9 : yabai -m window --space 9 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 9
+# shift + ctrl + alt + cmd - 1 : yabai -m window --space 1 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 1
+# shift + ctrl + alt + cmd - 2 : yabai -m window --space 2 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 2
+# shift + ctrl + alt + cmd - 3 : yabai -m window --space 3 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 3
+# shift + ctrl + alt + cmd - 4 : yabai -m window --space 4 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 4
+# shift + ctrl + alt + cmd - 5 : yabai -m window --space 5 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 5
+# shift + ctrl + alt + cmd - 6 : yabai -m window --space 6 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 6
+# shift + ctrl + alt + cmd - 7 : yabai -m window --space 7 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 7
+# shift + ctrl + alt + cmd - 8 : yabai -m window --space 8 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 8
+# shift + ctrl + alt + cmd - 9 : yabai -m window --space 9 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 9
 
 # Layout
 alt - f : yabai -m window --toggle zoom-fullscreen

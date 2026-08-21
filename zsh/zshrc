@@ -22,3 +22,15 @@ export PATH="$HOME/.local/bin:$PATH:$HOME/.composer/vendor/bin:$HOME/.config/com
 # Aliases and functions. Sourced rather than concatenated at build time — the
 # whole file is symlinked to ~/.zshrc now, so edits are live.
 source "$HOME/Code/dotfiles/zsh/aliases.sh"
+
+
+# Herd injected PHP 8.4 configuration.
+export HERD_PHP_84_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/84"
+
+
+# Herd injected PHP 8.5 configuration.
+export HERD_PHP_85_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/85"
+
+
+# Herd injected PHP 8.3 configuration.
+export HERD_PHP_83_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/83"

@@ -76,22 +76,6 @@ local spaceWatcher = hs.spaces.watcher.new(function()
 end)
 spaceWatcher:start()
 
--- Alt+G: toggle yabai + skhd
-hs.hotkey.bind({"alt"}, "g", function()
-    local output = hs.execute("pgrep -x yabai 2>/dev/null", true) or ""
-    if output:match("%d+") then
-        hs.execute("yabai --stop-service &", true)
-        hs.execute("skhd --stop-service &", true)
-        hs.execute("/Users/karlm/Code/dotfiles/yabai/show-dock.sh &", true)
-        hs.alert.show("Tiling off")
-    else
-        hs.execute("/Users/karlm/Code/dotfiles/yabai/hide-dock.sh &", true)
-        hs.execute("yabai --start-service &", true)
-        hs.execute("skhd --start-service &", true)
-        hs.alert.show("Tiling on")
-    end
-end)
-
 -- Periodic health check: restart eventtaps if anything has silently died
 local healthCheck = hs.timer.new(30, function()
     if not controlTap:isEnabled() or not keyDownTap:isEnabled() then

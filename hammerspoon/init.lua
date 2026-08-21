@@ -140,8 +140,10 @@ local YABAI = "/opt/homebrew/bin/yabai"
 -- --window` both exit 0 having done nothing, because yabai reports no focused
 -- window in that context. yabai's window ids are CGWindowIDs, so passing the id
 -- explicitly sidesteps that.
--- Desktops 1-8 only: macOS has no "Switch to Desktop 9" shortcut to post.
-local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28 }
+-- Keycodes for macOS's own "Switch to Desktop N" shortcuts (symbolichotkeys
+-- 118-126 = desktops 1-9, all ctrl+N and all enabled here). 127 is desktop 10
+-- (ctrl+0) and is disabled, so 10+ has no native shortcut to post.
+local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
 
 local function flatSpaces()
     local flat = {}
@@ -167,12 +169,28 @@ end
 -- without following. Verified directly: `key code 19 using control down`
 -- switches space, `using {control down, shift down}` does not.
 -- Physical ctrl still being held is fine — that is part of the chord we want.
-local function follow(idx, attempts)
+-- Switch to a space. Prefers macOS's own "Switch to Desktop N" shortcut so the
+-- animation is the native side-scroll; falls back to hs.spaces.gotoSpace only
+-- where no such shortcut exists (desktop 10+ — 127/ctrl+0 is disabled).
+-- gotoSpace works for any index but drives the Mission Control interface, so it
+-- flashes; that is why it is the fallback and not the default.
+--
+-- The shift wait is the subtle part: while ctrl+shift is physically held, a
+-- synthetic ctrl+N merges with the real modifier state and macOS sees
+-- ctrl+shift+N, which matches nothing — the window moves and the view never
+-- follows. Verified directly: `key code 19 using control down` switches space,
+-- `using {control down, shift down}` does not. Physical ctrl still being held is
+-- fine, it is part of the chord we want.
+local function gotoIndex(idx, attempts)
     local kc = KEYCODE[idx]
-    if not kc then return end -- desktop 9+: nothing to post
+    if not kc then -- no native shortcut (desktop 10+): accept the flash
+        local flat = flatSpaces()
+        if flat[idx] then hs.spaces.gotoSpace(flat[idx]) end
+        return
+    end
     attempts = attempts or 0
     if hs.eventtap.checkKeyboardModifiers().shift and attempts < 50 then
-        hs.timer.doAfter(0.03, function() follow(idx, attempts + 1) end)
+        hs.timer.doAfter(0.03, function() gotoIndex(idx, attempts + 1) end)
         return -- give up after ~1.5s rather than firing into a held chord
     end
     hs.execute(string.format(
@@ -197,7 +215,7 @@ local function moveAndFollow(target)
                 return
             end
             hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), idx), true)
-            follow(idx)
+            gotoIndex(idx)
         end)
         if not ok then
             hs.printf("moveAndFollow(%s) failed: %s", tostring(target), tostring(err))
@@ -211,6 +229,9 @@ pcall(function()
         table.insert(moveFollowKeys,
             hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i)))
     end
+    -- Plain ctrl+1..9 are macOS's own shortcuts and are deliberately NOT bound
+    -- here: binding them would intercept the native switch and replace a smooth
+    -- side-scroll with the Mission Control fallback.
     table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
     table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
 end)

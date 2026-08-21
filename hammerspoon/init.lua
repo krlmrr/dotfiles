@@ -92,60 +92,53 @@ pcall(function() require("hs.ipc") end)
 -- ── Move window to a space AND follow it ────────────────────────────────────
 -- ctrl+shift+1..9 / ctrl+shift+arrows: move the focused window to that desktop
 -- and go there too. yabai does the move (public API, fine with SIP on) but
--- cannot focus a space — `space --focus` needs the scripting addition SIP
--- blocks — so hs.spaces drives the switch.
+-- cannot focus a space — `space --focus` needs the scripting addition SIP blocks
+-- — so we post macOS's own "Switch to Desktop N" shortcut and let Apple do the
+-- switching with its native animation.
 --
--- Four mechanisms were tried before this one; all of them posted macOS's own
--- ctrl+N shortcut and all of them failed, each for a different reason:
---   1. hs.eventtap.keyStroke — appeared to be a no-op (it is not; see 3).
---   2. Held modifiers: the chord's own ctrl+shift is still down when the handler
---      runs, so the posted ctrl+N merged into ctrl+shift+N and matched nothing.
---      Forcing the event flags fixed that.
---   3. skhd's event tap consumed the chord before hs.hotkey ever saw it, so
---      while skhdrc also bound these the handler never ran at all.
---   4. Fatally: the frontmost app eats ctrl+1..9 if it binds them. VS Code does
---      by default (Focus Nth Editor Group), and the key is necessarily posted
---      while the window you just moved is still frontmost. Confirmed — with VS
---      Code frontmost the post is swallowed, with Finder frontmost it works.
+-- setFlags is the load-bearing part. The chord's own ctrl+shift is still
+-- physically held when this runs, and without forcing the flags the posted event
+-- merges with the real modifier state into ctrl+shift+N, which matches no
+-- shortcut — the window moves and the view never follows.
 --
--- hs.spaces.gotoSpace posts no keys, so nothing can intercept it and no modifier
--- state matters. Cost: it drives the Mission Control interface, so each switch
--- flashes it. That is the accepted trade for actually working every time.
+-- Hammerspoon must own these chords EXCLUSIVELY: skhd's event tap consumes the
+-- chord before hs.hotkey ever sees it, so binding them in skhdrc too silently
+-- disables this. They are commented out there; keep it that way.
 --
--- Space indices: yabai's mission-control index spans all displays, so flatten
--- each screen's list in screen order to match. Correct on one display; suspect
--- this first if a follow lands on the wrong space multi-display.
+-- Rejected alternatives, for anyone tempted:
+--   hs.spaces.gotoSpace — works and cannot be intercepted, but drives the
+--     Mission Control interface so every switch flashes it. Tried; disliked.
+--   osascript posting the key — cannot force event flags, so it loses to the
+--     held ctrl+shift.
+--   A skhd bind plus a CGEventSetFlags helper binary (yabai/helpers/
+--     space-follow.swift, still in the repo, unused) — worked, then stopped
+--     following for reasons never pinned down. Hammerspoon is where this has
+--     been reliable.
+--
+-- NO TIMERS here on purpose: an earlier version polled for shift-release and
+-- queued keystrokes that fired later, which produced stray space switches and
+-- broke plain ctrl+N.
 local YABAI = "/opt/homebrew/bin/yabai"
+local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
+local ARROW = { prev = 123, next = 124 } -- ctrl+left / ctrl+right = move a space
 
-local function flatSpaces()
-    local flat = {}
-    for _, scr in ipairs(hs.screen.allScreens()) do
-        for _, id in ipairs(hs.spaces.spacesForScreen(scr:getUUID()) or {}) do
-            table.insert(flat, id)
-        end
-    end
-    return flat
+local function post(kc)
+    local down = hs.eventtap.event.newKeyEvent(kc, true)
+    down:setFlags({ ctrl = true }); down:post()
+    local up = hs.eventtap.event.newKeyEvent(kc, false)
+    up:setFlags({ ctrl = true }); up:post()
 end
 
--- target is 1-9, or "prev"/"next". Move first, then ask yabai where the window
--- landed — one code path for both, and no end-of-range arithmetic to get wrong.
+-- target is 1-9, or "prev"/"next" for the adjacent desktop.
 local function moveAndFollow(target)
     return function()
         pcall(function()
             local win = hs.window.focusedWindow()
             if not win then return end
-            local _, ok = hs.execute(string.format(
-                "%s -m window %d --space %s", YABAI, win:id(), tostring(target)), true)
-            if not ok then
-                hs.alert.show("No space " .. tostring(target), 0.7)
-                return
-            end
-            local out = hs.execute(string.format("%s -m query --windows --window %d", YABAI, win:id()), true)
-            local info = out and hs.json.decode(out)
-            local flat = flatSpaces()
-            if info and info.space and flat[info.space] then
-                hs.spaces.gotoSpace(flat[info.space])
-            end
+            hs.execute(string.format("%s -m window %d --space %s", YABAI, win:id(), tostring(target)), true)
+            local kc = KEYCODE[target] or ARROW[target]
+            if not kc then return end
+            post(kc)
         end)
     end
 end

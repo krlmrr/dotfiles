@@ -122,26 +122,27 @@ pcall(function() require("hs.ipc") end)
 -- eventtaps above, which matter far more than this does.
 local YABAI = "/opt/homebrew/bin/yabai"
 
--- Two things here are the result of dead ends, both worth not repeating:
+-- Follow by posting macOS's own "Switch to Desktop N" shortcut through System
+-- Events, so Apple does the switching and you get the normal side-scroll.
 --
--- 1. Follow uses hs.spaces.gotoSpace, not a synthesized ctrl+N. Posting macOS's
---    own "Switch to Desktop N" shortcut via hs.eventtap.keyStroke silently does
---    nothing — synthetic events do not trigger symbolichotkeys. (osascript via
---    System Events does work, but spawns an interpreter per press and is capped
---    at desktop 8, since macOS has no ctrl+9.) hs.spaces uses the CoreGraphics
---    space APIs: no scripting addition, no SIP change, any index.
+-- Three mechanisms were tried; this is the only one that both works and looks
+-- native:
+--   * hs.eventtap.keyStroke — silently does nothing. Synthetic events do not
+--     trigger symbolichotkeys.
+--   * hs.spaces.gotoSpace — works, and handles any index, but drives the
+--     Mission Control interface, so every switch flashes Mission Control.
+--   * osascript + System Events — works, and gives the real native animation.
+--     Costs an interpreter spawn per press, and is capped at desktop 8 because
+--     macOS has no ctrl+9 (symbolichotkeys stop at 125).
 --
--- 2. The window id comes from hs.window.focusedWindow(), not from yabai. Run
---    from Hammerspoon, `yabai -m window --space N` and
---    `yabai -m query --windows --window` both exit 0 having done nothing —
---    yabai reports no focused window in that context. Hammerspoon knows the
---    frontmost window, and yabai's window ids are CGWindowIDs, so passing the
---    id explicitly sidesteps it entirely.
---
--- Space indices: yabai's mission-control index spans all displays, so flatten
--- each screen's space list in screen order to match that 1-based numbering.
--- Correct on a single display; suspect this mapping first if follow ever lands
--- on the wrong space multi-display.
+-- The window id comes from hs.window.focusedWindow(), not yabai: run from
+-- Hammerspoon, `yabai -m window --space N` and `yabai -m query --windows
+-- --window` both exit 0 having done nothing, because yabai reports no focused
+-- window in that context. yabai's window ids are CGWindowIDs, so passing the id
+-- explicitly sidesteps that.
+-- Desktops 1-8 only: macOS has no "Switch to Desktop 9" shortcut to post.
+local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28 }
+
 local function flatSpaces()
     local flat = {}
     for _, scr in ipairs(hs.screen.allScreens()) do
@@ -157,6 +158,13 @@ local function currentIndex(flat)
     for i, id in ipairs(flat) do
         if id == focused then return i end
     end
+end
+
+local function follow(idx)
+    local kc = KEYCODE[idx]
+    if not kc then return end -- desktop 9+: move only, nothing to post
+    hs.execute(string.format(
+        [[osascript -e 'tell application "System Events" to key code %d using control down']], kc), true)
 end
 
 -- target is a number, or "prev"/"next" resolved against the current space.
@@ -177,7 +185,7 @@ local function moveAndFollow(target)
                 return
             end
             hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), idx), true)
-            hs.spaces.gotoSpace(flat[idx])
+            follow(idx)
         end)
         if not ok then
             hs.printf("moveAndFollow(%s) failed: %s", tostring(target), tostring(err))

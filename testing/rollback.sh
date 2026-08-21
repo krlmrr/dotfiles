@@ -33,9 +33,11 @@ rm -f ~/.ideavimrc
 
 # Restore default .zshrc
 echo "Resetting .zshrc..."
-if [ -f ~/.zshrc ]; then
-    rm ~/.zshrc
-    echo "Removed .zshrc (oh-my-zsh will regenerate on next login)"
+# ~/.zshrc is a generated shim (a real file, not a symlink) that sources
+# zsh/zshrc. Removing it also discards anything Herd or an installer appended.
+if [ -f ~/.zshrc ] || [ -L ~/.zshrc ]; then
+    rm -f ~/.zshrc
+    echo "Removed .zshrc shim (oh-my-zsh will regenerate on next login)"
 fi
 
 # Reset .gitconfig and the generated identity include

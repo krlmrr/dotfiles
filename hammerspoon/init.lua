@@ -121,27 +121,63 @@ pcall(function() require("hs.ipc") end)
 -- Everything is pcall-wrapped: a failure here must never break the Caps Lock
 -- eventtaps above, which matter far more than this does.
 local YABAI = "/opt/homebrew/bin/yabai"
-local FOLLOW_DELAY = 0.05 -- let the move land before the space switch
 
--- macOS only has "Switch to Desktop N" shortcuts for 1-8 (symbolichotkeys
--- 118-125); there is no ctrl+9, so space 9 can be moved to but not followed.
-local MAX_FOLLOWABLE = 8
+-- Two things here are the result of dead ends, both worth not repeating:
+--
+-- 1. Follow uses hs.spaces.gotoSpace, not a synthesized ctrl+N. Posting macOS's
+--    own "Switch to Desktop N" shortcut via hs.eventtap.keyStroke silently does
+--    nothing — synthetic events do not trigger symbolichotkeys. (osascript via
+--    System Events does work, but spawns an interpreter per press and is capped
+--    at desktop 8, since macOS has no ctrl+9.) hs.spaces uses the CoreGraphics
+--    space APIs: no scripting addition, no SIP change, any index.
+--
+-- 2. The window id comes from hs.window.focusedWindow(), not from yabai. Run
+--    from Hammerspoon, `yabai -m window --space N` and
+--    `yabai -m query --windows --window` both exit 0 having done nothing —
+--    yabai reports no focused window in that context. Hammerspoon knows the
+--    frontmost window, and yabai's window ids are CGWindowIDs, so passing the
+--    id explicitly sidesteps it entirely.
+--
+-- Space indices: yabai's mission-control index spans all displays, so flatten
+-- each screen's space list in screen order to match that 1-based numbering.
+-- Correct on a single display; suspect this mapping first if follow ever lands
+-- on the wrong space multi-display.
+local function flatSpaces()
+    local flat = {}
+    for _, scr in ipairs(hs.screen.allScreens()) do
+        for _, id in ipairs(hs.spaces.spacesForScreen(scr:getUUID()) or {}) do
+            table.insert(flat, id)
+        end
+    end
+    return flat
+end
 
--- Spaces get created and removed here, so a target may simply not exist. yabai
--- says "could not locate space with mission-control index 'N'" and exits
--- non-zero; in that case skip the follow rather than switching to nowhere.
-local function moveAndFollow(target, followKey)
+local function currentIndex(flat)
+    local focused = hs.spaces.focusedSpace()
+    for i, id in ipairs(flat) do
+        if id == focused then return i end
+    end
+end
+
+-- target is a number, or "prev"/"next" resolved against the current space.
+local function moveAndFollow(target)
     return function()
         local ok, err = pcall(function()
-            local out, success = hs.execute(YABAI .. " -m window --space " .. target, true)
-            if not success then
-                hs.alert.show("No space " .. tostring(target), 0.7)
+            local win = hs.window.focusedWindow()
+            if not win then return end
+            local flat = flatSpaces()
+            local idx = target
+            if target == "prev" or target == "next" then
+                local cur = currentIndex(flat)
+                if not cur then return end
+                idx = (target == "prev") and (cur - 1) or (cur + 1)
+            end
+            if idx < 1 or idx > #flat then
+                hs.alert.show("No space " .. tostring(idx), 0.7)
                 return
             end
-            if not followKey then return end -- move-only (space 9)
-            hs.timer.doAfter(FOLLOW_DELAY, function()
-                pcall(function() hs.eventtap.keyStroke({ "ctrl" }, followKey, 0) end)
-            end)
+            hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), idx), true)
+            hs.spaces.gotoSpace(flat[idx])
         end)
         if not ok then
             hs.printf("moveAndFollow(%s) failed: %s", tostring(target), tostring(err))
@@ -152,13 +188,9 @@ end
 local moveFollowKeys = {}
 pcall(function()
     for i = 1, 9 do
-        -- 1-8 move and follow; 9 moves only (no native shortcut to follow with)
-        local followKey = (i <= MAX_FOLLOWABLE) and tostring(i) or nil
         table.insert(moveFollowKeys,
-            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i, followKey)))
+            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i)))
     end
-    table.insert(moveFollowKeys,
-        hs.hotkey.bind({ "ctrl", "shift" }, "left", moveAndFollow("prev", "left")))
-    table.insert(moveFollowKeys,
-        hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next", "right")))
+    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
+    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
 end)

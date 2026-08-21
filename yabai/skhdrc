@@ -42,27 +42,31 @@ shift + ctrl + alt + cmd - right : yabai -m window --warp east
 # nothing ^1..^5 doesn't. SIP-off (SA loaded), add
 # `ctrl - N : yabai -m space --focus N` here to let yabai focus spaces directly.
 
-# Move window to adjacent desktop (ctrl+shift laptop, meh+shift Lily58).
-# `window --space` works SIP-on; no `space --focus` follow — it no-ops SIP-on and
-# macOS owns ^1..^9 / ^<-> for the actual switching.
+# Move window to adjacent desktop / by number — NOW OWNED BY HAMMERSPOON.
+# See hammerspoon/init.lua ("Move window to a space AND follow it"): it moves the
+# window AND follows it to the target space, which skhd cannot do (yabai's
+# `space --focus` needs the scripting addition, which SIP blocks).
 #
-# These briefly moved to Hammerspoon on 2026-08-21 so they could also follow the
-# window to the target space. That was reverted — see the comment block in
-# hammerspoon/init.lua for the four mechanisms tried and why each failed. Back to
-# move-only here, which has always worked.
-ctrl + shift - left  : yabai -m window --space prev
-ctrl + shift - right : yabai -m window --space next
+# These MUST stay commented out. skhd's event tap consumes the chord before
+# hs.hotkey ever sees it, so binding them here silently disables the follow —
+# that was the cause of a long debugging session on 2026-08-21 where the window
+# moved but the view never followed. The two cannot coexist on one chord.
+#
+# Kept (commented) for reference and for a quick fallback: uncomment these and
+# restart skhd to get plain move-without-follow back if Hammerspoon is broken.
+# ctrl + shift - left  : yabai -m window --space prev
+# ctrl + shift - right : yabai -m window --space next
 
 # Move window to desktop by number
-ctrl + shift - 1 : yabai -m window --space 1
-ctrl + shift - 2 : yabai -m window --space 2
-ctrl + shift - 3 : yabai -m window --space 3
-ctrl + shift - 4 : yabai -m window --space 4
-ctrl + shift - 5 : yabai -m window --space 5
-ctrl + shift - 6 : yabai -m window --space 6
-ctrl + shift - 7 : yabai -m window --space 7
-ctrl + shift - 8 : yabai -m window --space 8
-ctrl + shift - 9 : yabai -m window --space 9
+# ctrl + shift - 1 : yabai -m window --space 1
+# ctrl + shift - 2 : yabai -m window --space 2
+# ctrl + shift - 3 : yabai -m window --space 3
+# ctrl + shift - 4 : yabai -m window --space 4
+# ctrl + shift - 5 : yabai -m window --space 5
+# ctrl + shift - 6 : yabai -m window --space 6
+# ctrl + shift - 7 : yabai -m window --space 7
+# ctrl + shift - 8 : yabai -m window --space 8
+# ctrl + shift - 9 : yabai -m window --space 9
 shift + ctrl + alt + cmd - 1 : yabai -m window --space 1
 shift + ctrl + alt + cmd - 2 : yabai -m window --space 2
 shift + ctrl + alt + cmd - 3 : yabai -m window --space 3

@@ -106,25 +106,62 @@ healthCheck:start()
 pcall(function() require("hs.ipc") end)
 
 -- ── Move window to a space AND follow it ────────────────────────────────────
--- REMOVED 2026-08-21, pending a rethink. See git history for the attempts.
+-- ctrl+shift+N moves the focused window to desktop N and follows it there.
 --
--- The goal: ctrl+shift+N moves the focused window to desktop N and takes you
--- with it. yabai can do the move (public API, works with SIP on) but not the
--- follow (`space --focus` needs the blocked scripting addition).
+-- Hammerspoon must own these chords EXCLUSIVELY. skhd's event tap consumes the
+-- chord before hs.hotkey sees it, so while skhdrc also bound ctrl+shift+N the
+-- handler below simply never ran — which is why this looked like "the follow
+-- doesn't work" through several rewrites when the follow code was fine all
+-- along. The skhdrc binds are commented out; they must stay that way.
 --
--- What was tried, and why each failed:
---   hs.eventtap.keyStroke posting ctrl+N — no-op; synthetic events do not
---     trigger macOS symbolichotkeys at all.
---   hs.spaces.gotoSpace — works for any index, but drives the Mission Control
---     interface, so every switch flashes it. Not native-feeling.
---   osascript + System Events posting ctrl+N — works when fired from a script
---     with no modifiers held, but NOT from the hotkey: while ctrl+shift is
---     physically down the synthetic ctrl+N merges with the real modifier state,
---     macOS sees ctrl+shift+N, and nothing matches. Confirmed directly.
---   Polling for shift release before posting — this is where it went wrong.
---     Every press spawns a poll chain that fires a keystroke at an
---     indeterminate later moment, which produced stray space switches and made
---     plain ctrl+N appear broken.
+-- Cost of exclusivity: if Hammerspoon is down, these chords do nothing at all
+-- (skhd is no longer a fallback). Uncomment the skhdrc block for move-only.
 --
--- Anything further needs a mechanism that does not synthesize keystrokes and
--- does not go through Mission Control. Unresolved.
+-- NO TIMERS. An earlier version polled for shift-release before posting, which
+-- queued a keystroke to fire at an indeterminate later moment and produced
+-- stray space switches that broke plain ctrl+N. Everything here is synchronous.
+--
+-- The follow posts macOS's own "Switch to Desktop N" shortcut (symbolichotkeys
+-- 118-126 = ctrl+1..9). setFlags is the crux: the chord's own ctrl+shift is
+-- still physically held when this runs, and without forcing the flags the
+-- posted event merges with the real modifier state into ctrl+shift+N, which
+-- matches nothing. Forcing ctrl-only defeated a synthetic held shift in
+-- testing.
+--
+-- The window id comes from hs.window.focusedWindow(), not yabai: run from
+-- Hammerspoon, `yabai -m window --space N` with no id exits 0 having done
+-- nothing, because yabai reports no focused window in that context.
+local YABAI = "/opt/homebrew/bin/yabai"
+local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
+local ARROW = { prev = 123, next = 124 } -- ctrl+left / ctrl+right = move a space
+
+local function post(kc)
+    local down = hs.eventtap.event.newKeyEvent(kc, true)
+    down:setFlags({ ctrl = true }); down:post()
+    local up = hs.eventtap.event.newKeyEvent(kc, false)
+    up:setFlags({ ctrl = true }); up:post()
+end
+
+-- target is 1-9, or "prev"/"next" for the adjacent desktop.
+local function moveAndFollow(target)
+    return function()
+        pcall(function()
+            local win = hs.window.focusedWindow()
+            if not win then return end
+            hs.execute(string.format("%s -m window %d --space %s", YABAI, win:id(), tostring(target)), true)
+            local kc = KEYCODE[target] or ARROW[target]
+            if not kc then return end
+            post(kc)
+        end)
+    end
+end
+
+local moveFollowKeys = {}
+pcall(function()
+    for i = 1, 9 do
+        table.insert(moveFollowKeys,
+            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i)))
+    end
+    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
+    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
+end)

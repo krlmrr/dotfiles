@@ -99,3 +99,52 @@ local healthCheck = hs.timer.new(30, function()
     end
 end)
 healthCheck:start()
+-- ── Remote control / inspection ─────────────────────────────────────────────
+-- Loads the message port the `hs` CLI talks to, so this config can be reloaded
+-- and inspected from a terminal (`hs -c 'hs.reload()'`, `hs -c '...'`) instead
+-- of only from the menu bar. Useful precisely when Hammerspoon is misbehaving.
+pcall(function() require("hs.ipc") end)
+
+-- ── Move window to a space AND follow it ────────────────────────────────────
+-- COSMIC-style "send to workspace and go there". macOS won't do it in one step
+-- with SIP on: `yabai -m window --space N` is public API and works, but
+-- `yabai -m space --focus N` needs the scripting addition, which SIP blocks.
+-- So yabai moves the window and macOS does its own switching — we just post the
+-- ctrl+N that System Settings ▸ Keyboard ▸ Shortcuts ▸ Mission Control already
+-- binds ("Switch to Desktop N", enabled for 1-6 here).
+--
+-- These chords used to live in skhdrc as move-without-follow; they were removed
+-- there because skhd's event tap would swallow the key before hs.hotkey saw it.
+-- ctrl+shift+7..9 are still skhd's (move only) — desktops 7+ have no native
+-- switch shortcut to follow with.
+--
+-- Everything is pcall-wrapped: a failure here must never break the Caps Lock
+-- eventtaps above, which matter far more than this does.
+local YABAI = "/opt/homebrew/bin/yabai"
+local FOLLOW_DELAY = 0.05 -- let the move land before the space switch
+
+local function moveAndFollow(target, followKey)
+    return function()
+        local ok, err = pcall(function()
+            hs.execute(YABAI .. " -m window --space " .. target, true)
+            hs.timer.doAfter(FOLLOW_DELAY, function()
+                pcall(function() hs.eventtap.keyStroke({ "ctrl" }, followKey, 0) end)
+            end)
+        end)
+        if not ok then
+            hs.printf("moveAndFollow(%s) failed: %s", tostring(target), tostring(err))
+        end
+    end
+end
+
+local moveFollowKeys = {}
+pcall(function()
+    for i = 1, 6 do
+        table.insert(moveFollowKeys,
+            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i, tostring(i))))
+    end
+    table.insert(moveFollowKeys,
+        hs.hotkey.bind({ "ctrl", "shift" }, "left", moveAndFollow("prev", "left")))
+    table.insert(moveFollowKeys,
+        hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next", "right")))
+end)

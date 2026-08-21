@@ -160,9 +160,21 @@ local function currentIndex(flat)
     end
 end
 
-local function follow(idx)
+-- Post the native shortcut, but only once SHIFT is physically released.
+-- This is the subtle one: while ctrl+shift is still held, the synthetic ctrl+N
+-- merges with the real modifier state and macOS sees ctrl+shift+N, which
+-- matches no shortcut — so nothing happens and the window looks like it moved
+-- without following. Verified directly: `key code 19 using control down`
+-- switches space, `using {control down, shift down}` does not.
+-- Physical ctrl still being held is fine — that is part of the chord we want.
+local function follow(idx, attempts)
     local kc = KEYCODE[idx]
-    if not kc then return end -- desktop 9+: move only, nothing to post
+    if not kc then return end -- desktop 9+: nothing to post
+    attempts = attempts or 0
+    if hs.eventtap.checkKeyboardModifiers().shift and attempts < 50 then
+        hs.timer.doAfter(0.03, function() follow(idx, attempts + 1) end)
+        return -- give up after ~1.5s rather than firing into a held chord
+    end
     hs.execute(string.format(
         [[osascript -e 'tell application "System Events" to key code %d using control down']], kc), true)
 end

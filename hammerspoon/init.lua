@@ -106,62 +106,16 @@ healthCheck:start()
 pcall(function() require("hs.ipc") end)
 
 -- ── Move window to a space AND follow it ────────────────────────────────────
--- ctrl+shift+N moves the focused window to desktop N and follows it there.
+-- Lives in skhd now, not here: see yabai/skhdrc and
+-- yabai/helpers/space-follow.swift.
 --
--- Hammerspoon must own these chords EXCLUSIVELY. skhd's event tap consumes the
--- chord before hs.hotkey sees it, so while skhdrc also bound ctrl+shift+N the
--- handler below simply never ran — which is why this looked like "the follow
--- doesn't work" through several rewrites when the follow code was fine all
--- along. The skhdrc binds are commented out; they must stay that way.
+-- It was implemented here first, because Hammerspoon can force event flags
+-- (needed to stop the posted ctrl+N merging with the chord's own held
+-- ctrl+shift) and skhd cannot do that from a shell command. The helper binary
+-- solves that for skhd, and it inherits skhd's Accessibility grant rather than
+-- needing its own — so the whole thing works without Hammerspoon, and keeps
+-- working when Hammerspoon is down. That mattered enough to move it.
 --
--- Cost of exclusivity: if Hammerspoon is down, these chords do nothing at all
--- (skhd is no longer a fallback). Uncomment the skhdrc block for move-only.
---
--- NO TIMERS. An earlier version polled for shift-release before posting, which
--- queued a keystroke to fire at an indeterminate later moment and produced
--- stray space switches that broke plain ctrl+N. Everything here is synchronous.
---
--- The follow posts macOS's own "Switch to Desktop N" shortcut (symbolichotkeys
--- 118-126 = ctrl+1..9). setFlags is the crux: the chord's own ctrl+shift is
--- still physically held when this runs, and without forcing the flags the
--- posted event merges with the real modifier state into ctrl+shift+N, which
--- matches nothing. Forcing ctrl-only defeated a synthetic held shift in
--- testing.
---
--- The window id comes from hs.window.focusedWindow(), not yabai: run from
--- Hammerspoon, `yabai -m window --space N` with no id exits 0 having done
--- nothing, because yabai reports no focused window in that context.
-local YABAI = "/opt/homebrew/bin/yabai"
-local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
-local ARROW = { prev = 123, next = 124 } -- ctrl+left / ctrl+right = move a space
-
-local function post(kc)
-    local down = hs.eventtap.event.newKeyEvent(kc, true)
-    down:setFlags({ ctrl = true }); down:post()
-    local up = hs.eventtap.event.newKeyEvent(kc, false)
-    up:setFlags({ ctrl = true }); up:post()
-end
-
--- target is 1-9, or "prev"/"next" for the adjacent desktop.
-local function moveAndFollow(target)
-    return function()
-        pcall(function()
-            local win = hs.window.focusedWindow()
-            if not win then return end
-            hs.execute(string.format("%s -m window %d --space %s", YABAI, win:id(), tostring(target)), true)
-            local kc = KEYCODE[target] or ARROW[target]
-            if not kc then return end
-            post(kc)
-        end)
-    end
-end
-
-local moveFollowKeys = {}
-pcall(function()
-    for i = 1, 9 do
-        table.insert(moveFollowKeys,
-            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i)))
-    end
-    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
-    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
-end)
+-- Note for anyone re-adding it here: skhd's event tap consumes the chord before
+-- hs.hotkey ever sees it. Binding the same chord in both places silently
+-- disables whichever one is in Hammerspoon.

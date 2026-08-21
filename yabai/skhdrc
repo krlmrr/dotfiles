@@ -42,40 +42,45 @@ shift + ctrl + alt + cmd - right : yabai -m window --warp east
 # nothing ^1..^5 doesn't. SIP-off (SA loaded), add
 # `ctrl - N : yabai -m space --focus N` here to let yabai focus spaces directly.
 
-# Move window to adjacent desktop / by number — NOW OWNED BY HAMMERSPOON.
-# See hammerspoon/init.lua ("Move window to a space AND follow it"): it moves the
-# window AND follows it to the target space, which skhd cannot do (yabai's
-# `space --focus` needs the scripting addition, which SIP blocks).
+# Move window to a desktop AND follow it there.
 #
-# These MUST stay commented out. skhd's event tap consumes the chord before
-# hs.hotkey ever sees it, so binding them here silently disables the follow —
-# that was the cause of a long debugging session on 2026-08-21 where the window
-# moved but the view never followed. The two cannot coexist on one chord.
+# yabai moves the window (public API, works with SIP on) but cannot focus a
+# space — `space --focus` needs the scripting addition SIP blocks. So the helper
+# posts macOS's own "Switch to Desktop N" shortcut instead (symbolichotkeys
+# 118-126 = ctrl+1..9, 79/81 = ctrl+left/right).
 #
-# Kept (commented) for reference and for a quick fallback: uncomment these and
-# restart skhd to get plain move-without-follow back if Hammerspoon is broken.
-# ctrl + shift - left  : yabai -m window --space prev
-# ctrl + shift - right : yabai -m window --space next
+# The helper exists rather than a plain `osascript ... key code N using control
+# down` because skhd fires while the chord's OWN ctrl+shift is still physically
+# held: without forcing the event flags, macOS sees ctrl+shift+N, matches no
+# shortcut, and the view never follows. yabai/helpers/space-follow.swift calls
+# CGEventSetFlags to drop the held shift. It needs no Accessibility grant of its
+# own — spawned by skhd, it inherits skhd's.
+#
+# `&&` matters: if the target space does not exist yabai exits non-zero and the
+# follow is skipped, rather than switching to nowhere.
+ctrl + shift - left  : yabai -m window --space prev && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow left
+ctrl + shift - right : yabai -m window --space next && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow right
 
-# Move window to desktop by number
-# ctrl + shift - 1 : yabai -m window --space 1
-# ctrl + shift - 2 : yabai -m window --space 2
-# ctrl + shift - 3 : yabai -m window --space 3
-# ctrl + shift - 4 : yabai -m window --space 4
-# ctrl + shift - 5 : yabai -m window --space 5
-# ctrl + shift - 6 : yabai -m window --space 6
-# ctrl + shift - 7 : yabai -m window --space 7
-# ctrl + shift - 8 : yabai -m window --space 8
-# ctrl + shift - 9 : yabai -m window --space 9
-shift + ctrl + alt + cmd - 1 : yabai -m window --space 1
-shift + ctrl + alt + cmd - 2 : yabai -m window --space 2
-shift + ctrl + alt + cmd - 3 : yabai -m window --space 3
-shift + ctrl + alt + cmd - 4 : yabai -m window --space 4
-shift + ctrl + alt + cmd - 5 : yabai -m window --space 5
-shift + ctrl + alt + cmd - 6 : yabai -m window --space 6
-shift + ctrl + alt + cmd - 7 : yabai -m window --space 7
-shift + ctrl + alt + cmd - 8 : yabai -m window --space 8
-shift + ctrl + alt + cmd - 9 : yabai -m window --space 9
+ctrl + shift - 1 : yabai -m window --space 1 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 1
+ctrl + shift - 2 : yabai -m window --space 2 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 2
+ctrl + shift - 3 : yabai -m window --space 3 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 3
+ctrl + shift - 4 : yabai -m window --space 4 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 4
+ctrl + shift - 5 : yabai -m window --space 5 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 5
+ctrl + shift - 6 : yabai -m window --space 6 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 6
+ctrl + shift - 7 : yabai -m window --space 7 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 7
+ctrl + shift - 8 : yabai -m window --space 8 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 8
+ctrl + shift - 9 : yabai -m window --space 9 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 9
+
+# Lily58 "meh" equivalents — same move-and-follow behaviour
+shift + ctrl + alt + cmd - 1 : yabai -m window --space 1 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 1
+shift + ctrl + alt + cmd - 2 : yabai -m window --space 2 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 2
+shift + ctrl + alt + cmd - 3 : yabai -m window --space 3 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 3
+shift + ctrl + alt + cmd - 4 : yabai -m window --space 4 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 4
+shift + ctrl + alt + cmd - 5 : yabai -m window --space 5 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 5
+shift + ctrl + alt + cmd - 6 : yabai -m window --space 6 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 6
+shift + ctrl + alt + cmd - 7 : yabai -m window --space 7 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 7
+shift + ctrl + alt + cmd - 8 : yabai -m window --space 8 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 8
+shift + ctrl + alt + cmd - 9 : yabai -m window --space 9 && /Users/karlm/Code/dotfiles/yabai/helpers/space-follow 9
 
 # Layout
 alt - f : yabai -m window --toggle zoom-fullscreen

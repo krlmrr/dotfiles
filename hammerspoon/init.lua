@@ -152,3 +152,26 @@ pcall(function()
     table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
     table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
 end)
+
+-- ── Auto-reload this config when it changes ─────────────────────────────────
+-- Saves a trip to the menu bar on every edit. Only reacts to .lua files, since
+-- the watcher fires for anything in the directory.
+--
+-- Kept in a file-scope local on purpose: a pathwatcher that isn't referenced
+-- gets garbage-collected and silently stops working. Same reason the eventtaps
+-- and watchers above are held in locals.
+--
+-- Caveat: a reload on a file with a syntax error leaves NOTHING loaded, which
+-- takes the Caps Lock handling down with it until the error is fixed. Check the
+-- console if the keyboard suddenly feels wrong after an edit.
+local configWatcher = hs.pathwatcher.new(
+    os.getenv("HOME") .. "/Code/dotfiles/hammerspoon/",
+    function(files)
+        for _, f in ipairs(files) do
+            if f:sub(-4) == ".lua" then
+                hs.reload()
+                return
+            end
+        end
+    end
+):start()

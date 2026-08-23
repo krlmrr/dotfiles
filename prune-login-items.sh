@@ -41,7 +41,15 @@ fi
 UID_NUM="$(id -u)"
 
 # Agents matching these prefixes get pruned from the launchd directories below.
-PREFIXES=(com.adobe. com.google.)
+# The apps themselves are kept — this only removes their background updater and
+# helper agents:
+#   com.adobe.        Creative Cloud (the whole suite is uninstalled now anyway)
+#   com.google.       GoogleUpdater + the legacy Keystone tombstones
+#   us.zoom.          two updater agents plus the privileged ZoomDaemon. Zoom
+#                     still updates when you launch it; it will just ask for
+#                     admin rights instead of having a daemon standing by.
+#   com.valvesoftware. Steam's steamclean helper.
+PREFIXES=(com.adobe. com.google. us.zoom. com.valvesoftware.)
 
 # Never touch these, even on a prefix match. Google ships security tooling
 # (santa) under the same namespace as its updaters — belt and braces in case
@@ -178,10 +186,16 @@ system_work_pending() {
 # agents, fail on the rest, and leave the job half done — which is exactly what
 # happened the first time this ran somewhere with no TTY for the prompt.
 if (( ! DRY_RUN )) && system_work_pending; then
-    if ! sudo -n true 2>/dev/null && ! sudo -v; then
+    # Try in order: an existing ticket; an askpass helper if one is configured
+    # (works with no TTY at all — sudo needs -A explicitly, exporting
+    # SUDO_ASKPASS alone is not enough); then a normal terminal prompt.
+    if ! sudo -n true 2>/dev/null \
+       && ! { [ -n "$SUDO_ASKPASS" ] && sudo -A -v 2>/dev/null; } \
+       && ! sudo -v; then
         echo "Can't get sudo, and the /Library items need it. Nothing was changed." >&2
         echo "Run this from a real terminal (a non-interactive shell has no TTY for" >&2
-        echo "the password prompt), or pre-authorize with 'sudo -v' first." >&2
+        echo "the password prompt), pre-authorize with 'sudo -v' first, or set" >&2
+        echo "SUDO_ASKPASS to a helper that prompts for the password." >&2
         exit 1
     fi
 fi

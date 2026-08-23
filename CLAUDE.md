@@ -55,6 +55,30 @@ Four delivery modes. Nothing is *built* any more (2.0 deleted the build scripts)
 
 - `zsh/aliases.sh` defines `alias test="clear && a test"` (deliberate — `test` running the Laravel suite via `php artisan test` is intentional and must NOT be changed). This shadows the `test` builtin in any zsh session that sources it: a script or verification command using `test -f foo` silently becomes `clear && php artisan test`, prints "Could not open input file: artisan", and reports false results. Scripts that get sourced into an interactive zsh (rather than run with `bash`/`sh`) should use `[ -f ... ]` instead of `test`, or `unalias test` first.
 
+## sudo without a terminal
+
+`scripts/askpass.sh` is a `SUDO_ASKPASS` helper that collects the password via an
+AppleScript dialog, so sudo works in contexts with no TTY — Claude Code's `!`
+prompt, editor tasks, launchd. `zsh/zshrc` exports `SUDO_ASKPASS`; the script
+itself is a plain osascript dialog.
+
+**It is opt-in per command.** sudo only calls the helper when given `-A`:
+
+```bash
+sudo -A rm -rf /Library/something
+```
+
+Exporting the variable alone does nothing, which is deliberate — nothing starts
+prompting unless a command asks for it. Two things learned the hard way:
+exporting `SUDO_ASKPASS` without `-A` is silently ignored, and a sudo ticket
+acquired in a parent shell does **not** carry into a child script, because macOS
+keys tickets per session. `prune-login-items.sh` therefore tries, in order: an
+existing ticket, `sudo -A -v` when `SUDO_ASKPASS` is set, then a normal prompt.
+
+Trade-off: any process able to run `sudo -A` can now put a convincing password
+dialog on screen. Accepted because otherwise the maintenance scripts here cannot
+run outside an interactive terminal.
+
 ## Releases
 
 Push a tag to trigger a GitHub Action that creates a release:

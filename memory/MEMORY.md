@@ -30,5 +30,4 @@
 - [jj git init --colocate scrambled .git/index](project_jj_colocate_index.md) — phantom Added/Deleted entries git-side after colocating; HEAD/refs/files unaffected; repair via `rm -f .git/index && git read-tree HEAD` (check for real staged changes first)
 - [jj conf.d layers over config.toml](project_jj_config_layering.md) — verified on jj 0.43.0; underpins the symlinked config.toml + generated conf.d/00-identity.toml split; jj skips git hooks so jj-made commits bypass the Brewfile-sorting pre-commit hook
 - [macOS resets termios on open()](project_serial_macos_termios.md) — stty before opening /dev/cu.* is discarded, port silently runs at 9600; configure after open and loopback-test before trusting silence
-- [Box 3 survived the lightning](project_box3_lightning.md) — boots stock Asus firmware; its "dead board" silence was TX/RX reversed. Confirm orientation before blaming hardware; Ethernet still untested.
 - [Ghostty tabs are native NSWindows](project_ghostty_native_tabs_yabai.md) — every tab is a real AXStandardWindow, so yabai tiles each one; no rule can distinguish them, so cmd+t is unbound

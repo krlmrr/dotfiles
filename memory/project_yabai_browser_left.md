@@ -6,10 +6,27 @@ metadata:
 ---
 
 **2026-08-25 — yabairc collapsed from 695 to 444 lines around a single rule:** on
-every space from index 3 up, the leftmost browser must be **strictly** left of
-every non-browser. No browser on the space, or nothing but browsers, means no
-action. The right-hand side is never constrained. Design and rationale:
+every space from index 3 up, **the browser owns the TOP-LEFT** — the topmost
+window of the leftmost column is a browser. No browser on the space means no
+action; the right-hand side is never constrained. Design and rationale:
 `docs/superpowers/specs/2026-08-25-browser-left-invariant-design.md`.
+
+**Two weaker rules were tried first and both shipped a layout Karl rejected on
+sight. Do not re-derive either.**
+- *"A browser is somewhere in the leftmost column"* (equality on min x) accepts an
+  EDITOR on top of the browser in that column.
+- *"The leftmost browser is strictly left of every non-browser"* MANUFACTURES
+  COLUMNS. Any non-browser landing in the browser's own column is a violation
+  whose only repair is warping the browser further west, so browser + terminal +
+  editor converges on three equal columns.
+
+**The transferable lesson: a rule's repair is part of the rule.** Strict's only
+available move was "add a column", and adding a column can never be the fix for
+"something shares my column". Check what a candidate invariant's repair *does*
+before adopting the invariant. Today's repair direction comes from the violation:
+`north` within the column when a browser is present but not topmost (adds no
+column), `west` only when the left column holds no browser, balance-only for the
+squeeze guard.
 
 **The trap that cost real damage: `yabairc` with NO argument is the full config
 load.** The file is both the config and its own signal-handler dispatcher — a
@@ -37,15 +54,17 @@ does not word-split unquoted parameter expansions. A loop over a newline-separat
 capture silently passes the whole blob as one argument. Use
 `printf '%s\n' "$list" | while IFS= read -r i`.
 
-**Two browsers splitting evenly needed no code.** `split_type auto` splits a
-container vertically only while it is wider than tall: two windows on the
-3200x1800 Studio Display go side by side, and the 1583x1778 right half of a
-three-window desk stacks. Forcing `split_type vertical` would break the second
-case into three narrow columns. Leave it on `auto`.
+**`split_type auto` decides at INSERTION time, and an explicit `--warp` overrides
+it.** auto splits a container vertically only while it is wider than tall, so left
+alone it puts two windows side by side on the 3200x1800 Studio Display and stacks
+the right half of a three-window desk. But that is what bsp does unattended — it
+is NOT a guarantee about the final tree, and reasoning as though it were is what
+made the strict rule look safe. Leave it on `auto` regardless: forcing `vertical`
+turns a three-window desk into three narrow columns.
 
 **Testing this must not drive live windows.** Moving real windows to verify the
 rule disrupts whoever is using the machine — Karl said so directly, mid-session.
-The invariant's jq is exercised by 18 fixtures instead, with the program extracted
+The invariant's jq is exercised by 21 fixtures instead, with the program extracted
 straight out of `yabairc` so the test cannot drift. `warp_to` has its own
 regression harness described in [[project-yabai-ax-loss]] (also not in the repo).
 

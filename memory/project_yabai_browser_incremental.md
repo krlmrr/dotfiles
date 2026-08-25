@@ -1,54 +1,45 @@
 ---
 name: project-yabai-browser-incremental
-description: yabai browser array (fixed the "constantly misplacing / restart" pain) + incremental place_one on-open placement; why zero-motion is impossible
+description: yabai display topology (Studio Display is 3200x1800, not the laptop) and why zero-motion window placement is impossible; the trio/slot architecture this file used to document is superseded
 metadata:
   type: project
 ---
 
-**2026-07-23 (final) — Ghostty location-is-truth too (commit aa2988c).** place_editors was still pulling the trio Ghostty back to space 3 after Karl moved it to the personal desk. Now the trio uses the oldest Ghostty ALREADY ON the work space (never drags one back); place_one still routes a newly CREATED first Ghostty to the work desk. Full doctrine: **windows move only by user action or at creation; place logic arranges within desks, never across them** (sole exceptions: Zen exile/promote on the browser slot boundary, and extra editors decluttered OFF the work desk).
+**SUPERSEDED ARCHITECTURE — read this first.** This file used to document the
+trio/slot design: `EDITOR_APPS` + `BROWSER_APPS` as priority lists, a sticky slot
+holder per desk, `place_editors`/`place_one`/`adopt`/`reconcile`, Zen exile and
+promotion, dual-project mode, personal-desk parity, and cross-desk swaps. **All of
+it was deleted on 2026-08-25** in favour of a single invariant — see
+[[project-yabai-browser-left]]. Do not reason about yabairc from the old model;
+there is no editor role, no slot, no managed-desk pair, and no cross-desk
+movement. What is kept below are the two findings that outlived the design.
 
-**2026-07-23 (later) — PERSONAL DESK LAYOUT PARITY (commit ffd636d).** Space 4 now gets the same managed shape as space 3: **Zen left / editor right / extra-Ghostty under Zen**, via `layout_correct(space, browser-predicate)` (generalized external_correct) + `arrange(ed, br, gho)` (extracted warp rebuild) + `place_personal()` (arranges ONLY windows already on the zen space — never pulls; wired into place_editors tail + place_one's Zen and extra-Ghostty branches; skips laptop-only where zen_space==editor_space). **NEW COVERAGE CHECK in layout_correct: members must reach the left display edge (min x ≤ 20)** — a window MOVED off a space (not destroyed → no balance signal) leaves the remainers half-width; shape/order checks can't see that. Both desks verified 50/50 full-width.
+## Display topology (corrected 2026-07-15 — an earlier note was WRONG)
 
-**2026-07-23 — LOCATION OWNS THE TRIO (commit 15c1775, supersedes the age rule below).** The age rule immediately failed live: an Untitled scratch Code window (oldest) claimed the work desk and exiled Karl's real work editor; manual swaps would un-swap on the next place trigger; and ALL Ghostty windows were being teleported to the trio ("having to open a Ghostty window just breaks things"). New contract: **the oldest editor ON the work space owns the trio (user placement = truth); editors are NEVER dragged across desktops; extras crowding the work desk get decluttered to the personal space; editors elsewhere untouched; single-editor-anywhere still adopted (fresh start). Extra Ghostty windows stay where opened (only oldest is trio-managed; `win_id` now sorts by id).** To swap work editors: clear space 3 of the old one FIRST (it has seniority there), then ⌃⇧3 the new one in.
+Daily driver is an **Apple Studio Display** (5120x2880 native, reported by yabai as
+**3200x1800** at "more space" scaling; usually the sole display, laptop in
+clamshell). An earlier version of this note claimed 3200x1800 was "the laptop" —
+that misdiagnosis sent a whole debugging session chasing a phantom. It is the
+Studio Display. The MacBook's built-in panel reports **2056x1329**.
 
-**2026-07-22 — DUAL-PROJECT MODE (commit 34b8aef) + Tiling toggle (3068ef1).** Karl was killing yabai to work two projects (the editor array forced ALL editor windows onto space 3). New rule: **only the FIRST (oldest) editor window joins the work trio; extra editor windows go to the Zen/personal space** where bsp tiles them beside Zen (personal editor + personal browser side-by-side, automatic). Closing the trio editor promotes the next (browser-slot-style fallback). Age decides work-vs-personal — swapped landing = close/reopen the personal one. Also: **Raycast "Tiling" script command** (`mac/raycast/tiling.sh`) toggles yabai + sketchybar together (sketchybar is brew-services managed; yabai is not).
+`LAPTOP_W`/`LAPTOP_H` and `external_idx` no longer exist in `yabairc` (nothing is
+keyed by display or space identity any more), but the numbers are recorded here
+because they are the ones to use if display detection is ever reintroduced.
 
-**2026-07-21 (final) — Zen slot-fallback design (commits 56a878d + 3cfb1ff).** Karl: **Zen = personal, Chrome = NotaryDash work.** Final contract: **BROWSER_APPS is a priority list `Chrome > Safari > Arc > Zen`** — highest-priority OPEN browser owns the trio slot (space 3: slot TL / Ghostty BL / editor full-R). **Zen is exiled to the 4th external space (3 laptop-only) whenever it is NOT the slot** (`place_zen()` skips the slot window); when the last work browser closes, a `window_destroyed app=BROWSER_RE → place` signal promotes Zen into the slot immediately ("Chrome closed ≠ working, but keep the feel"); opening Chrome evicts Zen back to its space. Both directions live-verified. Mode mapping: Chrome open = work; the reshuffle on that boundary is intentional (mode switch), everything else is reshuffle-free.
-
-**2026-07-21 — slot hijack + unbalance root-caused (the "open Zen and it gets screwy" bug):** yabai's window query returns NEWEST-first, so `browser_id`'s "first open browser is the slot" actually meant "newest browser steals the slot" — opening Zen with Chrome holding TL evicted Chrome under the editor mid-layout. FIX (commit 9e70631): `BROWSER_APPS` is now a PRIORITY list (Zen > Chrome > Safari > Arc), ties by window id (oldest); `external_correct` picks `$browser` with the SAME ordering (they must never disagree); `editor_ids` sorts by id so the base editor is stable too. Second half: `place_editors` balanced BEFORE the stray-sweep — the sweep then moved the demoted browser across columns leaving 2110/1055 skew; balance now runs AFTER the sweep and ONLY on rebuilds (`rebuilt` flag) so skip paths (space_changed heal) never stomp manual resizes. Verified: close/reopen Zen converges to an even 2×2 (Zen TL, Ghostty BL, editor TR, Chrome adopted BR). Transient sighting: a lowercase-`ghostty` empty-subrole window (id 2983) TILED in the tree as a 3rd left-column node — vanished before inspection; if uneven splits recur, look for it (`subrole==""` windows are invisible to all trio logic but occupy tree nodes).
-
-Two related yabai changes shipped 2026-07-15 (v1.0.95), all in `mac/yabai/yabairc`. Specs: `docs/superpowers/specs/2026-07-15-yabai-browser-array-design.md` and `…-incremental-placement-design.md`.
-
-## Browser array — the fix for "constantly having to restart yabai"
-
-Root cause of the constant window misplacement (and the restarts it drove): `external_correct()` **hard-required Zen** as the top-left window. Whenever the top-left browser was anything else (Chrome/Safari/Arc) or Zen wasn't running, the layout the user wanted was flagged WRONG, so **every** `place` trigger (any editor/browser/Ghostty window open/close) did a destructive full rebuild. Not tied to wake/dock — triggered by normal window activity.
-
-Fix: generalized the hardcoded `Zen` role into `BROWSER_APPS` (newline-delimited so "Google Chrome" survives; generates `browser_sel` jq predicate + `BROWSER_RE` regex, mirroring `EDITOR_APPS`). New `browser_id()` = first open browser = the top-left slot occupant. `external_correct`/`place_editors` use it; `adopt` excludes the slot browser **by id** (a 2nd browser is still adopted). "Single browser only" — first open browser owns the slot. Live-proven: with Chrome in the slot, `place` now logs "trio correct — skip rebuild" instead of churning.
-
-## Incremental `place_one` — one clean move on open (not a full rebuild)
-
-On window open, `place_editors`' full teardown-rebuild (re-warp browser+Ghostty + `--balance`) was the "shuffle." Replaced the FOUR `window_created` signals (3 per-app `place` + catch-all `adopt` — which also double-fired) with ONE catch-all → `place_one $YABAI_WINDOW_ID`. `place_one` moves ONLY the new window relative to a cross-role anchor: slot-browser→west of editor, editor→east of browser, Ghostty→south of browser(fallback editor), stray/2nd-browser→`adopt` (south under editor); anchor-absent→leave as anchor. `place_editors` full rebuild stays for startup/display-change only. Live-verified: opening a window fires one `[one]` line (no rebuild, no double-fire); only the direct anchor **resizes** to yield space (dh change, no reposition) — inherent to tiling, not a shuffle.
+**Apple TV (AirPlay, 1920x1080):** connects rarely for casting fullscreen video.
+When present it is an additional display. Deliberately not special-cased.
 
 ## Why "zero visible motion" is impossible (don't retry)
 
-yabai fires `window_created` **after** BSP has already tiled the new window — the window always appears at BSP's guess first, then we move it. The only pre-creation lever is the insertion point, which can't be conditioned on which app is opening AND is the documented parity coin-flip trap ([[project-yabai-insert-parity]]). So one BSP→slot hop is unavoidable; best achievable is "appears → one clean move."
+yabai fires `window_created` **after** BSP has already tiled the new window — the
+window always appears at BSP's guess first, then any correction moves it. The only
+pre-creation lever is the insertion point, which cannot be conditioned on which
+app is opening AND is the documented parity coin-flip trap
+([[project-yabai-insert-parity]]). So one BSP-then-correct hop is unavoidable; the
+best achievable is "appears, then one clean move." Under the browser-left rule
+this is rarer than it was, because a window that does not break the invariant is
+never moved at all.
 
-### Topology-flip fix (2026-07-15, commit b4e16cb) — why place_one is a HYBRID
-
-The first incremental `place_one` moved only the new window relative to a cross-role anchor. That broke on **editor open**: an editor's presence flips the trio's whole topology (browser|Ghostty **side-by-side** with no editor ↔ browser/Ghostty **stacked** in the left column + editor full-right). A single warp can't restructure that — a new editor got warped "east of browser" into a side-by-side layout and produced a **3-column wedge** (Zen|Code|Ghostty) that persisted until a restart, because only startup/display-change rebuild.
-
-Fix: `place_one` now splits windows into **structural** (editor, slot browser — presence changes topology) → run the full `place_editors` rebuild (which self-skips when already correct, so no gratuitous shuffle); and **append-only** (Ghostty, strays, 2nd browser) → single incremental warp, then **self-heal**: re-check `external_correct` and rebuild if the incremental result left the trio wrong. So a bad incremental placement can never persist to the next restart. Ghostty append stays smooth (no shuffle when it lands correct). Editor-open shuffles only when the layout is actually wrong.
-
-### Partial trio — editor open, no browser (2026-07-16, commit d05e05c)
-
-When an editor + Ghostty are open but **no browser**, Ghostty was warped `south` of its anchor — and with no browser the anchor fell back to the editor, so Ghostty stacked **below** it → a full-width **top/bottom split** (editor top, Ghostty bottom). `external_correct`'s editor-branch also hard-required a browser, so it flagged every 2-window editor layout WRONG and re-rebuilt endlessly. Fix: with no browser, Ghostty warps **`west`** of the editor → **Ghostty-left / editor-right side-by-side** (the trio minus the empty browser slot), applied in BOTH `place_editors` rebuild and the `place_one` Ghostty-append path. `external_correct` now accepts the partial-trio side-by-side cases: editor+Ghostty (Ghostty left) AND the symmetric editor+browser (browser left). Rule of thumb: Ghostty goes `south` only when a browser occupies the left column above it; otherwise `west` of the editor.
-
-## Display topology (corrected 2026-07-15 — earlier note was WRONG)
-
-Daily driver is an **Apple Studio Display** (5120×2880 native, reported by yabai as **3200×1800** at "more space" scaling; usually the sole display, laptop in clamshell). `LAPTOP_W/H=2056×1329` correctly identifies the MacBook's built-in panel and is NOT stale. So the "external present → stacked trio on space 3" path is the **intended docked behavior** on the Studio Display, not an accident. Laptop-only (away from the Studio) → `external_idx` empty → apps break out to separate desktops 3/4/5.
-
-An earlier version of this note claimed 3200×1800 was "the laptop" and LAPTOP_W/H was stale — that misdiagnosis sent a whole debugging session chasing a phantom. 3200×1800 is the **Studio Display**.
-
-**Apple TV (AirPlay, 1920×1080):** connects rarely for casting fullscreen video. When present it's a 2nd/3rd display; the trio-placement logic doesn't distinguish it from a work monitor, so a cast can transiently scramble the Studio trio (recovered by one `yabairc place` or opening a trio window). Deliberately NOT handled (2026-07-15) — too rare to be worth a UUID/resolution exclusion.
-
-See [[project-yabai-wake-no-restart]], [[project-yabai-insert-parity]], [[project-yabai-pip-masquerade]], [[feedback-yabai-space2]], [[feedback-yabai-display-events]].
+See [[project-yabai-browser-left]], [[project-yabai-ax-loss]],
+[[project-yabai-insert-parity]], [[project-yabai-pip-masquerade]],
+[[feedback-yabai-space2]], [[feedback-yabai-display-events]].

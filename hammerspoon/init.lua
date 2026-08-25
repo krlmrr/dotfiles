@@ -120,8 +120,55 @@ pcall(function() require("hs.ipc") end)
 -- broke plain ctrl+N.
 local YABAI = "/opt/homebrew/bin/yabai"
 local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
-local ARROW = { prev = 123, next = 124 } -- ctrl+left / ctrl+right = move a space
+-- Arrow keycodes are deliberately NOT posted. macOS's "Move left/right a space"
+-- (symbolichotkeys 79/81) ignores synthetic events -- it only responds to real
+-- hardware keys -- so posting ctrl+arrow, with or without the Fn flag those
+-- shortcuts are registered with (mask 0x840000), moves nothing and the view
+-- stays put while the window leaves. "Switch to Desktop N" (118-126, plain ctrl,
+-- mask 0x40000) DOES accept a posted event. So prev/next resolve to an absolute
+-- space index and reuse the digit path, which is the only mechanism that works.
+--
+-- Consequence: following only works for desktops 1-9, since that is as far as
+-- both KEYCODE and macOS's own "Switch to Desktop N" shortcuts go. Past that the
+-- window still moves, the view just will not follow.
 
+local function query(args)
+    -- No user-environment shell here: hs.execute(cmd, true) runs the command via
+    -- `$SHELL -l -i -c`, which sources the whole zsh profile -- ~700ms per call,
+    -- versus ~10ms for a plain sh. This fires on every keypress and YABAI is an
+    -- absolute path, so there is nothing the profile is needed for.
+    local out = hs.execute(string.format("%s -m query %s", YABAI, args))
+    if not out or out == "" then return nil end
+    local ok, decoded = pcall(hs.json.decode, out)
+    if not ok then return nil end
+    return decoded
+end
+
+-- Absolute index of the neighbouring space on the current display, or nil when
+-- there is no space that way (so an edge press is a no-op instead of a surprise).
+-- One query, not two: --spaces --display already flags the focused space, and
+-- this runs synchronously on Hammerspoon's main thread on every keypress.
+local function neighbour(direction)
+    local onDisplay = query("--spaces --display")
+    if not onDisplay then return nil end
+    local current, first, last
+    for _, sp in ipairs(onDisplay) do
+        if sp.index then
+            if sp["has-focus"] then current = sp.index end
+            if not first or sp.index < first then first = sp.index end
+            if not last or sp.index > last then last = sp.index end
+        end
+    end
+    if not current then return nil end
+    local want = current + (direction == "prev" and -1 or 1)
+    if want < first or want > last then return nil end
+    return want
+end
+
+-- Posts macOS's own "Switch to Desktop N" chord. setFlags is the load-bearing
+-- part: the triggering chord's ctrl+shift is still physically held, and without
+-- forcing the flags the posted event merges with the real modifier state into
+-- ctrl+shift+N, which matches no shortcut.
 local function post(kc)
     local down = hs.eventtap.event.newKeyEvent(kc, true)
     down:setFlags({ ctrl = true }); down:post()
@@ -135,9 +182,11 @@ local function moveAndFollow(target)
         pcall(function()
             local win = hs.window.focusedWindow()
             if not win then return end
-            hs.execute(string.format("%s -m window %d --space %s", YABAI, win:id(), tostring(target)), true)
-            local kc = KEYCODE[target] or ARROW[target]
+            local index = type(target) == "number" and target or neighbour(target)
+            if not index then return end
+            local kc = KEYCODE[index]
             if not kc then return end
+            hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), index))
             post(kc)
         end)
     end

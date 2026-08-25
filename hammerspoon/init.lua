@@ -128,9 +128,16 @@ local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28
 -- mask 0x40000) DOES accept a posted event. So prev/next resolve to an absolute
 -- space index and reuse the digit path, which is the only mechanism that works.
 --
--- Consequence: following only works for desktops 1-9, since that is as far as
--- both KEYCODE and macOS's own "Switch to Desktop N" shortcuts go. Past that the
--- window still moves, the view just will not follow.
+-- macOS only has "Switch to Desktop N" shortcuts for 1-9, so past desktop 9 --
+-- which is where a second display's spaces land, since yabai indexes globally --
+-- there is no chord to post and the view used to stay behind. Those cases fall
+-- back to focusing the window instead: activating a window pulls the view to its
+-- space, which needs no shortcut and is not limited to 9. That relies on
+-- AppleSpacesSwitchOnActivate, which is on unless deliberately turned off.
+--
+-- The post is still preferred where a chord exists: it is the long-proven path
+-- here, and it switches the desktop without touching window focus or app
+-- activation, which focusing necessarily does.
 
 local function query(args)
     -- No user-environment shell here: hs.execute(cmd, true) runs the command via
@@ -184,10 +191,9 @@ local function moveAndFollow(target)
             if not win then return end
             local index = type(target) == "number" and target or neighbour(target)
             if not index then return end
-            local kc = KEYCODE[index]
-            if not kc then return end
             hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), index))
-            post(kc)
+            local kc = KEYCODE[index]
+            if kc then post(kc) else win:focus() end
         end)
     end
 end

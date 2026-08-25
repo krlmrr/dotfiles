@@ -27,10 +27,16 @@ On every space with index >= 3, **the leftmost tiled window must be a browser.**
 - Fewer than two tiled windows -> trivially satisfied, no action.
 - No browser on the space -> nothing to enforce, no action. The right side is
   never constrained, so a desk without a browser is left entirely to bsp.
-- Otherwise -> the minimum `frame.x` among browsers must equal the minimum
-  `frame.x` among all tiled windows. Equality rather than strict ordering is
-  deliberate: it means "a browser is in the left column", so a browser above a
-  terminal in that same column still passes.
+- Nothing but browsers on the space -> nothing to be left *of*, no action.
+- Otherwise -> the leftmost browser must be **strictly** left of every
+  non-browser. The browser owns the left column outright.
+
+Strict rather than "a browser is somewhere in the leftmost column", and the
+difference is the whole point. An equality test passes when an editor sits *on
+top of* the browser in that column -- observed live, and the exact arrangement
+this rewrite exists to stop. Strict costs one thing: a terminal stacked under the
+browser in the same column is now a violation and gets rebuilt into its own
+column. Acceptable, because the right-hand side is never constrained.
 
 Spaces 1 and 2 are out of scope. Space 2 is `layout float` and yabai tiles
 nothing there regardless.
@@ -46,9 +52,10 @@ since without one there is nothing to rebuild from.
 
 ## Two browsers
 
-No special case is needed. "A browser is leftmost" is satisfied by *either*
-browser, so there is no tie-break to decide and no state to remember. The even
-split the user asked for falls out of `split_type auto` plus `split_ratio 0.5`:
+No special case is needed. With only browsers on a space there is no non-browser
+for them to be left of, so the invariant is silent and neither browser has to win
+a tie-break. No state to remember. The even split falls out of `split_type auto`
+plus `split_ratio 0.5`:
 
 | Tiled windows | Container | `auto` splits | Result |
 | --- | --- | --- | --- |
@@ -117,6 +124,19 @@ the "move an editor onto the browser's desk" case.
 
 Balance runs only when a rebuild actually happened, so manual resizes survive a
 desk revisit.
+
+## Verification
+
+The invariant's jq program is exercised by 18 fixture cases: an empty space,
+single windows, a right-hand browser, the squeeze guard (with browsers, without,
+and browsers-only), floating / Picture-in-Picture / non-standard-subrole
+exclusion, multi-word app names, two and three browsers, leftmost-browser
+selection among several, a terminal stacked under the browser, and an editor
+stacked on top of one. The harness extracts the jq straight out of `yabairc`, so
+it cannot drift from what actually runs.
+
+Fixtures rather than live windows, deliberately: driving real windows to test
+this disrupts whoever is using the machine.
 
 ## Core rule, retained
 

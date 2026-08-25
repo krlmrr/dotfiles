@@ -4,30 +4,38 @@
 #   • "<cmd>" → signal actions re-invoke this file to run one function
 # Everything logs to /tmp/yabai.log so there's one place to watch.
 #
+# THE ONE RULE — on every space from FIRST_MANAGED_SPACE up:
+#
+#     THE LEFTMOST TILED WINDOW IS A BROWSER.
+#
+# That is the whole contract. What sits on the right is never constrained; a desk
+# with no browser is left entirely to bsp. This file used to maintain two
+# "managed desks", a sticky role-holder per desk, and a record of every window's
+# previous desk, so it could tell a drag from a fresh open and swap windows
+# between desks. Desks are moved by hand now, so all of that is gone — see
+# docs/superpowers/specs/2026-08-25-browser-left-invariant-design.md.
+#
 # CORE RULE — "location is truth":
-#   Where a window is, and what the user did to it, decides its role. The config
-#   NEVER moves a window the user did not move. Each desk is arranged from what
-#   is already on it; nothing is dragged between desks on the config's own
-#   initiative. The single exception is the desk SWAP (see reconcile), which
-#   only ever fires as the echo of a drag the user just performed.
+#   Where a window is decides nothing except which space gets checked. This
+#   config NEVER moves a window between spaces; with reconcile() deleted there is
+#   no code path that can. It only arranges what it finds.
 
 # No settle after a warp/split-toggle. warp_to detects the "arrived but not yet
 # tiled" state directly (identical frames) rather than waiting a fixed time for
 # it, which is what these delays were really standing in for. Swept
-# 0/0.05/0.10/0.15 on 2026-08-12; 0 passed 8 of 8 uninterrupted cycles. An
-# earlier failure at 0 was the user switching desks mid-run, not the setting.
-# Caveat: the harness drove moves with `yabai -m window --space` plus a scripted
-# focus, which is NOT a Mission Control drag. Restore a delay here if real drags
-# ever land a desk in the wrong order.
+# 0/0.05/0.10/0.15 on 2026-08-12; 0 passed 8 of 8 uninterrupted cycles.
 WARP_SETTLE=0
 LOG=/tmp/yabai.log
 SELF="$HOME/Code/dotfiles/yabai/yabairc"
-LAPTOP_W=2056          # MBP 16" reports 2056x1329 in yabai points; used to
-LAPTOP_H=1329          # tell the laptop panel from an external display.
-SIG_FILE=/tmp/yabai_display_sig
-SLOT_FILE=/tmp/yabai_slots   # "<space>:<role>:<window_id>" — sticky incumbents
-SEEN_FILE=/tmp/yabai_seen    # "<window_id>:<space>" — last known desk, per candidate
 STUCK_FILE=/tmp/yabai_stuck  # "<src>:<dst>:<dir>:<sx>,<sy>,<tx>,<ty>" — repairs that achieved nothing
+SEEN_FILE=/tmp/yabai_seen    # "<window_id>:<space>" — last known space, for the moved gate only
+
+# Spaces below this are none of our business. Space 2 is the float chaos zone
+# anyway (see the layout config below), and space 1 is left free-form.
+FIRST_MANAGED_SPACE=3
+
+# A tiled, real window: what every predicate here means by "window".
+TILED='.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false'
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] ${2:-}" >> "$LOG"; }
 
@@ -40,159 +48,35 @@ sa_capable() {
 }
 
 # ----------------------------------------------------------------- app lists
-# The editor set — whichever of these are open compete for a desk's editor slot.
-# THE one list to edit when editors change; editor_sel (jq predicate) and
-# EDITOR_RE (signal regex) are generated from it.
-# App names must be single words with no regex metacharacters.
-EDITOR_APPS="Zed Code"
-editor_sel=""
-for a in $EDITOR_APPS; do editor_sel="$editor_sel${editor_sel:+ or }.app==\"$a\""; done
-editor_sel="($editor_sel)"
-EDITOR_RE="^($(echo "$EDITOR_APPS" | tr ' ' '|'))\$"
-
-# Browser list. NOTE the demotion: this is no longer a global priority that
-# decides WHICH DESK a browser lives on — that is now decided purely by where
-# the user put it. Order here only breaks a tie during an ELECTION, when two
-# browsers share one desk and the slot is vacant. Multi-word names (e.g.
-# "Google Chrome") mean this list is NEWLINE-delimited, not space-split like
-# EDITOR_APPS. browser_sel (jq) and BROWSER_RE are generated.
+# THE one list. Membership is tested by passing this straight to jq as --arg and
+# looking the app name up in it, so multi-word names ("Google Chrome") are fine
+# and there is no generated jq predicate or signal regex to keep in sync.
+# NEWLINE-delimited. Order is not significant any more: with a single invariant,
+# "a browser is leftmost" is satisfied by whichever browser is already furthest
+# left, so there is nothing to prioritise and no tie to break.
 BROWSER_APPS='Google Chrome
 Safari
 Arc
 Zen'
-browser_sel=""; browser_alt=""
-while IFS= read -r a; do
-  [ -n "$a" ] || continue
-  browser_sel="$browser_sel${browser_sel:+ or }.app==\"$a\""
-  browser_alt="$browser_alt${browser_alt:+|}$a"
-done <<EOF
-$BROWSER_APPS
-EOF
-browser_sel="($browser_sel)"
-BROWSER_RE="^($browser_alt)\$"
 
-# ------------------------------------------------------------------- geometry
-external_idx() {  # index of the non-laptop display, empty when undocked
-  yabai -m query --displays 2>/dev/null \
-    | jq -r --argjson w "$LAPTOP_W" --argjson h "$LAPTOP_H" \
-      '.[]|select(.frame.w!=$w or .frame.h!=$h)|.index' | head -1
+# ------------------------------------------------------------------- helpers
+managed() {  # true when $1 is a space index we arrange
+  case "$1" in ''|*[!0-9]*) return 1 ;; esac
+  [ "$1" -ge "$FIRST_MANAGED_SPACE" ]
 }
 
-# The two managed desks, one space index per line. Docked: 3rd and 4th space of
-# the external display. Undocked: spaces 3 and 4. They are PEERS — neither is
-# "the work desk" any more, which is what killed the old editor_space/zen_space
-# asymmetry (and with it Zen's special status).
-DESKS_CACHE=""
-desk_spaces() {
-  [ -n "$DESKS_CACHE" ] && { printf '%s\n' "$DESKS_CACHE"; return; }
-  ext=$(external_idx)
-  if [ -z "$ext" ]; then
-    DESKS_CACHE="3
-4"
-  else
-    DESKS_CACHE=$(yabai -m query --spaces --display "$ext" 2>/dev/null \
-      | jq -r '[.[2].index,.[3].index]|map(select(.!=null))|.[]')
-  fi
-  printf '%s\n' "$DESKS_CACHE"
+managed_spaces() {
+  yabai -m query --spaces 2>/dev/null \
+    | jq -r --argjson f "$FIRST_MANAGED_SPACE" '.[]|select(.index >= $f)|.index'
 }
 
-is_managed() {  # true when space index $1 is one of the managed desks
-  [ -n "$1" ] || return 1
-  for _d in $(desk_spaces); do [ "$_d" = "$1" ] && return 0; done
-  return 1
-}
-
-win_space() { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '.space // empty'; }
-
-# ------------------------------------------------------------ slot bookkeeping
-# The sticky incumbent. "Oldest window id" used to decide every slot — but that
-# was only ever a stability hack: yabai returns windows newest-first, so the
-# naive pick let each new window seize the slot and evict the incumbent. Sorting
-# by id inverted the failure — the incumbent became permanently the oldest and
-# the slot could never be re-elected, no matter what the user did. Recording the
-# holder fixes both: new windows cannot hijack, and a deliberate move DOES win.
-slot_get() {  # $1 space, $2 role -> window id (empty when vacant)
-  [ -f "$SLOT_FILE" ] || return 0
-  awk -F: -v s="$1" -v r="$2" '$1==s && $2==r {print $3; exit}' "$SLOT_FILE" 2>/dev/null
-}
-
-slot_set() {  # $1 space, $2 role, $3 id ("" vacates)
-  _tmp="${SLOT_FILE}.$$"
-  { [ -f "$SLOT_FILE" ] && awk -F: -v s="$1" -v r="$2" '!($1==s && $2==r)' "$SLOT_FILE" 2>/dev/null
-    [ -n "$3" ] && echo "$1:$2:$3"
-  } > "$_tmp" 2>/dev/null
-  mv "$_tmp" "$SLOT_FILE" 2>/dev/null
-}
-
-slots_prune() {  # drop records whose window no longer exists
-  [ -f "$SLOT_FILE" ] || return 0
-  _live=$(yabai -m query --windows 2>/dev/null | jq -r '.[].id' | tr '\n' ' ')
-  [ -n "$_live" ] || return 0
-  _tmp="${SLOT_FILE}.$$"
-  while IFS=: read -r _s _r _i; do
-    [ -n "$_i" ] || continue
-    case " $_live " in *" $_i "*) echo "$_s:$_r:$_i" ;; esac
-  done < "$SLOT_FILE" > "$_tmp" 2>/dev/null
-  mv "$_tmp" "$SLOT_FILE" 2>/dev/null
-}
-
-# The ORIGIN record. Slot records alone can't answer "where did this window come
-# from" for a non-slot window, so every editor/browser window's last known desk
-# is tracked here. This is what separates a DRAG (seen elsewhere before -> the
-# user moved it, honour it) from a fresh OPEN (never seen -> no hijack).
-seen_get() { [ -f "$SEEN_FILE" ] && awk -F: -v i="$1" '$1==i{print $2;exit}' "$SEEN_FILE" 2>/dev/null; }
-
-seen_set() {  # CONSUME an origin: record id $1 as now living on desk $2.
-              # Must happen the instant a swap/arrival is acted on. Waiting for
-              # seen_write let a second placement run (kicked off by the swap's
-              # own window_moved) re-read the stale origin and swap it back —
-              # an infinite ping-pong between the two desks.
-  _t="${SEEN_FILE}.$$"
-  { [ -f "$SEEN_FILE" ] && awk -F: -v i="$1" '$1!=i' "$SEEN_FILE" 2>/dev/null
-    echo "$1:$2"
-  } > "$_t" 2>/dev/null
-  mv "$_t" "$SEEN_FILE" 2>/dev/null
-}
-
-seen_write() {  # rewrite from live state; call AFTER all moves have settled
-  yabai -m query --windows 2>/dev/null \
-    | jq -r "[.[]|select(($editor_sel or $browser_sel) and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\")]|.[]|\"\(.id):\(.space)\"" \
-    > "$SEEN_FILE" 2>/dev/null
-}
-
-candidates() {  # $1 space, $2 role -> tileable candidate ids, oldest first
-  _csel=$editor_sel; [ "$2" = browser ] && _csel=$browser_sel
-  yabai -m query --windows --space "$1" 2>/dev/null \
-    | jq -r "[.[]|select($_csel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\" and .\"is-floating\"==false)]|sort_by(.id)|.[].id"
-}
-
-ghostty_on() {  # oldest Ghostty already on space $1. Ghostty is the filler
-                # window, not a slot holder — no stickiness, no swap.
-  yabai -m query --windows --space "$1" 2>/dev/null \
-    | jq -r '[.[]|select(.app=="Ghostty" and .subrole=="AXStandardWindow" and .title!="Picture-in-Picture")]|sort_by(.id)|first.id // empty'
-}
-
-elect() {  # $1 space, $2 role -> id for a VACANT slot.
-           # Order: focused candidate → position (rightmost editor / leftmost
-           # browser, i.e. whichever already sits in the slot's half) → app
-           # order → oldest id. Position before app order is deliberate: the
-           # existing arrangement outranks the BROWSER_APPS list.
-  _esel=$editor_sel; [ "$2" = browser ] && _esel=$browser_sel
-  yabai -m query --windows --space "$1" 2>/dev/null \
-    | jq -r --arg apps "$BROWSER_APPS" --arg role "$2" "
-        (\$apps|split(\"\n\")|map(select(length>0))) as \$prio
-      | [ .[] | select($_esel and .subrole==\"AXStandardWindow\" and .title!=\"Picture-in-Picture\" and .\"is-floating\"==false) ] as \$c
-      | if (\$c|length)==0 then empty
-        else ( (\$c|map(select(.\"has-focus\"==true))|first)
-               // (\$c|sort_by([ (if \$role==\"editor\" then -(.frame.x) else (.frame.x) end),
-                                 (.app as \$a | ((\$prio|index(\$a)) // 99)),
-                                 .id ])|first) ).id
-        end"
-}
+focused_space() { yabai -m query --spaces --space 2>/dev/null | jq -r '.index // empty'; }
+win_space()     { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '.space // empty'; }
 
 # ------------------------------------------------------------- warp primitives
 floating()     { yabai -m query --windows --window "$1" 2>/dev/null | jq -r '."is-floating"'; }
-ensure_tiled() { [ "$(floating "$1")" = "true" ]  && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
+ensure_tiled() { [ "$(floating "$1")" = "true" ] && yabai -m window "$1" --toggle float 2>/dev/null; return 0; }
+
 pair_geom() {  # echo "sx sy tx ty" (floored) for window ids $1 $2; empty on miss
   yabai -m query --windows 2>/dev/null | jq -r --argjson s "$1" --argjson t "$2" '
       (map(select(.id==$s))[0].frame) as $a
@@ -200,7 +84,7 @@ pair_geom() {  # echo "sx sy tx ty" (floored) for window ids $1 $2; empty on mis
     | "\($a.x|floor) \($a.y|floor) \($b.x|floor) \($b.y|floor)"' 2>/dev/null
 }
 
-# yabai reports pre-op frames for an off-screen desk, so geometry is only
+# yabai reports pre-op frames for an off-screen space, so geometry is only
 # trustworthy while the space is visible.
 space_visible() {
   yabai -m query --spaces --space "$1" 2>/dev/null | jq -e '."is-visible"' >/dev/null 2>&1
@@ -236,21 +120,19 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
              # same-dir --insert toggles it off (verified live), so arming is a
              # parity coin flip. Warp, then verify geometry and repair with
              # --toggle split (wrong axis) and --swap (wrong order) instead.
-  # Never warp across desks. --warp moves the window to the target's space, so a
-  # stale/off-desk target would silently relocate a window the user placed —
-  # exactly the cross-desk drag this config exists to stop.
+  # Never warp across spaces. --warp moves the window to the target's space, so a
+  # stale/off-space target would silently relocate a window the user placed.
   w_s=$(win_space "$1")
   [ "$w_s" = "$(win_space "$2")" ] || { log warp "warp $1 onto $2 skipped — different spaces"; return 1; }
 
   # Decide whether the warp is needed from GEOMETRY, not just window count.
   #   • >2 tiled windows      -> they may not be siblings, warp.
-  #   • identical frames      -> the window has just arrived on this desk and is
+  #   • identical frames      -> the window has just arrived on this space and is
   #                              not in the tree yet, sitting exactly on top of
-  #                              the target. Skipping here made arrange a no-op
-  #                              (sx==tx reads as "order fine"), macOS then tiled
-  #                              it in whatever order it liked, and a second pass
-  #                              swapped it — the extra visible flip. Warp forces
-  #                              siblinghood now instead.
+  #                              the target. Skipping here made the rebuild a
+  #                              no-op (sx==tx reads as "order fine"), macOS then
+  #                              tiled it in whatever order it liked, and a
+  #                              second pass swapped it — the extra visible flip.
   #   • otherwise             -> already siblings and properly laid out; the warp
   #                              would only make them jump before the repair puts
   #                              them back, so skip it and repair in place.
@@ -278,7 +160,7 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
   # the pair wrong. This, not the settle delay, is why post-warp frames sometimes
   # read pre-warp; no WARP_SETTLE value fixes it. The arrival run does the shape.
   if ! space_visible "$w_s"; then
-    log warp "  $1->$2 $3: desk $w_s off screen — geometry repair deferred to arrival"
+    log warp "  $1->$2 $3: space $w_s off screen — geometry repair deferred to arrival"
     return 0
   fi
   w_pre="$sx $sy $tx $ty"
@@ -318,280 +200,148 @@ warp_to() {  # warp $1 onto $2 so it lands $3 (west/east/north/south) of it.
   return 0
 }
 
-# True when space $1 already has the desired shape, given slot holders
-# $2 editor / $3 browser / $4 ghostty (any may be empty):
-#   editor present -> browser TL / Ghostty BL (stacked left) / editor full-R
-#   no editor      -> browser | Ghostty side by side (browser left)
-# BROWSERS LEFT, EDITORS RIGHT, always. 0-or-1 members is trivially correct.
-shape_correct() {
-  yabai -m query --windows --space "$1" 2>/dev/null \
-    | jq -e --argjson ed "${2:-0}" --argjson br "${3:-0}" --argjson gh "${4:-0}" '
-        (map(select(.subrole=="AXStandardWindow" and .title!="Picture-in-Picture"))) as $w
-      | ($w|map(select(.id==$ed))|first) as $E
-      | ($w|map(select(.id==$br))|first) as $B
-      | ($w|map(select(.id==$gh))|first) as $G
-      | ([$E,$B,$G]|map(select(.!=null))|length) as $n
-      # members must reach the left edge of the display: a stale split (window
-      # moved away without a balance) leaves the group squeezed into one half,
-      # which shape checks alone cannot see
-      | (($w|map(.frame.x|floor)|min // 0) <= 20) as $covers
-      | if $n <= 1 then true
-        elif ($covers|not) then false
-        elif $E then
-          if ($B and $G) then
-            ($E.frame.x > $B.frame.x)
-            and (($B.frame.x|floor) == ($G.frame.x|floor))
-            and ($B.frame.y < $G.frame.y)
-          elif $G then
-            ($E.frame.x > $G.frame.x) and (($E.frame.y|floor) == ($G.frame.y|floor))
-          elif $B then
-            ($E.frame.x > $B.frame.x) and (($E.frame.y|floor) == ($B.frame.y|floor))
-          else true end
-        else
-          ($B and $G) and ($B.frame.x < $G.frame.x)
-          and (($B.frame.y|floor) == ($G.frame.y|floor))
-        end' >/dev/null 2>&1
+# ------------------------------------------------------------- the space memo
+# A plain id:space map, and nothing more. Its ONLY job is to gate window_moved,
+# which fires continuously while a window is being dragged. Without the gate,
+# dragging a non-browser leftward trips the invariant mid-drag and warps the
+# window out from under the cursor. The gate limits action to a real change of
+# space — which is exactly the "move an editor onto the browser's desk" case.
+seen_write() {
+  yabai -m query --windows 2>/dev/null | jq -r '.[]|"\(.id):\(.space)"' > "$SEEN_FILE" 2>/dev/null
 }
+seen_get() { [ -f "$SEEN_FILE" ] && awk -F: -v i="$1" '$1==i{print $2;exit}' "$SEEN_FILE" 2>/dev/null; }
 
-# Warp-based rebuild of the standard shape on the CURRENT space of the given
-# windows: browser TL / Ghostty BL / editor full-R (or the 2-member pairs).
-# Args: $1 editor id, $2 browser id, $3 ghostty id (any may be empty).
-arrange() {
-  a_ed="$1"; a_br="$2"; a_gh="$3"
-  for id in $a_ed $a_br $a_gh; do ensure_tiled "$id"; done
-  if [ -n "$a_ed" ]; then
-    if [ -n "$a_br" ]; then
-      warp_to "$a_br" "$a_ed" west
-      [ -n "$a_gh" ] && warp_to "$a_gh" "$a_br" south
-    elif [ -n "$a_gh" ]; then
-      warp_to "$a_gh" "$a_ed" west
-    fi
-  else
-    [ -n "$a_br" ] && [ -n "$a_gh" ] && warp_to "$a_gh" "$a_br" east
-  fi
-}
-
-adopt() {  # tuck a non-slot window under its desk's editor. Warp is tree-only,
-           # so it works SIP-on and unfocused. Slot holders are skipped BY ID —
-           # note there is no longer an app-based editor guard, which is what
-           # lets a second editor tile in place instead of being deported.
-  id="$1"; [ -n "$id" ] || return 0
-  win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
-  echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
-  a_s=$(echo "$win" | jq -r '.space')
-  is_managed "$a_s" || return 0
-  a_e=$(slot_get "$a_s" editor); a_b=$(slot_get "$a_s" browser); a_g=$(ghostty_on "$a_s")
-  case "$id" in "$a_e"|"$a_b"|"$a_g") return 0 ;; esac
-  [ -n "$a_e" ] || return 0
-  # Already parked directly under the editor? Bail. Without this the desk sweep
-  # re-warps a correctly-placed window on every single signal.
-  a_g2=$(pair_geom "$id" "$a_e")
-  if [ -n "$a_g2" ]; then
-    a_sx=$(echo "$a_g2" | cut -d' ' -f1); a_sy=$(echo "$a_g2" | cut -d' ' -f2)
-    a_tx=$(echo "$a_g2" | cut -d' ' -f3); a_ty=$(echo "$a_g2" | cut -d' ' -f4)
-    [ "$a_sx" = "$a_tx" ] && [ "$a_sy" -gt "$a_ty" ] && return 0
-  fi
-  log adopt "adopt: $id -> under editor $a_e on desk $a_s"
-  warp_to "$id" "$a_e" south
-}
-
-# ------------------------------------------------------------------ reconcile
-# Resolve every desk's slot holders, and perform the SWAP when the user has
-# dragged a slot holder onto another managed desk.
+# ------------------------------------------------------------- the invariant
+# One query answers everything. Emits "<ok>|<browser id>|<other id>":
+#   ok      — is the leftmost tiled window already a browser?
+#   browser — leftmost browser, the window to move
+#   other   — leftmost non-browser, the window to move it west of
 #
-# Swap: the seen-record is the origin. If a candidate on desk S was last seen on
-# managed desk D, the user dragged it S-ward, so D's counterpart is sent back to
-# D and both records are rewritten in the same pass — which is why this cannot
-# loop: the next pass already sees a consistent state.
+# ok is true when there is nothing to enforce: 0 or 1 tiled windows, no browser
+# on the space at all, or nothing but browsers. Otherwise the leftmost browser
+# must be STRICTLY left of every non-browser — the browser owns the left column
+# outright.
 #
-# Never-seen candidate = freshly opened, NOT a drag -> it must not hijack a held
-# slot (that is the whole point of the sticky incumbent). A dragged candidate
-# with no MANAGED origin takes the slot and the incumbent tiles beneath it.
-reconcile() {
-  slots_prune
-  for r_s in $(desk_spaces); do
-    for r_role in editor browser; do
-      r_inc=$(slot_get "$r_s" "$r_role")
-      if [ -n "$r_inc" ]; then
-        r_cur=$(win_space "$r_inc")
-        if [ "$r_cur" != "$r_s" ]; then
-          log slot "reconcile: $r_role incumbent $r_inc left desk $r_s (now ${r_cur:-gone}) -> vacate"
-          slot_set "$r_s" "$r_role" ""; r_inc=""
-        fi
-      fi
-
-      # ONE slot change per desk/role per pass, and re-verify each candidate is
-      # still here. The list is captured before any swap, so without both guards
-      # the loop walks a stale list and — because a swap rewrites the outgoing
-      # incumbent's origin to the other desk — reads that incumbent as a fresh
-      # arrival and swaps it straight back, ping-ponging within one pass.
-      for r_c in $(candidates "$r_s" "$r_role"); do
-        [ "$r_c" = "$r_inc" ] && continue
-        [ "$(win_space "$r_c")" = "$r_s" ] || continue
-        r_org=$(seen_get "$r_c")
-        [ -n "$r_org" ] || continue          # never seen -> freshly opened, no hijack
-        [ "$r_org" = "$r_s" ] && continue    # already lived here
-        if [ -z "$r_inc" ]; then
-          log slot "reconcile: desk $r_s $r_role slot <- $r_c (arrived from $r_org, slot vacant)"
-          slot_set "$r_s" "$r_role" "$r_c"; seen_set "$r_c" "$r_s"; r_inc="$r_c"
-        elif is_managed "$r_org"; then
-          log slot "reconcile: SWAP $r_role — $r_c ${r_org}->${r_s}, incumbent $r_inc ${r_s}->${r_org}"
-          # Arm the destination's insertion point BEFORE the move so the window
-          # lands on the correct side straight away. Repairing afterwards cannot
-          # work here: the destination desk is not visible (you are still on the
-          # desk you dragged from), --swap is a no-op there under SIP, and the
-          # correction is deferred until you switch — so you always arrive to a
-          # wrong layout that then flips in front of you.
-          # Browser goes west of the editor; an editor goes east of the browser.
-          if [ "$r_role" = browser ]; then r_anch=$(slot_get "$r_org" editor); r_dir=west
-          else                             r_anch=$(slot_get "$r_org" browser); r_dir=east
-          fi
-          if [ -n "$r_anch" ]; then
-            log slot "  arming insert: $r_anch <- $r_dir for incoming $r_inc"
-            yabai -m window "$r_anch" --insert "$r_dir" 2>/dev/null
-          fi
-          yabai -m window "$r_inc" --space "$r_org" 2>/dev/null
-          RECONCILE_MOVED=1
-          slot_set "$r_org" "$r_role" "$r_inc"
-          slot_set "$r_s" "$r_role" "$r_c"
-          # Consume BOTH origins immediately — the mover and the moved.
-          seen_set "$r_c" "$r_s"; seen_set "$r_inc" "$r_org"
-          r_inc="$r_c"
-        else
-          log slot "reconcile: desk $r_s $r_role slot <- $r_c (dragged from unmanaged $r_org; $r_inc tiles beneath)"
-          slot_set "$r_s" "$r_role" "$r_c"; seen_set "$r_c" "$r_s"; r_inc="$r_c"
-        fi
-        break   # one slot change per desk/role per pass — see above
-      done
-
-      if [ -z "$r_inc" ]; then
-        r_new=$(elect "$r_s" "$r_role")
-        if [ -n "$r_new" ]; then
-          log slot "reconcile: desk $r_s $r_role slot <- $r_new (elected)"
-          slot_set "$r_s" "$r_role" "$r_new"
-        fi
-      fi
-    done
-  done
+# Strict, not equality-with-the-leftmost-column, and the difference matters. An
+# equality test asks only "is a browser in the left column", which passes when an
+# editor sits on TOP of the browser in that column — the exact arrangement this
+# rewrite exists to stop. Strict costs one thing: a terminal stacked under the
+# browser in the same column now counts as a violation and gets rebuilt into its
+# own column. That is fine, because the right-hand side is not constrained.
+#
+# The min x > 20 clause is the squeeze guard: a window leaving a space can strand
+# a split, cramming the survivors into one half with the other half empty.
+# Relative-x comparison cannot see that, so the leftmost window is also required
+# to actually reach the left edge (left_padding is 12). It is checked only when a
+# browser exists, since without one there is nothing to rebuild from.
+space_state() {
+  yabai -m query --windows --space "$1" 2>/dev/null | jq -r --arg apps "$BROWSER_APPS" '
+      ($apps | split("\n") | map(select(length > 0)))                    as $browsers
+    | [ .[] | select(.subrole=="AXStandardWindow"
+                     and .title!="Picture-in-Picture"
+                     and ."is-floating"==false) ]                        as $w
+    | [ $w[] | select(.app as $a | $browsers | index($a)) ]              as $b
+    | [ $w[] | select(.app as $a | ($browsers | index($a)) | not) ]      as $o
+    | ($w | map(.frame.x | floor) | min)                                 as $mx
+    | (if ($w | length) <= 1 or ($b | length) == 0 then true
+       elif $mx > 20 then false
+       elif ($o | length) == 0 then true
+       else ($b | map(.frame.x | floor) | min) < ($o | map(.frame.x | floor) | min)
+       end)                                                              as $ok
+    | [ ($ok | tostring),
+        ((($b | sort_by(.frame.x, .id) | first | .id) // "") | tostring),
+        ((($o | sort_by(.frame.x, .id) | first | .id) // "") | tostring) ]
+      | join("|")'
 }
 
-# ----------------------------------------------------------------- place desks
-# Arrange ONE desk from whatever is already on it. Never pulls a window in.
-place_desk() {
-  p_s="$1"; p_trigger="$2"; p_new="$3"
-  p_ed=$(slot_get "$p_s" editor); p_br=$(slot_get "$p_s" browser); p_gh=$(ghostty_on "$p_s")
-  p_rebuilt=0
-  if shape_correct "$p_s" "$p_ed" "$p_br" "$p_gh"; then
-    log place "place($p_trigger): desk $p_s correct — skip rebuild"
-  else
-    p_rebuilt=1
-    log place "place($p_trigger): desk $p_s rebuild — browser TL / Ghostty BL / editor R (ed=$p_ed br=$p_br gho=$p_gh)"
-    log place "  measured: $(yabai -m query --windows --space "$p_s" 2>/dev/null | jq -r '[.[]|select(.subrole=="AXStandardWindow")]|sort_by(.id)|map("\(.id)/\(.app|.[0:4])@x\(.frame.x|floor)y\(.frame.y|floor)")|join(" ")')"
-    arrange "$p_ed" "$p_br" "$p_gh"
+# Arrange ONE space. Never pulls a window in from anywhere.
+place_space() {
+  p_s="$1"; p_trigger="${2:-window}"
+  managed "$p_s" || return 0
+  p_info=$(space_state "$p_s"); [ -n "$p_info" ] || return 0
+  p_ok=${p_info%%|*}; p_rest=${p_info#*|}
+  p_br=${p_rest%%|*}; p_ot=${p_rest#*|}
+
+  if [ "$p_ok" = true ]; then
+    log place "place($p_trigger): space $p_s ok"
+    return 0
   fi
 
-  # Tuck the NEWLY CREATED window under the editor — only that one, only at
-  # creation. Sweeping every window here dragged deliberately-placed windows back
-  # under the editor on every arrival. Placement is the user's; creation is ours.
-  if [ -n "$p_new" ] && [ "$(win_space "$p_new")" = "$p_s" ]; then adopt "$p_new"; fi
+  log place "place($p_trigger): space $p_s rebuild — browser $p_br west of $p_ot"
+  log place "  measured: $(yabai -m query --windows --space "$p_s" 2>/dev/null | jq -r '[.[]|select(.subrole=="AXStandardWindow")]|sort_by(.frame.x)|map("\(.id)/\(.app[0:4])@x\(.frame.x|floor)y\(.frame.y|floor)")|join(" ")')"
 
-  # Balance LAST and only after a rebuild: the sweep can move a window out of one
-  # column into another, which skews the split ratios if the balance ran before
-  # it. Skip-rebuild paths (space_changed heal etc.) must NOT balance, or they'd
-  # stomp manual resizes on every visit.
-  [ "$p_rebuilt" = 1 ] && yabai -m space "$p_s" --balance 2>/dev/null
+  if [ -n "$p_br" ] && [ -n "$p_ot" ]; then
+    ensure_tiled "$p_br"; ensure_tiled "$p_ot"
+    warp_to "$p_br" "$p_ot" west
+  fi
+  # Balance ONLY on a rebuild. This is both the even split for two browsers and
+  # the repair for a stranded split; running it on every visit would stomp every
+  # manual resize.
+  yabai -m space "$p_s" --balance 2>/dev/null
   return 0
 }
 
-place_desks() {
-  trigger="${1:-startup}"; new_win="$2"   # $2 = the window just created, if any
-  # Serialize. Signals arrive in bursts (a swap's own window_moved, plus
-  # space_changed, plus window_created) and two concurrent runs interleave their
-  # read-modify-write of the slot/seen files. Skipping is safe: the run holding
-  # the lock reaches the same final state.
+# $1 = space index, or empty for every managed space. $2 = trigger, for the log.
+place() {
+  pl_s="$1"; pl_trigger="${2:-window}"
+  # Serialize. Signals arrive in bursts (space_changed plus window_created plus
+  # window_moved) and concurrent runs would fight over the same tree. Skipping is
+  # safe: the run holding the lock reaches the same final state.
   PLOCK=/tmp/yabai_place.lock
   if [ -d "$PLOCK" ]; then
     # Stale-lock guard: a killed run must not wedge placement forever.
     if [ -z "$(find "$PLOCK" -maxdepth 0 -mmin -1 2>/dev/null)" ]; then
-      log place "place($trigger): stale lock — reclaiming"; rmdir "$PLOCK" 2>/dev/null
+      log place "place($pl_trigger): stale lock — reclaiming"; rmdir "$PLOCK" 2>/dev/null
     else
-      log place "place($trigger): busy — skip"; return 0
+      log place "place($pl_trigger): busy — skip"; return 0
     fi
   fi
-  mkdir "$PLOCK" 2>/dev/null || { log place "place($trigger): busy — skip"; return 0; }
+  mkdir "$PLOCK" 2>/dev/null || { log place "place($pl_trigger): busy — skip"; return 0; }
   trap 'rmdir "$PLOCK" 2>/dev/null' EXIT INT TERM
 
-  RECONCILE_MOVED=0
-  reconcile
-  # No settle delay here: warp_to now detects the "arrived but not yet tiled"
-  # state directly (identical frames) instead of waiting a fixed time for it.
-  # Swept 0 / 0.05 / 0.10 / 0.20 / 0.35s over three drag-then-switch cycles each
-  # on 2026-08-12 — byte-identical results, so the delay had nothing left to do.
-  for d_s in $(desk_spaces); do place_desk "$d_s" "$trigger" "$new_win"; done
-  seen_write   # after all moves have settled — this is next run's origin record
+  if [ -n "$pl_s" ]; then
+    place_space "$pl_s" "$pl_trigger"
+  else
+    for pl_i in $(managed_spaces); do place_space "$pl_i" "$pl_trigger"; done
+  fi
+  seen_write   # after all moves have settled — this is the next moved-gate baseline
 
   rmdir "$PLOCK" 2>/dev/null
   trap - EXIT INT TERM
   return 0
 }
 
-# ------------------------------------------------- incremental single placement
-# window_created (any app). place_desks self-skips per desk via shape_correct, so
-# a stray that doesn't disturb the shape costs one adopt warp, not a rebuild.
+# window_created (any app). Only the new window's own space is checked.
 place_one() {
   id="$1"; [ -n "$id" ] || return 0
-  win=$(yabai -m query --windows --window "$id" 2>/dev/null); [ -n "$win" ] || return 0
-  echo "$win" | jq -e '.subrole=="AXStandardWindow" and .title!="Picture-in-Picture" and ."is-floating"==false' >/dev/null || return 0
-  o_s=$(echo "$win" | jq -r '.space')
-  is_managed "$o_s" || { log one "place-one: $id on unmanaged space $o_s — left alone"; return 0; }
-  log one "place-one: $(echo "$win" | jq -r '.app') $id on desk $o_s"
-  place_desks window "$id"
+  o_s=$(win_space "$id"); [ -n "$o_s" ] || return 0
+  managed "$o_s" || { log one "place-one: $id on unmanaged space $o_s — left alone"; return 0; }
+  place "$o_s" window
 }
 
-# --------------------------------------------------------------- moved gate
 # window_moved fires for ordinary drags and resizes WITHIN a space too, and a
-# mouse drag emits a burst of them — running the full placement on each would be
-# pure churn. Only a genuine change of desk is our business, so compare against
-# the seen-record and bail otherwise.
+# mouse drag emits a burst of them. Only a genuine change of space is our
+# business — see the space memo above for why acting sooner is harmful.
 on_moved() {
   m_id="$1"; [ -n "$m_id" ] || return 0
   m_cur=$(win_space "$m_id"); [ -n "$m_cur" ] || return 0
   m_org=$(seen_get "$m_id"); [ -n "$m_org" ] || return 0
   [ "$m_org" = "$m_cur" ] && return 0
-  log moved "window $m_id moved desk $m_org -> $m_cur"
-  place_desks moved
-}
-
-# ------------------------------------------------------- display-change gate
-# Re-place only when the set of displays actually changed (dock/undock or
-# resolution change), ignoring the duplicate/spurious events a dock fires.
-on_display_change() {
-  LOCK=/tmp/yabai_display.lock
-  if ! mkdir "$LOCK" 2>/dev/null; then log dpy "display-change: locked-skip"; return; fi
-  trap 'rmdir "$LOCK" 2>/dev/null' EXIT
-  sig=$(yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)')
-  prev=$(cat "$SIG_FILE" 2>/dev/null)
-  log dpy "display-change: sig=$sig prev=$prev"
-  [ -z "$sig" ] && { log dpy "  empty query, skip"; return; }
-  [ "$sig" = "$prev" ] && { log dpy "  no change, skip"; return; }
-  printf '%s' "$sig" > "$SIG_FILE"
-  # Desk indices differ docked vs undocked, and slot records are keyed by space.
-  rm -f "$SLOT_FILE" "$SEEN_FILE" "$STUCK_FILE" 2>/dev/null
-  place_desks display-change
+  log moved "window $m_id moved space $m_org -> $m_cur"
+  place "$m_cur" moved
 }
 
 # SA capability — computed once before the dispatch case below. It does not gate
 # the rebuild; it only gates load-time SA setup (--load-sa, dock_did_restart)
-# and the startup space --focus 3.
+# and the startup space --focus.
 if sa_capable; then HAS_SA=1; else HAS_SA=0; fi
 
 # ----------------------------------------------------- dispatch (signal calls)
 case "$1" in
-  display-change) on_display_change; exit 0 ;;
-  place)          place_desks "${2:-window}"; exit 0 ;;
-  place-one)      place_one "$2"; exit 0 ;;
-  moved)          on_moved "$2"; exit 0 ;;
-  adopt)          adopt "$2"; exit 0 ;;
+  place-all)     place "" "${2:-signal}"; exit 0 ;;
+  place-focused) place "$(focused_space)" "${2:-space}"; exit 0 ;;
+  place-one)     place_one "$2"; exit 0 ;;
+  moved)         on_moved "$2"; exit 0 ;;
 esac
 
 # ============================================================ yabai load (no arg)
@@ -631,6 +381,14 @@ yabai -m config --space 2 layout float
 yabai -m config layout bsp
 yabai -m config window_placement second_child
 
+# split_type stays auto, and that is load-bearing. auto splits a container
+# vertically when it is wider than tall, which is exactly where the line wants to
+# be: two windows on a 3200x1800 display go side by side, while the 1583x1778
+# right half of a three-window desk is taller than wide and so stacks. Forcing
+# `vertical` would break the second case into three narrow columns.
+yabai -m config split_type auto
+yabai -m config split_ratio 0.50
+
 # Gaps
 yabai -m config top_padding 6
 yabai -m config bottom_padding 16
@@ -659,37 +417,35 @@ yabai -m rule --add app="^LilyView$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 
-# App->desktop assignment is left to macOS (Dock → Assign To). This is now the
-# ONLY thing that restores desks from cold — the config no longer herds windows
-# onto a desk, it only arranges what it finds there. rule --apply also re-floats
-# the manage=off windows (System Settings, ghostty phantom, TV).
+# App->desktop assignment is left to macOS (Dock → Assign To). rule --apply also
+# re-floats the manage=off windows (System Settings, ghostty phantom, TV).
 yabai -m rule --apply
 
-# Rebalance BSP when a window closes (works without the scripting addition)
+# A close can strand a split — the survivors crammed into one half. Balance
+# repairs that, and no close can break the invariant itself (removing a window
+# cannot stop a browser being leftmost), so this needs no placement run.
 yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
 
-# Placement signals. `window --space` works SIP-on (yabai 7.1.25) and the layout
-# rebuild is warp-based (tree-only), so placement runs fully in both modes. Only
-# `space --focus` still needs the SA — just the startup focus below is gated.
-yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
-yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
-yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
-yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/yabai/yabairc display-change"
-yabai -m signal --add event=window_destroyed app="$EDITOR_RE" action="\$HOME/Code/dotfiles/yabai/yabairc place"
-yabai -m signal --add event=window_destroyed app="$BROWSER_RE" action="\$HOME/Code/dotfiles/yabai/yabairc place"
+# Placement signals. The rebuild is warp-based (tree-only), so it runs fully with
+# SIP on. Only `space --focus` still needs the SA — just the startup focus below.
+# Space indices shift when displays come and go, so a display change rechecks
+# everything; the place lock absorbs the duplicate events a dock fires.
+yabai -m signal --add event=display_added   action="\$HOME/Code/dotfiles/yabai/yabairc place-all display"
+yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/yabai/yabairc place-all display"
+yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/yabai/yabairc place-all display"
+yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/yabai/yabairc place-all display"
 yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/yabai/yabairc place-one \$YABAI_WINDOW_ID"
-# Heal on returning to a space, and — more importantly — this is what resolves a
-# SWAP: dragging a window across spaces via Mission Control normally lands you on
-# the destination desk, which fires space_changed. place_desks self-skips via
-# shape_correct, so this is a no-op when nothing has changed.
-yabai -m signal --add event=space_changed action="\$HOME/Code/dotfiles/yabai/yabairc place"
-# Direct swap trigger when yabai reports the move itself (lower latency than
-# waiting for space_changed; harmless duplicate when it doesn't fire). Gated by
-# on_moved so within-space drags and resizes cost one query, not a placement.
+# Heal on returning to a space. Dragging a window across spaces via Mission
+# Control lands you on the destination, which fires this; place_space self-skips
+# when the invariant already holds, so it is a no-op when nothing changed.
+yabai -m signal --add event=space_changed action="\$HOME/Code/dotfiles/yabai/yabairc place-focused"
+# Lower-latency path for the same thing when yabai reports the move itself.
+# Gated by on_moved so within-space drags and resizes cost one query, not a
+# placement.
 yabai -m signal --add event=window_moved action="\$HOME/Code/dotfiles/yabai/yabairc moved \$YABAI_WINDOW_ID"
-yabai -m query --displays 2>/dev/null | jq -Sc '[.[]|{w:(.frame.w|floor),h:(.frame.h|floor)}]|sort_by(.w,.h)' > "$SIG_FILE"
-place_desks startup
-# Startup focus of the editor space needs the SA; under SIP-on switch with ^3.
+
+place "" startup
+# Startup focus of space 3 needs the SA; under SIP-on switch with ^3.
 [ "$HAS_SA" = 1 ] && yabai -m space --focus 3
 log load "config loaded"
 echo "yabai configuration loaded"

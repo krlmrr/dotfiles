@@ -22,24 +22,48 @@ Everything else in the file existed to serve the retired question.
 
 ## The invariant
 
-On every space with index >= 3, **the leftmost tiled window must be a browser.**
+On every space with index >= 3, **the browser owns the top-left** — precisely, the
+topmost window of the leftmost column is a browser.
 
 - Fewer than two tiled windows -> trivially satisfied, no action.
 - No browser on the space -> nothing to enforce, no action. The right side is
   never constrained, so a desk without a browser is left entirely to bsp.
-- Nothing but browsers on the space -> nothing to be left *of*, no action.
-- Otherwise -> the leftmost browser must be **strictly** left of every
-  non-browser. The browser owns the left column outright.
-
-Strict rather than "a browser is somewhere in the leftmost column", and the
-difference is the whole point. An equality test passes when an editor sits *on
-top of* the browser in that column -- observed live, and the exact arrangement
-this rewrite exists to stop. Strict costs one thing: a terminal stacked under the
-browser in the same column is now a violation and gets rebuilt into its own
-column. Acceptable, because the right-hand side is never constrained.
 
 Spaces 1 and 2 are out of scope. Space 2 is `layout float` and yabai tiles
 nothing there regardless.
+
+### Two weaker rules, both tried, both wrong
+
+This landed on the third attempt. Recording the first two because each looks
+correct on paper and each produced a layout that had to be thrown out.
+
+**"A browser is somewhere in the leftmost column"** (equality on min x). Accepts
+an *editor* sitting on top of the browser in that column — observed live: Code at
+(12, 37) with Zen beneath it at (12, 916) satisfies the test. Not what "the
+browser is on the left" means.
+
+**"The leftmost browser is strictly left of every non-browser."** Manufactures
+columns. Any non-browser landing in the browser's own column reads as a
+violation, and the only repair strict admits is warping the browser further west
+— so browser + terminal + editor converges on three equal columns. Observed live
+and rejected immediately; it was worse than the problem it solved. The lesson is
+that a rule's *repair* is part of the rule: strict's only move added a column, and
+adding a column can never be the fix for "something shares my column".
+
+**Top-of-leftmost-column** accepts "browser top-left, anything below it, anything
+to the right", rejects an editor above the browser, and repairs the common case
+without a new column.
+
+### Repair directions
+
+The direction is chosen from the violation, and this is what keeps the rule from
+splitting the screen:
+
+| Case | Direction | Effect |
+| --- | --- | --- |
+| A browser is in the left column but not at its top | `north` | Moves it up *within* the column. Adds no column. |
+| No browser in the left column at all | `west` | A new leftmost column, which here is genuinely correct. |
+| Squeeze guard only (see below) | none | `--balance` alone is the repair. |
 
 ### The squeeze guard
 
@@ -63,10 +87,14 @@ plus `split_ratio 0.5`:
 | 3 | right half 1583x1778, taller than wide | horizontal | left column + right pair stacked |
 
 Row 1 is "two browsers, split evenly". Row 2 is "browser keeps the left half,
-everything else shares the right". `auto` draws the line exactly where the user
-would — at the point a column stops being wider than it is tall. **Setting
-`split_type vertical` would break row 2** by forcing three narrow columns, so it
-stays `auto`.
+everything else shares the right". **Setting `split_type vertical` would break row
+2** by forcing three narrow columns, so it stays `auto`.
+
+One caveat, learned the hard way: `auto` decides at *insertion* time from the
+container being split then, and an explicit `--warp` afterwards overrides whatever
+it chose. So this table describes what bsp does when left alone — it is not a
+guarantee about the final tree. The three-equal-columns layout that killed the
+strict rule was produced by the rule's own west-warp, not by `auto`.
 
 ## Horizontal splits
 
@@ -127,13 +155,18 @@ desk revisit.
 
 ## Verification
 
-The invariant's jq program is exercised by 18 fixture cases: an empty space,
-single windows, a right-hand browser, the squeeze guard (with browsers, without,
-and browsers-only), floating / Picture-in-Picture / non-standard-subrole
-exclusion, multi-word app names, two and three browsers, leftmost-browser
-selection among several, a terminal stacked under the browser, and an editor
-stacked on top of one. The harness extracts the jq straight out of `yabairc`, so
-it cannot drift from what actually runs.
+The invariant's jq program is exercised by 21 fixture cases. Four of them are the
+exact layouts that drove the design — the editor-above-browser screenshot (must
+repair `north`), the three-equal-columns screenshot (must NOT be produced), the
+browser-top-left-with-two-below layout that is fine as it stands, and the approved
+browser-left-half preview. The rest cover an empty space, single windows, a
+right-hand browser (must repair `west`), a left column containing no browser, the
+topmost browser being chosen when a column holds several, the squeeze guard with
+and without a browser, floating / Picture-in-Picture / non-standard-subrole
+exclusion, multi-word app names, and two browsers alone.
+
+The harness extracts the jq straight out of `yabairc`, so it cannot drift from
+what actually runs.
 
 Fixtures rather than live windows, deliberately: driving real windows to test
 this disrupts whoever is using the machine.

@@ -6,7 +6,9 @@
 #
 # THE ONE RULE — on every space from FIRST_MANAGED_SPACE up:
 #
-#     THE LEFTMOST TILED WINDOW IS A BROWSER.
+#     THE BROWSER OWNS THE TOP-LEFT.
+#
+# Precisely: the topmost window of the leftmost column is a browser.
 #
 # That is the whole contract. What sits on the right is never constrained; a desk
 # with no browser is left entirely to bsp. This file used to maintain two
@@ -212,28 +214,41 @@ seen_write() {
 seen_get() { [ -f "$SEEN_FILE" ] && awk -F: -v i="$1" '$1==i{print $2;exit}' "$SEEN_FILE" 2>/dev/null; }
 
 # ------------------------------------------------------------- the invariant
-# One query answers everything. Emits "<ok>|<browser id>|<other id>":
-#   ok      — is the leftmost tiled window already a browser?
-#   browser — leftmost browser, the window to move
-#   other   — leftmost non-browser, the window to move it west of
+# THE BROWSER OWNS THE TOP-LEFT. One query answers everything, emitting four
+# pipe-separated fields: "<ok>|<browser id>|<target id>|<direction>".
 #
-# ok is true when there is nothing to enforce: 0 or 1 tiled windows, no browser
-# on the space at all, or nothing but browsers. Otherwise the leftmost browser
-# must be STRICTLY left of every non-browser — the browser owns the left column
-# outright.
+# The rule is "the topmost window of the leftmost column is a browser", and the
+# two weaker rules that look equivalent are both wrong — each was tried and each
+# produced a layout that had to be thrown out:
 #
-# Strict, not equality-with-the-leftmost-column, and the difference matters. An
-# equality test asks only "is a browser in the left column", which passes when an
-# editor sits on TOP of the browser in that column — the exact arrangement this
-# rewrite exists to stop. Strict costs one thing: a terminal stacked under the
-# browser in the same column now counts as a violation and gets rebuilt into its
-# own column. That is fine, because the right-hand side is not constrained.
+#   "a browser is somewhere in the leftmost column" (equality on x) accepts an
+#   EDITOR sitting on top of the browser in that column. Observed live; not what
+#   "the browser is on the left" means.
+#
+#   "the leftmost browser is STRICTLY left of every non-browser" manufactures
+#   columns. Any non-browser landing in the browser's column reads as a
+#   violation whose only repair is warping the browser further west, so
+#   browser/terminal/editor becomes three equal columns. Observed live, worse
+#   than the problem it solved.
+#
+# Top-of-leftmost-column accepts "browser top-left, anything below it, anything
+# right", rejects an editor above the browser, and never needs a new column to
+# fix the common case — hence the direction field:
+#
+#   north — a browser is already in the left column, just not at its top. Move it
+#           up WITHIN that column. Adds no column.
+#   west  — no browser in the left column at all. A new leftmost column is
+#           genuinely what is wanted here.
+#   ""    — nothing to warp; balance alone is the repair (the squeeze guard).
+#
+# ok is true when there is nothing to enforce: 0 or 1 tiled windows, or no
+# browser on the space.
 #
 # The min x > 20 clause is the squeeze guard: a window leaving a space can strand
-# a split, cramming the survivors into one half with the other half empty.
-# Relative-x comparison cannot see that, so the leftmost window is also required
-# to actually reach the left edge (left_padding is 12). It is checked only when a
-# browser exists, since without one there is nothing to rebuild from.
+# a split, cramming the survivors into one half with the other half empty. No
+# relative comparison can see that, so the leftmost window is also required to
+# actually reach the left edge (left_padding is 12). Checked only when a browser
+# exists, since without one there is nothing to rebuild from.
 space_state() {
   yabai -m query --windows --space "$1" 2>/dev/null | jq -r --arg apps "$BROWSER_APPS" '
       ($apps | split("\n") | map(select(length > 0)))                    as $browsers
@@ -241,17 +256,20 @@ space_state() {
                      and .title!="Picture-in-Picture"
                      and ."is-floating"==false) ]                        as $w
     | [ $w[] | select(.app as $a | $browsers | index($a)) ]              as $b
-    | [ $w[] | select(.app as $a | ($browsers | index($a)) | not) ]      as $o
     | ($w | map(.frame.x | floor) | min)                                 as $mx
-    | (if ($w | length) <= 1 or ($b | length) == 0 then true
-       elif $mx > 20 then false
-       elif ($o | length) == 0 then true
-       else ($b | map(.frame.x | floor) | min) < ($o | map(.frame.x | floor) | min)
-       end)                                                              as $ok
-    | [ ($ok | tostring),
-        ((($b | sort_by(.frame.x, .id) | first | .id) // "") | tostring),
-        ((($o | sort_by(.frame.x, .id) | first | .id) // "") | tostring) ]
-      | join("|")'
+    | [ $w[] | select((.frame.x | floor) == $mx) ]                       as $col
+    | ($col | sort_by(.frame.y) | first)                                 as $top
+    | (($browsers | index($top.app)) != null)                            as $topok
+    | [ $col[] | select(.app as $a | $browsers | index($a)) ]            as $colb
+    | (if ($w | length) <= 1 or ($b | length) == 0 then ["true","","",""]
+       elif $topok then [(if $mx > 20 then "false" else "true" end),"","",""]
+       elif ($colb | length) > 0
+         then ["false", ($colb | sort_by(.frame.y) | first.id | tostring),
+                        ($top.id | tostring), "north"]
+       else       ["false", ($b | sort_by(.frame.x, .frame.y, .id) | first.id | tostring),
+                        ($top.id | tostring), "west"]
+       end)
+    | join("|")'
 }
 
 # Arrange ONE space. Never pulls a window in from anywhere.
@@ -259,20 +277,21 @@ place_space() {
   p_s="$1"; p_trigger="${2:-window}"
   managed "$p_s" || return 0
   p_info=$(space_state "$p_s"); [ -n "$p_info" ] || return 0
-  p_ok=${p_info%%|*}; p_rest=${p_info#*|}
-  p_br=${p_rest%%|*}; p_ot=${p_rest#*|}
+  p_ok=${p_info%%|*};  p_r1=${p_info#*|}
+  p_br=${p_r1%%|*};    p_r2=${p_r1#*|}
+  p_tg=${p_r2%%|*};    p_dir=${p_r2#*|}
 
   if [ "$p_ok" = true ]; then
     log place "place($p_trigger): space $p_s ok"
     return 0
   fi
 
-  log place "place($p_trigger): space $p_s rebuild — browser $p_br west of $p_ot"
-  log place "  measured: $(yabai -m query --windows --space "$p_s" 2>/dev/null | jq -r '[.[]|select(.subrole=="AXStandardWindow")]|sort_by(.frame.x)|map("\(.id)/\(.app[0:4])@x\(.frame.x|floor)y\(.frame.y|floor)")|join(" ")')"
+  log place "place($p_trigger): space $p_s rebuild — browser ${p_br:-none} ${p_dir:-balance-only} of ${p_tg:-none}"
+  log place "  measured: $(yabai -m query --windows --space "$p_s" 2>/dev/null | jq -r '[.[]|select(.subrole=="AXStandardWindow")]|sort_by(.frame.x,.frame.y)|map("\(.id)/\(.app[0:4])@x\(.frame.x|floor)y\(.frame.y|floor)")|join(" ")')"
 
-  if [ -n "$p_br" ] && [ -n "$p_ot" ]; then
-    ensure_tiled "$p_br"; ensure_tiled "$p_ot"
-    warp_to "$p_br" "$p_ot" west
+  if [ -n "$p_br" ] && [ -n "$p_tg" ] && [ -n "$p_dir" ]; then
+    ensure_tiled "$p_br"; ensure_tiled "$p_tg"
+    warp_to "$p_br" "$p_tg" "$p_dir"
   fi
   # Balance ONLY on a rebuild. This is both the even split for two browsers and
   # the repair for a stranded split; running it on every visit would stomp every

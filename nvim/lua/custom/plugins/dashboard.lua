@@ -41,9 +41,6 @@ return {
                         end
                     end
                 end)
-                -- Disable <leader>e on dashboard
-                vim.keymap.set('n', '<leader>e', '<Nop>', { buffer = true, silent = true })
-
                 local cursor = require("config.cursor")
                 vim.defer_fn(function()
                     cursor.hide()

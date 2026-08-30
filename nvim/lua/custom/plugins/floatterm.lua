@@ -100,7 +100,7 @@ local function run_in_terminal(cmd)
 end
 
 -- Set up keymaps
-vim.keymap.set({ 'n', 't' }, '<leader>tt', toggle_terminal, { desc = 'Toggle floating terminal' })
+vim.keymap.set({ 'n', 't' }, '<leader>ft', toggle_terminal, { desc = 'Toggle floating terminal' })
 vim.keymap.set({ 'n', 't' }, '<leader>tr', reset_terminal, { desc = 'Reset floating terminal' })
 vim.keymap.set('n', '<leader>pt', function() run_in_terminal('./vendor/bin/pest --parallel') end, { desc = 'Run Pest tests' })
 

@@ -110,7 +110,7 @@ Install via Mason: `:MasonInstall intelephense lua_ls`
 | Key | Mode | Description |
 |-----|------|-------------|
 | `<leader>e` | Normal | Toggle Neo-tree (right side) |
-| `<leader>sf` | Normal | Search files |
+| `<leader>ff` | Normal | Find files (includes hidden, e.g. `.env`) |
 | `<leader>gf` | Normal | Search git files |
 | `<leader>?` | Normal | Find recently opened files |
 | `<leader><space>` | Normal | Find open buffers |

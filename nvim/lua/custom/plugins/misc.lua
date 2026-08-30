@@ -54,8 +54,10 @@ return {
     end,
   },
 
-  -- Comment with gc
-  { 'numToStr/Comment.nvim',  opts = {} },
+  -- Commenting uses Neovim's built-in gc/gcc; this only fixes `commentstring`
+  -- per treesitter injection, so gcc inside <script> in .vue/.blade.php
+  -- comments as JS rather than HTML.
+  { 'folke/ts-comments.nvim', event = 'VeryLazy', opts = {} },
 
   -- Auto-close HTML tags
   { 'windwp/nvim-ts-autotag', opts = {} },

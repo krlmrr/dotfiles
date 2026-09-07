@@ -429,4 +429,5 @@
     "terminal.integrated.minimumContrastRatio": 4.5,
     "claudeCode.focusView": false,
     "zenMode.hideLineNumbers": false,
+    "continue.showInlineTip": false,
 }

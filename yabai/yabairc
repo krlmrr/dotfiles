@@ -31,6 +31,8 @@ LOG=/tmp/yabai.log
 SELF="$HOME/Code/dotfiles/yabai/yabairc"
 STUCK_FILE=/tmp/yabai_stuck  # "<src>:<dst>:<dir>:<sx>,<sy>,<tx>,<ty>" — repairs that achieved nothing
 SEEN_FILE=/tmp/yabai_seen    # "<window_id>:<space>" — last known space, for the moved gate only
+TAB_FILE=/tmp/yabai_tabs     # "<window_id>" — every id yabai has announced; the only way to find tabs
+TABF_FILE=/tmp/yabai_tabfloat # "<window_id>" — background tabs THIS config floated, so it can re-tile them
 
 # Spaces below this are none of our business. Space 2 is the float chaos zone
 # anyway (see the layout config below), and space 1 is left free-form.
@@ -213,6 +215,113 @@ seen_write() {
 }
 seen_get() { [ -f "$SEEN_FILE" ] && awk -F: -v i="$1" '$1==i{print $2;exit}' "$SEEN_FILE" 2>/dev/null; }
 
+# --------------------------------------------------------- native-tab windows
+# A macOS native tab is a real AXStandardWindow, so yabai gives every tab of a
+# tabbed window its own tree node and the background ones hold empty tiles —
+# the TablePlus "two connections, half the column blank" bug.
+#
+# They cannot be found by listing: `query --windows` omits a background tab
+# entirely, yet `query --windows --window <id>` still returns it in full. That
+# is the exact INVERSE of an AX-dead record, which stays in the list and fails
+# to resolve (see project-yabai-ax-loss), so the two are cleanly separable and
+# neither repair can fire on the other:
+#
+#   in list + resolves      -> an ordinary window
+#   in list + fails         -> AX-dead phantom  (not ours; the ax_dead warning)
+#   NOT in list + resolves  -> background tab   (ours)
+#   NOT in list + fails     -> genuinely gone   (prune from the ledger)
+#
+# THE RULE: exactly one tab of a tabbed window is tiled — the frontmost, which
+# is precisely the one `query --windows` shows. Its siblings float; a tab switch
+# swaps the roles. Only ids this config floated are ever re-tiled, so a window
+# floated by hand is never dragged back into the tree.
+tab_probe() {  # "<pid> <is-floating>" for a resolvable standard window; empty otherwise
+  yabai -m query --windows --window "$1" 2>/dev/null \
+    | jq -r 'select(.subrole=="AXStandardWindow")|"\(.pid) \(."is-floating")"' 2>/dev/null
+}
+
+# A background tab's OWN .space is a lie: yabai reports the FOCUSED space for a
+# window it cannot find in any space list. Verified live — tab 48206 read
+# "space 2" while its frontmost sibling sat on space 3 and space 2's own window
+# array did not contain it. Trusting it would float windows on space 2, which is
+# never ours to touch (see feedback-yabai-space2). Two honest routes instead:
+#   * the id is a tree extreme of a managed space  -> proven by construction
+#   * every LISTED window of the same pid agrees on one space -> that space
+# Neither available means the space is unproven, and an unproven tab is skipped.
+tab_extremes() {
+  yabai -m query --spaces 2>/dev/null \
+    | jq -r --argjson f "$FIRST_MANAGED_SPACE" \
+        '.[]|select(.index >= $f)|."first-window",."last-window"' \
+    2>/dev/null | grep -E '^[0-9]+$' | grep -vx 0
+}
+
+tab_space() {  # $1 = candidate id, $2 = its pid. Echoes a proven space, or nothing.
+  if echo "$T_EXTREMES" | grep -qx "$1"; then
+    yabai -m query --spaces 2>/dev/null \
+      | jq -r --argjson w "$1" '.[]|select(."first-window"==$w or ."last-window"==$w)|.index' \
+      2>/dev/null | head -1
+    return 0
+  fi
+  yabai -m query --windows 2>/dev/null \
+    | jq -r --argjson p "$2" '[.[]|select(.pid==$p)|.space]|unique|if length==1 then (.[0]|tostring) else "" end' \
+    2>/dev/null
+}
+
+tab_note() {  # remember an id yabai announced — a background tab appears in no listing
+  [ -n "$1" ] || return 0
+  grep -qxF "$1" "$TAB_FILE" 2>/dev/null || echo "$1" >> "$TAB_FILE"
+  return 0
+}
+
+# The ledger plus both tree extremes of every managed space. first/last-window
+# still name a background tab even when the space's own `windows` array omits
+# it, so the extremes catch tabs that predate the ledger.
+tab_candidates() {
+  { cat "$TAB_FILE" 2>/dev/null; echo "$T_EXTREMES"; } 2>/dev/null \
+    | grep -E '^[0-9]+$' | grep -vx 0 | sort -u
+}
+
+# Sets TABS_ACTED=1 when it changed the tree, so callers can skip a placement
+# run that has nothing to do.
+TABS_ACTED=0
+tabs_repair() {
+  TABS_ACTED=0
+  t_live=$(yabai -m query --windows 2>/dev/null | jq -r '.[].id')
+  [ -n "$t_live" ] || return 0
+  T_EXTREMES=$(tab_extremes)
+
+  # Re-tile BEFORE floating, so a space is never momentarily all-floating.
+  if [ -s "$TABF_FILE" ]; then
+    for t_id in $(cat "$TABF_FILE" 2>/dev/null); do
+      if echo "$t_live" | grep -qx "$t_id"; then
+        ensure_tiled "$t_id"; TABS_ACTED=1
+        log tabs "$t_id frontmost again — re-tiled"
+        sed -i '' "/^$t_id\$/d" "$TABF_FILE" 2>/dev/null
+      elif [ -z "$(tab_probe "$t_id")" ]; then
+        sed -i '' "/^$t_id\$/d" "$TABF_FILE" 2>/dev/null
+      fi
+    done
+  fi
+
+  for t_id in $(tab_candidates); do
+    echo "$t_live" | grep -qx "$t_id" && continue      # frontmost — leave it tiled
+    t_info=$(tab_probe "$t_id")
+    if [ -z "$t_info" ]; then                          # gone, or AX-dead: not ours
+      [ -f "$TAB_FILE" ] && sed -i '' "/^$t_id\$/d" "$TAB_FILE" 2>/dev/null
+      continue
+    fi
+    [ "${t_info##* }" = "true" ] && continue           # already out of the tree
+    t_sp=$(tab_space "$t_id" "${t_info%% *}")
+    [ -n "$t_sp" ] || { log tabs "$t_id background tab on an unproven space — skipped"; continue; }
+    managed "$t_sp" || continue                        # space 2 is never touched
+    yabai -m window "$t_id" --toggle float 2>/dev/null || continue
+    grep -qxF "$t_id" "$TABF_FILE" 2>/dev/null || echo "$t_id" >> "$TABF_FILE"
+    TABS_ACTED=1
+    log tabs "$t_id background tab — floated out of the tree"
+  done
+  return 0
+}
+
 # ------------------------------------------------------------- the invariant
 # THE BROWSER OWNS THE TOP-LEFT. One query answers everything, emitting four
 # pipe-separated fields: "<ok>|<browser id>|<target id>|<direction>".
@@ -318,6 +427,11 @@ place() {
   mkdir "$PLOCK" 2>/dev/null || { log place "place($pl_trigger): busy — skip"; return 0; }
   trap 'rmdir "$PLOCK" 2>/dev/null' EXIT INT TERM
 
+  # Before measuring anything: a background tab holds a tile while being absent
+  # from every query the invariant reads, so the geometry below is only honest
+  # once the tabs are out of the tree.
+  tabs_repair
+
   if [ -n "$pl_s" ]; then
     place_space "$pl_s" "$pl_trigger"
   else
@@ -333,6 +447,7 @@ place() {
 # window_created (any app). Only the new window's own space is checked.
 place_one() {
   id="$1"; [ -n "$id" ] || return 0
+  tab_note "$id"
   o_s=$(win_space "$id"); [ -n "$o_s" ] || return 0
   managed "$o_s" || { log one "place-one: $id on unmanaged space $o_s — left alone"; return 0; }
   place "$o_s" window
@@ -350,6 +465,36 @@ on_moved() {
   place "$m_cur" moved
 }
 
+# window_destroyed. The window is already gone when this fires, so its space
+# cannot be queried — it comes from the seen ledger, the last place we knew it.
+# This used to be a bare `yabai -m space --balance`, which balances the FOCUSED
+# space: closing anything anywhere reshuffled whatever desk you happened to be
+# looking at, and spammed "cannot balance a non-managed space" whenever that was
+# space 1 or 2. An unknown id now balances NOTHING, which is the safe direction —
+# a missed repair is one stranded split, a wrong one moves a desk you never
+# touched.
+on_destroyed() {
+  d_id="$1"; [ -n "$d_id" ] || return 0
+  d_s=$(seen_get "$d_id"); [ -n "$d_s" ] || return 0
+  managed "$d_s" || return 0
+  yabai -m space "$d_s" --balance 2>/dev/null
+  log closed "window $d_id closed on space $d_s — balanced"
+}
+
+# window_focused. A tab switch is invisible to every other signal — no window is
+# created, destroyed or moved, the two tabs just trade places in the window
+# list — so this is the only event that can see it. Kept cheap: it places only
+# when tabs_repair actually changed the tree.
+on_focused() {
+  f_id="$1"; [ -n "$f_id" ] || return 0
+  tab_note "$f_id"
+  f_s=$(win_space "$f_id"); [ -n "$f_s" ] || return 0
+  managed "$f_s" || return 0
+  tabs_repair
+  [ "$TABS_ACTED" = 1 ] || return 0
+  place "$f_s" tabs
+}
+
 # SA capability — computed once before the dispatch case below. It does not gate
 # the rebuild; it only gates load-time SA setup (--load-sa, dock_did_restart)
 # and the startup space --focus.
@@ -361,6 +506,8 @@ case "$1" in
   place-focused) place "$(focused_space)" "${2:-space}"; exit 0 ;;
   place-one)     place_one "$2"; exit 0 ;;
   moved)         on_moved "$2"; exit 0 ;;
+  focused)       on_focused "$2"; exit 0 ;;
+  destroyed)     on_destroyed "$2"; exit 0 ;;
 esac
 
 # ============================================================ yabai load (no arg)
@@ -369,6 +516,11 @@ log load "config loading"
 # Parked repairs describe the OLD tree; a fresh yabai rebuilds it, so every pair
 # gets one more honest attempt.
 rm -f "$STUCK_FILE" 2>/dev/null
+
+# Reseed the tab ledger from what exists now, dropping ids that died while yabai
+# was down. Window ids survive a reload, so TABF_FILE is deliberately NOT reset —
+# tabs floated before the reload must still be re-tiled when they come forward.
+yabai -m query --windows 2>/dev/null | jq -r '.[].id' > "$TAB_FILE" 2>/dev/null
 
 # Windows yabai cannot read AX for report role/subrole "" — they keep their old tile
 # geometry and are invisible to every predicate here, so the layout logic chases a
@@ -442,8 +594,9 @@ yabai -m rule --apply
 
 # A close can strand a split — the survivors crammed into one half. Balance
 # repairs that, and no close can break the invariant itself (removing a window
-# cannot stop a browser being leftmost), so this needs no placement run.
-yabai -m signal --add event=window_destroyed action="yabai -m space --balance"
+# cannot stop a browser being leftmost), so this needs no placement run. It must
+# balance the space that LOST the window, not the focused one — see on_destroyed.
+yabai -m signal --add event=window_destroyed action="\$HOME/Code/dotfiles/yabai/yabairc destroyed \$YABAI_WINDOW_ID"
 
 # Placement signals. The rebuild is warp-based (tree-only), so it runs fully with
 # SIP on. Only `space --focus` still needs the SA — just the startup focus below.
@@ -454,6 +607,8 @@ yabai -m signal --add event=display_removed action="\$HOME/Code/dotfiles/yabai/y
 yabai -m signal --add event=display_resized action="\$HOME/Code/dotfiles/yabai/yabairc place-all display"
 yabai -m signal --add event=display_moved   action="\$HOME/Code/dotfiles/yabai/yabairc place-all display"
 yabai -m signal --add event=window_created action="\$HOME/Code/dotfiles/yabai/yabairc place-one \$YABAI_WINDOW_ID"
+# Tab switches change nothing but which tab is frontmost, so only focus sees them.
+yabai -m signal --add event=window_focused action="\$HOME/Code/dotfiles/yabai/yabairc focused \$YABAI_WINDOW_ID"
 # Heal on returning to a space. Dragging a window across spaces via Mission
 # Control lands you on the destination, which fires this; place_space self-skips
 # when the invariant already holds, so it is a no-op when nothing changed.

@@ -1,4 +1,5 @@
 zed/prompts/
 lazygit/state.yml
+lazygit/github_pull_requests.json
 node_modules/
 .superpowers/

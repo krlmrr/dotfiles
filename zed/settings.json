@@ -155,6 +155,11 @@
         "button": false,
     },
     "agent": {
+        "notify_when_agent_waiting": "all_screens",
+        "single_file_review": true,
+        "thinking_display": "always_collapsed",
+        "play_sound_when_agent_done": "always",
+        "enable_feedback": false,
         "default_model": {
             "provider": "anthropic",
             "model": "claude-opus-4-6-thinking-latest",

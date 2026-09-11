@@ -1,5 +1,12 @@
 title = "  "
-theme = dark:One Half Dark,light:artisan
+# Ghostty's quick terminal (an NSPanel, not a window) resolves the LIGHT half of
+# a `dark:X,light:Y` split theme regardless of the system appearance — verified on
+# 1.3.1 with macOS pinned to Dark: the panel rendered artisan's #F3F3F3 exactly,
+# and followed a config reload to beggars' #E8F0F2, while regular windows stayed
+# on One Half Dark. `window-theme = dark` does NOT override it, and there is no
+# quick-terminal-specific theme option. So the split syntax is unusable while the
+# quick terminal is in play — pin a single theme instead.
+theme = One Half Dark
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
 
@@ -36,3 +43,12 @@ keybind = cmd+shift+l=goto_split:right
 # half behind an invisible tab. No config makes them non-native; unbind
 # instead. Use splits (cmd+d) or a real window (cmd+n).
 keybind = cmd+t=unbind
+
+# Quick terminal: slides up from the bottom edge on cmd+shift+up. `global:` is
+# what makes the chord work when Ghostty isn't focused — it needs Accessibility
+# permission, and it consumes cmd+shift+up in EVERY app, where Cocoa binds it to
+# "select to start of document" in any text field. Drop the prefix to make it
+# Ghostty-only. Changing quick-terminal-position needs a full Ghostty restart on
+# macOS, not just a config reload.
+quick-terminal-position = bottom
+keybind = global:cmd+shift+up=toggle_quick_terminal

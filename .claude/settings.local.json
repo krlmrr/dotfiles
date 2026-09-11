@@ -845,11 +845,17 @@
       "Bash(sed -i '' 's/^\\\\\\( *\\\\\\)sleep 0\\\\.15$/\\\\1[ \"$WARP_SETTLE\" != 0 ] \\\\&\\\\& sleep \"$WARP_SETTLE\"/' mac/yabai/yabairc)",
       "Bash(sed -i '' 's|^LOG=/tmp/yabai.log|WARP_SETTLE=0.15   # settle after a warp/split-toggle before re-measuring\\\\nLOG=/tmp/yabai.log|' mac/yabai/yabairc)",
       "Bash(sed -i '' \"s/^WARP_SETTLE=[0-9.]*/WARP_SETTLE=0.15/\" mac/yabai/yabairc)",
-      "Bash(sed -i '' \"s|^WARP_SETTLE=0.15 .*|WARP_SETTLE=0.15   # settle after a warp/split-toggle before re-measuring.\\\\n                   # Swept 0/0.05/0.10/0.15 on 2026-08-12: 0 failed 1 of 8 cycles,\\\\n                   # so it is NOT free. Note the harness used scripted moves, not\\\\n                   # Mission Control drags \u2014 retest properly before lowering it.|\" mac/yabai/yabairc)",
+      "Bash(sed -i '' \"s|^WARP_SETTLE=0.15 .*|WARP_SETTLE=0.15   # settle after a warp/split-toggle before re-measuring.\\\\n                   # Swept 0/0.05/0.10/0.15 on 2026-08-12: 0 failed 1 of 8 cycles,\\\\n                   # so it is NOT free. Note the harness used scripted moves, not\\\\n                   # Mission Control drags — retest properly before lowering it.|\" mac/yabai/yabairc)",
       "Bash(timeout 10 hs -c 'return \"ipc ok\"')",
       "Bash(hs -c 'return \"ipc ok\"')",
       "Bash(pkill -f \"seq 1 900\")",
-      "Bash(sed -n '/REAL DRAG TEST/,$p' /tmp/yabai.log)"
+      "Bash(sed -n '/REAL DRAG TEST/,$p' /tmp/yabai.log)",
+      "Read(//opt/homebrew/Library/Taps/msitarzewski/homebrew-brew-browser/Casks/**)",
+      "Read(//opt/homebrew/Caskroom/brew-browser/**)",
+      "Bash(osascript -e 'quit app \"brew-browser\"')",
+      "Bash(brew untap *)",
+      "Bash(brew update-reset *)",
+      "Bash(sh -n yabai/yabairc)"
     ]
   }
 }

@@ -430,4 +430,5 @@
     "claudeCode.focusView": false,
     "zenMode.hideLineNumbers": false,
     "continue.showInlineTip": false,
+    "claudeCode.hideOnboarding": true,
 }

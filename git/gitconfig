@@ -7,3 +7,6 @@
 	rebase = false
 [include]
 	path = ~/.config/git/identity
+[user]
+	name = Karl Murray
+	email = karl@vheissulabs.com

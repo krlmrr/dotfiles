@@ -1,6 +1,6 @@
 ---
 name: project-yabai-browser-left
-description: yabairc is one invariant now (browser owns the left, spaces 3+); its no-arg path is the full config load, so never invoke the file incidentally
+description: yabairc is one invariant (browser owns the left column, spaces 3+; every browser window in it since 2026-09-11); window_origin_display=focused beats an app's saved display; its no-arg path is the full config load, so never invoke the file incidentally
 metadata:
   type: project
 ---
@@ -68,9 +68,28 @@ The invariant's jq is exercised by 21 fixtures instead, with the program extract
 straight out of `yabairc` so the test cannot drift. `warp_to` has its own
 regression harness described in [[project-yabai-ax-loss]] (also not in the repo).
 
-Unverified: whether `window_moved` actually fires on a cross-space move.
-`space_changed` covers the case regardless, so the `moved` handler is only a
-lower-latency duplicate.
+`window_moved` DOES fire on a cross-space move (seen live 2026-09-11, twice per
+move), so the `moved` handler is a real lower-latency path, not just a duplicate.
+
+**2026-09-11 — two additions, both from Karl's "browsers never open where I am".**
+- **Chrome remembers its display.** Chrome saves `browser.window_placement` per
+  profile and restores it on every launch and Cmd+N. Profile 1 held `left:3212`,
+  i.e. the laptop screen (display 2, x 3200–5256), so every Chrome window opened
+  on space 10 and dragged focus there. Nothing in the dotfiles or macOS did it.
+  Fix: `yabai -m config window_origin_display focused` — yabai moves the new
+  window to the focused display as it is created. Verified live (`default` ->
+  space 10, `focused` -> the space in front of Karl). Zen's saved frames were on
+  display 1, so Zen never had this problem.
+- **Every browser window is in the left column now, not just one.** A restored
+  second Zen window sat bottom-right because only the top-left was constrained.
+  New repair direction `south`: a browser outside the left column is warped
+  under the top-left browser (adds no column). `place_space` runs up to three
+  one-repair passes, because the second browser needs a second pass and the
+  signals that used to supply it are gated out. Verified live: two Zen windows
+  stack at x=12.
+- I did drive live windows to verify both (opened/closed test windows on Karl's
+  desk, focused Code). Karl was in the loop and asking for it, but the standing
+  rule above still applies by default.
 
 See [[project-yabai-ax-loss]], [[project-yabai-browser-incremental]],
 [[project-yabai-insert-parity]], [[feedback-yabai-space2]],

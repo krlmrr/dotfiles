@@ -8,7 +8,10 @@
 #
 #     THE BROWSER OWNS THE TOP-LEFT.
 #
-# Precisely: the topmost window of the leftmost column is a browser.
+# Precisely: the topmost window of the leftmost column is a browser, and every
+# browser window on the space is in that column. Hard and fast — no browser
+# window is ever left where bsp dropped it (2026-09-11: a session-restored second
+# Zen window sat bottom-right because only the first was constrained).
 #
 # That is the whole contract. What sits on the right is never constrained; a desk
 # with no browser is left entirely to bsp. This file used to maintain two
@@ -348,6 +351,10 @@ tabs_repair() {
 #           up WITHIN that column. Adds no column.
 #   west  — no browser in the left column at all. A new leftmost column is
 #           genuinely what is wanted here.
+#   south — the top-left is already a browser but ANOTHER browser window sits
+#           outside the left column (a second Zen window restored by the session,
+#           Cmd+N with Code focused). Stack it under the top-left browser, so the
+#           left column is browsers all the way down. Adds no column.
 #   ""    — nothing to warp; balance alone is the repair (the squeeze guard).
 #
 # ok is true when there is nothing to enforce: 0 or 1 tiled windows, or no
@@ -370,7 +377,11 @@ space_state() {
     | ($col | sort_by(.frame.y) | first)                                 as $top
     | (($browsers | index($top.app)) != null)                            as $topok
     | [ $col[] | select(.app as $a | $browsers | index($a)) ]            as $colb
+    | [ $b[]   | select((.frame.x | floor) != $mx) ]                     as $bout
     | (if ($w | length) <= 1 or ($b | length) == 0 then ["true","","",""]
+       elif $topok and ($bout | length) > 0
+         then ["false", ($bout | sort_by(.frame.x, .frame.y, .id) | first.id | tostring),
+                        ($top.id | tostring), "south"]
        elif $topok then [(if $mx > 20 then "false" else "true" end),"","",""]
        elif ($colb | length) > 0
          then ["false", ($colb | sort_by(.frame.y) | first.id | tostring),
@@ -385,28 +396,42 @@ space_state() {
 place_space() {
   p_s="$1"; p_trigger="${2:-window}"
   managed "$p_s" || return 0
-  p_info=$(space_state "$p_s"); [ -n "$p_info" ] || return 0
+  # One repair per pass; a second browser window needs a second pass, and the
+  # signals that would otherwise supply it are gated out (on_moved only acts
+  # on a change of space). Three passes bound a tree that refuses to settle.
+  for p_pass in 1 2 3; do
+    place_pass "$p_s" "$p_trigger" || break
+  done
+  return 0
+}
+
+# Returns 0 when it repaired something (another pass may be needed), 1 when
+# the space is ok or nothing can be done.
+place_pass() {
+  p_s="$1"; p_trigger="$2"
+  p_info=$(space_state "$p_s"); [ -n "$p_info" ] || return 1
   p_ok=${p_info%%|*};  p_r1=${p_info#*|}
   p_br=${p_r1%%|*};    p_r2=${p_r1#*|}
   p_tg=${p_r2%%|*};    p_dir=${p_r2#*|}
 
   if [ "$p_ok" = true ]; then
     log place "place($p_trigger): space $p_s ok"
-    return 0
+    return 1
   fi
 
   log place "place($p_trigger): space $p_s rebuild — browser ${p_br:-none} ${p_dir:-balance-only} of ${p_tg:-none}"
   log place "  measured: $(yabai -m query --windows --space "$p_s" 2>/dev/null | jq -r '[.[]|select(.subrole=="AXStandardWindow")]|sort_by(.frame.x,.frame.y)|map("\(.id)/\(.app[0:4])@x\(.frame.x|floor)y\(.frame.y|floor)")|join(" ")')"
 
+  p_did=1
   if [ -n "$p_br" ] && [ -n "$p_tg" ] && [ -n "$p_dir" ]; then
     ensure_tiled "$p_br"; ensure_tiled "$p_tg"
-    warp_to "$p_br" "$p_tg" "$p_dir"
+    warp_to "$p_br" "$p_tg" "$p_dir" && p_did=0
   fi
   # Balance ONLY on a rebuild. This is both the even split for two browsers and
   # the repair for a stranded split; running it on every visit would stomp every
   # manual resize.
   yabai -m space "$p_s" --balance 2>/dev/null
-  return 0
+  return $p_did
 }
 
 # $1 = space index, or empty for every managed space. $2 = trigger, for the log.
@@ -551,6 +576,13 @@ yabai -m config --space 2 layout float
 
 yabai -m config layout bsp
 yabai -m config window_placement second_child
+
+# New windows open on the display that has focus, not the display the app
+# remembers. Chrome saves its last window frame per profile and restores it on
+# every launch and Cmd+N; with the saved frame on the laptop screen, every Chrome
+# window landed on display 2 (space 10) and dragged focus there. Verified live
+# 2026-09-11: `default` -> space 10, `focused` -> the space in front of you.
+yabai -m config window_origin_display focused
 
 # split_type stays auto, and that is load-bearing. auto splits a container
 # vertically when it is wider than tall, which is exactly where the line wants to

@@ -8,6 +8,12 @@ ctrl + alt + cmd - j : yabai -m window --focus south
 ctrl + alt + cmd - k : yabai -m window --focus north
 ctrl + alt + cmd - l : yabai -m window --focus east
 
+# omarchy-style focus (cmd+ctrl+hjkl)
+ctrl + cmd - h : yabai -m window --focus west
+ctrl + cmd - j : yabai -m window --focus south
+ctrl + cmd - k : yabai -m window --focus north
+ctrl + cmd - l : yabai -m window --focus east
+
 alt - left : yabai -m window --focus west
 alt - down : yabai -m window --focus south
 alt - up : yabai -m window --focus north

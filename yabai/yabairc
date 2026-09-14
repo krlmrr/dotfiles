@@ -97,6 +97,14 @@ space_visible() {
   yabai -m query --spaces --space "$1" 2>/dev/null | jq -e '."is-visible"' >/dev/null 2>&1
 }
 
+wait_visible() {
+  for _try in 1 2 3 4 5 6 7 8 9 10; do
+    space_visible "$1" && return 0
+    sleep 0.05
+  done
+  return 1
+}
+
 # True when a window at $2/$3 sits correctly $1 (west/east/north/south) of $4/$5.
 dir_ok() {
   case "$1" in
@@ -396,6 +404,7 @@ space_state() {
 place_space() {
   p_s="$1"; p_trigger="${2:-window}"
   managed "$p_s" || return 0
+  [ "$p_trigger" = space ] && wait_visible "$p_s"
   # One repair per pass; a second browser window needs a second pass, and the
   # signals that would otherwise supply it are gated out (on_moved only acts
   # on a change of space). Three passes bound a tree that refuses to settle.

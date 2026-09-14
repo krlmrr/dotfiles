@@ -44,9 +44,9 @@ can fix it**, consistent with [[feedback-no-sleep]]. Repairs are now gated on
 
 Cost of the gate: the `space_changed` signal fires *before* the space reports
 visible, so the first arrival after a perturbation defers and the **second**
-arrival converges. Strictly better than a permanent restack; fixable later by
-polling visibility only when the trigger is `space_changed` (do NOT poll on the
-ordinary off-screen desk sweep — that is the common path).
+arrival converges. Strictly better than a permanent restack. **FIXED 2026-09-14** by
+`wait_visible()`, polled on the `space` trigger only — the off-screen sweep still
+must never poll, it is the common path.
 
 **Two fixes that sounded right and are WRONG** (both disproven live, don't retry):
 - *"Count phantom nodes in `warp_to`'s sibling heuristic."* Phantoms are **not**

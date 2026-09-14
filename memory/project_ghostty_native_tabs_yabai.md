@@ -12,12 +12,19 @@ yabairc placement logic):
 - each `cmd+t` fires a yabai `window_created` with a fresh id (`/tmp/yabai.log`:
   `place-one: 47555 … 47566 … 47578`)
 - each reports `role=AXWindow`, `subrole=AXStandardWindow`, `is-floating=false` —
-  **indistinguishable from a genuine second window**, so no yabai rule can single
-  them out (a rule would have to unmanage every Ghostty window)
+  indistinguishable from a genuine second window **by any rule predicate**
 - the tile halved the instant the tab appeared: `1583x1747` → `1583x868`, the
   other half held by the non-selected tab
 
 `ghostty +show-config --default` exposes no knob to make tabs non-native.
+
+**2026-09-01 — "no rule can single them out" is now OUT OF DATE.** That was
+true only because every predicate reads `query --windows`, which never showed
+these windows. A *background* native tab is absent from that list yet still
+resolves via `query --windows --window <id>`, and that inversion identifies it
+exactly — see [[project_yabai_native_tab_windows]]. `yabairc` now floats
+background tabs of any app, so **the cmd+t unbind below may no longer be needed;
+test before assuming it still is.**
 
 **Fix in place:** `keybind = cmd+t=unbind` in `ghostty/config`. Ghostty builds
 its macOS menu from the keybind table, so this also strips File ▸ New Tab's

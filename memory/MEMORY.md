@@ -21,6 +21,8 @@
 ## Project
 - [yabai: never restart-service on wake](project_yabai_wake_no_restart.md) — restart-on-wake caused all post-wake breakage; sleep changes nothing. No system_woke signal; display events gated by display-changed.sh
 - [yabai SIP-on test on macOS 27 beta](project_yabai_sip_on_test.md) — Karl testing yabai without SA on a "Beta" volume. v7.1.25 (#2788) makes `window --space` work SIP-on; `space --focus` still needs SA. No-SA branch can regain window-to-space binds pending live test on Golden Gate.
+- [yabai: background native tabs hold invisible tiles](project_yabai_native_tab_windows.md) — absent from `query --windows` but resolvable individually; their own `.space` reports the FOCUSED space, so never trust it
+- [yabai animations are impossible under SIP](project_yabai_sip_no_animation.md) — `window_animation_duration` is refused outright; stop looking for smoothing, reduce the number of moves instead
 - [yabai: Zen PiP masquerades as AXStandardWindow](project_yabai_pip_masquerade.md) — PiP popout reports AXStandardWindow + is-sticky; hijacked win_id → random red insert-overlay box + wrong editor layout. Fixed by excluding PiP by title in win_id/external_correct/move.
 - [Two Zen profiles: Home + NotaryDash](project_zen_profiles.md) — Personal (1Password) vs work (ProtonPass); hard isolation via real Firefox profiles
 - [Laravel LSP in Zed via dev extension](project_laravel_lsp_zed.md) — pending PR #6996; when it merges, swap to the marketplace extension and remove the rustup provisioning in Brewfile + setup

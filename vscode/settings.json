@@ -409,11 +409,11 @@
     "claudeCode.respectGitIgnore": false,
     "chat.useAgentSkills": true,
     "supermaven.enableFixWithSupermaven": false,
-    // Keys are path prefixes ("/" = everywhere), values are numeric problem
-    // codes — the "PHP" prefix and glob patterns shown in the editor are NOT
-    // accepted here. See https://docs.devsense.com/vscode/problems
+    // Keys are glob patterns ("**" = everywhere), values are NUMERIC problem
+    // codes — the "PHP" prefix shown in the editor is not accepted.
+    // See https://docs.devsense.com/vscode/problems/suppressing-diagnostics
     "php.problems.exclude": {
-        "/": [
+        "**": [
             413,
             // "Hint: Foo::class" on class-name strings — fires where the string
             // form is required (config arrays, Gate/alias maps).

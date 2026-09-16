@@ -38,7 +38,7 @@
     "editor.gotoLocation.multipleTypeDefinitions": "goto",
     // Typography
     "editor.fontSize": 16,
-    "editor.lineHeight": 2.8,
+    "editor.lineHeight": 2,
     "editor.suggestFontSize": 17,
     "editor.suggestLineHeight": 28,
     "terminal.integrated.fontSize": 15,
@@ -409,9 +409,18 @@
     "claudeCode.respectGitIgnore": false,
     "chat.useAgentSkills": true,
     "supermaven.enableFixWithSupermaven": false,
+    // Keys are path prefixes ("/" = everywhere), values are numeric problem
+    // codes — the "PHP" prefix and glob patterns shown in the editor are NOT
+    // accepted here. See https://docs.devsense.com/vscode/problems
     "php.problems.exclude": {
-        "**/*": [
-            "PHP0413"
+        "/": [
+            413,
+            // "Hint: Foo::class" on class-name strings — fires where the string
+            // form is required (config arrays, Gate/alias maps).
+            7103,
+            // "Call to unknown function" — misfires on string args that only
+            // look like calls, e.g. Pest arch tests' expect('App\\Http\\Controllers').
+            417
         ]
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",

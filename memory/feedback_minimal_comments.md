@@ -5,7 +5,7 @@ metadata:
   type: feedback
 ---
 
-When editing config/scripts in this repo, don't add multi-line comment blocks explaining a change. Karl pushed back on a 6-line comment added just to justify deleting one line in `yabairc`.
+When editing config/scripts in this repo, don't add multi-line comment blocks explaining a change. Karl pushed back on a 6-line comment added just to justify deleting one line in `yabairc`, and again on a 5-line block above `php.problems.*` in `vscode/settings.json` ("thanks for removing the blog").
 
 **Why:** The code should speak for itself; verbose rationale comments are noise. Git history/commit messages carry the "why".
 

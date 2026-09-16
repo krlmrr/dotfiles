@@ -409,19 +409,10 @@
     "claudeCode.respectGitIgnore": false,
     "chat.useAgentSkills": true,
     "supermaven.enableFixWithSupermaven": false,
-    // Keys are glob patterns ("**" = everywhere), values are NUMERIC problem
-    // codes — the "PHP" prefix shown in the editor is not accepted.
-    // See https://docs.devsense.com/vscode/problems/suppressing-diagnostics
+    // DEVSENSE diagnostics off: too many fire on correct code.
+    "php.problems.scope": "none",
     "php.problems.exclude": {
-        "**": [
-            413,
-            // "Hint: Foo::class" on class-name strings — fires where the string
-            // form is required (config arrays, Gate/alias maps).
-            7103,
-            // "Call to unknown function" — misfires on string args that only
-            // look like calls, e.g. Pest arch tests' expect('App\\Http\\Controllers').
-            417
-        ]
+        "**": true
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "tailwindCSS.colorDecorators": false,

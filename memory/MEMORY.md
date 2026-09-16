@@ -15,7 +15,9 @@
 - [Don't suggest AeroSpace](feedback_no_aerospace.md) — User evaluated and rejected AeroSpace; needs native macOS spaces. Fix yabai pain inside yabai, don't pitch alternatives.
 - [Raycast is the launcher](feedback_raycast_launcher.md) — Karl uses Raycast for launching apps and shell actions; prefer Raycast script commands over zsh aliases
 - [Clean up remote temp state](feedback_cleanup_remote_state.md) — Don't trust `--rm` under signal kills; verify and clean up containers/files/processes I create on remote hosts before declaring done
+- [Pass silently, fail loudly](feedback_pass_silently_fail_loudly.md) — no "nothing to do" chatter; gate the steady-state lines, never the failure ones
 - [Minimal comments](feedback_minimal_comments.md) — Don't add explanatory comment blocks just because code changed; make the minimal edit
+- [Editor config goes global, not per-repo](feedback_editor_config_global.md) — user-level dotfiles settings, never a project `.vscode/`; survives editor and codebase changes
 - [Key chords as cmd+X, never cmd-X](feedback_keybinding_notation.md) — Font ligatures turn `->` into `→`; hyphen-separated chords get misread as arrow keys
 
 ## Project

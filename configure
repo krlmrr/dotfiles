@@ -93,6 +93,8 @@ link "$DOTFILES_DIR/claude/skills/general" ~/.claude/skills/general
 link "$DOTFILES_DIR/claude/skills/laravel" ~/.claude/skills/laravel
 link "$DOTFILES_DIR/claude/skills/feature" ~/.claude/skills/feature
 link "$DOTFILES_DIR/claude/skills/vue" ~/.claude/skills/vue
+# Snapshot of `herdr --skill`; regenerate after a herdr upgrade
+link "$DOTFILES_DIR/claude/skills/herdr" ~/.claude/skills/herdr
 
 # Ghostty — symlinked in both locations macOS reads from, so edits are live
 link "$DOTFILES_DIR/ghostty/config" ~/.config/ghostty/config

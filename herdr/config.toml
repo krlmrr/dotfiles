@@ -1,0 +1,11 @@
+onboarding = false
+
+[theme]
+name = "one-dark"
+auto_switch = false
+
+[ui]
+hide_tab_bar_when_single_tab = true
+
+[ui.toast]
+delivery = "system"

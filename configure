@@ -100,6 +100,9 @@ link "$DOTFILES_DIR/ghostty/themes" ~/.config/ghostty/themes
 link "$DOTFILES_DIR/ghostty/config" "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
 link "$DOTFILES_DIR/ghostty/themes" "$HOME/Library/Application Support/com.mitchellh.ghostty/themes"
 
+# Herdr — only config.toml; the rest of ~/.config/herdr is sockets, logs and session state
+link "$DOTFILES_DIR/herdr/config.toml" ~/.config/herdr/config.toml
+
 link "$DOTFILES_DIR/hammerspoon" ~/.hammerspoon
 open -a Hammerspoon
 link "$DOTFILES_DIR/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"

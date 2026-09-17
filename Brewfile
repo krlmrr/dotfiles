@@ -69,7 +69,7 @@ cask "figma"
 cask "font-sf-pro" # SF Symbols glyphs for sketchybar (Apple logo, battery, volume)
 cask "forklift"
 cask "ghostty"
-cask "github"
+cask "gitdifferent"
 cask "hammerspoon"
 cask "herd"
 cask "hiddenbar"

@@ -19,6 +19,8 @@
 - [Minimal comments](feedback_minimal_comments.md) — Don't add explanatory comment blocks just because code changed; make the minimal edit
 - [Editor config goes global, not per-repo](feedback_editor_config_global.md) — user-level dotfiles settings, never a project `.vscode/`; survives editor and codebase changes
 - [Key chords as cmd+X, never cmd-X](feedback_keybinding_notation.md) — Font ligatures turn `->` into `→`; hyphen-separated chords get misread as arrow keys
+- [The Brewfile is not ground truth](feedback_brewfile_drifts.md) — packages get installed/removed ad hoc; check `brew list`, not the Brewfile, and confirm a tool is recorded before tracking its config
+- [Don't automate pain you haven't felt](feedback_dont_automate_unfelt_pain.md) — a problem hit once and understood doesn't earn a permanent branch in a maintenance script
 
 ## Project
 - [yabai: never restart-service on wake](project_yabai_wake_no_restart.md) — restart-on-wake caused all post-wake breakage; sleep changes nothing. No system_woke signal; display events gated by display-changed.sh

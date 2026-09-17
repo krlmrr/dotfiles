@@ -49,7 +49,13 @@ Four delivery modes. Nothing is *built* any more (2.0 deleted the build scripts)
 ## Key Aliases
 
 - `a` = `php artisan` (uses Herd)
-- `brewup` upgrades everything, reloads yabai's scripting addition and cleans TCC if yabai itself was upgraded, always runs `prune-login-items.sh` afterward, and relaunches Raycast (`open -gj -a Raycast`, hidden/no-focus-steal) only if the Raycast cask actually changed — restoring whatever app had focus beforehand
+- `brewup` upgrades everything, then acts only on what actually changed:
+  - **yabai** — reloads the scripting addition, restarts the service, cleans TCC
+  - **Raycast** — relaunches it (`open -gj -a Raycast`, hidden/no-focus-steal), restoring whatever app had focus beforehand; this branch only
+  - **herdr** — rewrites `claude/skills/herdr/SKILL.md` from `herdr --skill`, since that file is a snapshot of what the binary prints and goes stale silently; expect an uncommitted diff there after an upgrade
+  - always runs `prune-login-items.sh --quiet` afterward, regardless
+
+  Everything is silent unless it actually did something; `--quiet` defers the prune script's header until it has something to report, and `--dry-run` overrides it.
 
 ## Gotchas
 

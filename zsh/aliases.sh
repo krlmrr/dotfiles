@@ -136,12 +136,12 @@ OSA
 
 brewup() {
   # Save versions up front so we can tell what was actually upgraded
-  local before after ray_before ray_after front
+  local before after ray_before ray_after herdr_before herdr_after front
   before=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
   ray_before=$(_cask_version ray)
-  # Remember what had focus. Cask installers steal it, and a relaunched Raycast
-  # can pop its own window that `open -gj` cannot suppress, so restore focus at
-  # the end rather than hoping nothing grabs it.
+  herdr_before=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
+  # Remember what had focus: a relaunched Raycast can pop its own window that
+  # `open -gj` cannot suppress.
   front=$(_frontmost_app)
 
   brew upgrade || return $?
@@ -150,6 +150,7 @@ brewup() {
 
   after=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
   ray_after=$(_cask_version ray)
+  herdr_after=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
 
   if [[ "$before" != "$after" && -n "$after" ]]; then
     echo "yabai upgraded ($before → $after) — reloading SA, restarting, cleaning TCC"
@@ -157,8 +158,6 @@ brewup() {
     env -u TERMINFO sudo yabai --load-sa
     yabai --restart-service
     sudo bash ~/Code/dotfiles/tcc-cleanup.sh
-  else
-    echo "yabai not upgraded — skipping SA reload, restart, and TCC cleanup"
   fi
 
   # `brew upgrade --greedy` is exactly what puts the Adobe/Google background
@@ -169,7 +168,7 @@ brewup() {
   # NOT `sudo bash` (unlike tcc-cleanup.sh above): this one must run as you, so
   # it can reach the gui/$UID domain for the per-user agents. It calls sudo
   # itself for the /Library ones and will prompt if the session has gone stale.
-  bash ~/Code/dotfiles/prune-login-items.sh
+  bash ~/Code/dotfiles/prune-login-items.sh --quiet
 
   # Only relaunch Raycast if it was actually replaced — upgrading the cask quits
   # the running app, so it needs reopening; otherwise leave it alone rather than
@@ -184,14 +183,18 @@ brewup() {
     # LSUIElement app (menu-bar only, no Dock icon), so this just gets the
     # hotkey listener back without stealing focus or popping the search window.
     open -gj -a Raycast
-  else
-    echo "Raycast not upgraded — leaving it as-is"
+    if [[ -n "$front" && "$(_frontmost_app)" != "$front" ]]; then
+      _focus_app "$front"
+    fi
   fi
 
-  # Put focus back where it started, if anything moved it.
-  if [[ -n "$front" && "$(_frontmost_app)" != "$front" ]]; then
-    echo "restoring focus to $front"
-    _focus_app "$front"
+  # claude/skills/herdr/SKILL.md is a snapshot of `herdr --skill`, which prints
+  # from the binary — so it goes stale silently on upgrade (202 -> 214 lines
+  # between 0.9.0 and 0.9.1). Rewrite it here and let git surface the diff.
+  # Reads the binary, not the running server, so it is correct before any restart.
+  if [[ "$herdr_before" != "$herdr_after" && -n "$herdr_after" ]]; then
+    echo "herdr upgraded ($herdr_before → $herdr_after) — refreshing the Claude skill"
+    herdr --skill > ~/Code/dotfiles/claude/skills/herdr/SKILL.md
   fi
 }
 

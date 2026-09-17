@@ -21,6 +21,7 @@
 # Usage:
 #   bash mac/prune-login-items.sh              # prune
 #   bash mac/prune-login-items.sh --dry-run    # show what would be pruned
+#   bash mac/prune-login-items.sh --quiet      # say nothing unless something changed
 #
 # To undo, re-enable a service and let the app reinstall its agent:
 #   launchctl enable gui/$(id -u)/com.adobe.ccxprocess
@@ -29,7 +30,15 @@
 shopt -s nullglob
 
 DRY_RUN=0
-[[ "$1" == "--dry-run" || "$1" == "-n" ]] && DRY_RUN=1
+QUIET=0
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run|-n) DRY_RUN=1 ;;
+        --quiet|-q)   QUIET=1 ;;
+    esac
+done
+# A dry run exists to show you everything; quiet would defeat it.
+(( DRY_RUN )) && QUIET=0
 
 if [[ $EUID -eq 0 ]]; then
     echo "Run this as your normal user, not with sudo — it needs your GUI" >&2
@@ -59,11 +68,24 @@ KEEP=(com.google.santad com.google.santa.bundleservice com.google.santa.metricse
 pruned=0
 skipped=0
 failed=0
+banner_shown=0
 # Plists already handled this run. Phase 2 re-walks the same directories, and a
 # vendor agent can also be an orphan (Adobe CC currently is both), so without
 # this the dry-run count double-reports it. Newline-delimited string rather than
 # an associative array: macOS ships bash 3.2, which has no `declare -A`.
 SEEN=$'\n'
+
+# Under --quiet the header is deferred until there is something to head, so a
+# clean run says nothing at all.
+banner() {
+    (( banner_shown )) && return
+    banner_shown=1
+    if (( DRY_RUN )); then
+        echo "=== Pruning Adobe/Google login items (dry run) ==="
+    else
+        echo "=== Pruning Adobe/Google login items ==="
+    fi
+}
 
 is_kept() {
     local label="$1" k
@@ -87,12 +109,13 @@ prune() {
     fi
 
     if is_kept "$label"; then
-        echo "  keep    $label (allowlisted)"
+        (( QUIET )) || echo "  keep    $label (allowlisted)"
         ((skipped++))
         return
     fi
 
     if (( DRY_RUN )); then
+        banner
         echo "  would   $label  [$domain]  $plist"
         ((pruned++))
         return
@@ -115,9 +138,11 @@ prune() {
     # only honest test: rm's exit status can be masked by sudo failing, and
     # claiming a prune that didn't happen is worse than no output at all.
     if [[ -e "$plist" ]]; then
+        banner
         echo "  FAILED  $label — could not remove $plist" >&2
         ((failed++))
     else
+        banner
         echo "  pruned  $label"
         ((pruned++))
     fi
@@ -126,7 +151,7 @@ prune() {
 scan() {
     local dir="$1" domain="$2" needs_sudo="$3" p prefix
     [[ -d "$dir" ]] || return 0
-    echo "$dir"
+    (( QUIET )) || echo "$dir"
     for prefix in "${PREFIXES[@]}"; do
         for p in "$dir/$prefix"*.plist; do
             [[ -e "$p" ]] || continue
@@ -148,13 +173,14 @@ job_program() {
 scan_orphans() {
     local dir="$1" domain="$2" needs_sudo="$3" p prog
     [[ -d "$dir" ]] || return 0
-    echo "$dir"
+    (( QUIET )) || echo "$dir"
     for p in "$dir"/*.plist; do
         [[ -e "$p" ]] || continue
         prog="$(job_program "$p")"
         # No resolvable program key at all: inert, but not provably dead. Leave it.
         [[ -z "$prog" ]] && continue
         [[ -e "$prog" ]] && continue
+        banner
         echo "  orphan  $(basename "$p" .plist) -> $prog"
         prune "$p" "$domain" "$needs_sudo" nodisable
     done
@@ -200,11 +226,7 @@ if (( ! DRY_RUN )) && system_work_pending; then
     fi
 fi
 
-if (( DRY_RUN )); then
-    echo "=== Pruning Adobe/Google login items (dry run) ==="
-else
-    echo "=== Pruning Adobe/Google login items ==="
-fi
+(( QUIET )) || banner
 
 # Per-user agents. Root-owned /Library/LaunchAgents jobs still run in the
 # user's GUI domain, so they're disabled there but need sudo to delete.
@@ -213,16 +235,18 @@ scan "/Library/LaunchAgents"      "gui/$UID_NUM" sudo
 # System-wide daemons live in the system domain.
 scan "/Library/LaunchDaemons"     "system"       sudo
 
-echo
-echo "--- Orphans (target binary no longer installed) ---"
+if (( ! QUIET )); then
+    echo
+    echo "--- Orphans (target binary no longer installed) ---"
+fi
 scan_orphans "$HOME/Library/LaunchAgents" "gui/$UID_NUM" nosudo
 scan_orphans "/Library/LaunchAgents"      "gui/$UID_NUM" sudo
 scan_orphans "/Library/LaunchDaemons"     "system"       sudo
 
-echo
 if (( pruned == 0 && failed == 0 )); then
-    echo "Nothing to prune — already clean."
+    (( QUIET )) || { echo; echo "Nothing to prune — already clean."; }
 else
+    echo
     if (( DRY_RUN )); then
         echo "$pruned item(s) would be pruned; $skipped kept."
     else

@@ -1,54 +1,35 @@
 title = "  "
-# Ghostty's quick terminal (an NSPanel, not a window) resolves the LIGHT half of
-# a `dark:X,light:Y` split theme regardless of the system appearance — verified on
-# 1.3.1 with macOS pinned to Dark: the panel rendered artisan's #F3F3F3 exactly,
-# and followed a config reload to beggars' #E8F0F2, while regular windows stayed
-# on One Half Dark. `window-theme = dark` does NOT override it, and there is no
-# quick-terminal-specific theme option. So the split syntax is unusable while the
-# quick terminal is in play — pin a single theme instead.
-theme = One Half Dark
+macos-titlebar-proxy-icon = hidden
+
+theme = dark:One Half Dark,light:One Half Light
+
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
+
+# Custom
+split-divider-color = #2C313A
 
 font-family = MonoLisa
 font-style = Medium
 font-style-italic = Medium Italic
 font-style-bold = Medium
 font-style-bold-italic = Medium Italic
-window-padding-balance = true
+font-size = 18
 
+window-padding-balance = true
 window-save-state = always
 
 cursor-style = bar
 confirm-close-surface = false
 shell-integration-features = sudo
-keybind = shift+enter=text:\x1b\r
-# ctrl+shift+w was hijacked by GTK when this repo still targeted Linux; the
-# binding stayed because muscle memory did. Kept as-is deliberately.
-keybind = ctrl+shift+x=close_surface
 
-# Custom
-split-divider-color = #2C313A
-
-macos-titlebar-proxy-icon = hidden
-font-size = 18
 window-padding-y = 8,0
 window-padding-x = 8,8
 macos-option-as-alt = true
+
 keybind = cmd+shift+h=goto_split:left
 keybind = cmd+shift+l=goto_split:right
-
-# Ghostty tabs on macOS are native NSWindow tabs — one real AXStandardWindow
-# per tab — so yabai tiles each tab as its own window and the desk splits in
-# half behind an invisible tab. No config makes them non-native; unbind
-# instead. Use splits (cmd+d) or a real window (cmd+n).
 keybind = cmd+t=unbind
-
-# Quick terminal: slides up from the bottom edge on cmd+shift+up. `global:` is
-# what makes the chord work when Ghostty isn't focused — it needs Accessibility
-# permission, and it consumes cmd+shift+up in EVERY app, where Cocoa binds it to
-# "select to start of document" in any text field. Drop the prefix to make it
-# Ghostty-only. Changing quick-terminal-position needs a full Ghostty restart on
-# macOS, not just a config reload.
-quick-terminal-position = bottom
 keybind = global:cmd+shift+up=toggle_quick_terminal
+keybind = shift+enter=text:\x1b\r
+keybind = ctrl+shift+x=close_surface

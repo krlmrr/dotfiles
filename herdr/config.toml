@@ -2,7 +2,9 @@ onboarding = false
 
 [theme]
 name = "one-dark"
-auto_switch = false
+auto_switch = true
+dark_name = "one-dark"
+light_name = "one-light"
 
 [ui]
 hide_tab_bar_when_single_tab = true

@@ -360,9 +360,11 @@ tabs_repair() {
 #   west  — no browser in the left column at all. A new leftmost column is
 #           genuinely what is wanted here.
 #   south — the top-left is already a browser but ANOTHER browser window sits
-#           outside the left column (a second Zen window restored by the session,
-#           Cmd+N with Code focused). Stack it under the top-left browser, so the
-#           left column is browsers all the way down. Adds no column.
+#           outside the left column AND below the top row (a second Zen window
+#           restored by the session, Cmd+N with Code focused). Stack it under the
+#           top-left browser. Adds no column. A browser level with the top-left
+#           one is BESIDE it, not stranded, and is left alone — two browsers side
+#           by side is a layout to keep, not a violation to repair.
 #   ""    — nothing to warp; balance alone is the repair (the squeeze guard).
 #
 # ok is true when there is nothing to enforce: 0 or 1 tiled windows, or no
@@ -385,7 +387,8 @@ space_state() {
     | ($col | sort_by(.frame.y) | first)                                 as $top
     | (($browsers | index($top.app)) != null)                            as $topok
     | [ $col[] | select(.app as $a | $browsers | index($a)) ]            as $colb
-    | [ $b[]   | select((.frame.x | floor) != $mx) ]                     as $bout
+    | [ $b[]   | select((.frame.x | floor) != $mx
+                        and (.frame.y | floor) > ($top.frame.y | floor)) ] as $bout
     | (if ($w | length) <= 1 or ($b | length) == 0 then ["true","","",""]
        elif $topok and ($bout | length) > 0
          then ["false", ($bout | sort_by(.frame.x, .frame.y, .id) | first.id | tostring),

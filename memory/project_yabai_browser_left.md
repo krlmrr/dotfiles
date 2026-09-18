@@ -83,13 +83,28 @@ move), so the `moved` handler is a real lower-latency path, not just a duplicate
 - **Every browser window is in the left column now, not just one.** A restored
   second Zen window sat bottom-right because only the top-left was constrained.
   New repair direction `south`: a browser outside the left column is warped
-  under the top-left browser (adds no column). `place_space` runs up to three
+  under the top-left browser (adds no column). **Narrowed 2026-09-17 — see
+  below; a browser BESIDE the top-left one is fine.** `place_space` runs up to three
   one-repair passes, because the second browser needs a second pass and the
   signals that used to supply it are gated out. Verified live: two Zen windows
   stack at x=12.
 - I did drive live windows to verify both (opened/closed test windows on Karl's
   desk, focused Code). Karl was in the loop and asking for it, but the standing
   rule above still applies by default.
+
+**2026-09-17 — `south` was one dimension too broad.** `$bout` selected every
+browser outside the leftmost column, so two Zen windows deliberately side by side
+read as a violation and got stacked on every arrival at the desk (16 rebuilds in
+a day on space 3, each undone by hand). A browser now counts as out of place only
+when it is outside the left column **AND below the top row** — level with the
+top-left browser means beside it, not stranded. The stranded bottom-right case
+the clause was written for still repairs. `e16eaba` did not cause this; it made
+it visible, because the repair used to defer to the next arrival.
+
+The fixtures that cover this jq are **still not in the repo** and had to be
+rebuilt from scratch to verify the change — second time that cost real work. If
+you touch `space_state` again, extract the jq out of `yabairc` and run it against
+cases rather than driving live windows.
 
 See [[project-yabai-ax-loss]], [[project-yabai-browser-incremental]],
 [[project-yabai-insert-parity]], [[feedback-yabai-space2]],

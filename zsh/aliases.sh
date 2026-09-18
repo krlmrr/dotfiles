@@ -117,39 +117,17 @@ _cask_version() {
     | jq -r '.casks[0].installed // empty' 2>/dev/null
 }
 
-_frontmost_app() {
-  osascript -e 'tell application "System Events" to get name of first process whose frontmost is true' 2>/dev/null
-}
-
-# Raise an app by process name. Name is passed as an argv item rather than
-# interpolated into the script text, so a name with quotes can't break it.
-_focus_app() {
-  [[ -n "$1" ]] || return 0
-  osascript - "$1" <<'OSA' 2>/dev/null
-on run argv
-  tell application "System Events"
-    set frontmost of (first process whose name is (item 1 of argv)) to true
-  end tell
-end run
-OSA
-}
-
 brewup() {
   # Save versions up front so we can tell what was actually upgraded
-  local before after ray_before ray_after herdr_before herdr_after front
+  local before after herdr_before herdr_after
   before=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
-  ray_before=$(_cask_version ray)
   herdr_before=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
-  # Remember what had focus: a relaunched Raycast can pop its own window that
-  # `open -gj` cannot suppress.
-  front=$(_frontmost_app)
 
   brew upgrade || return $?
   brew upgrade --greedy
   brew cleanup --prune=all
 
   after=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
-  ray_after=$(_cask_version ray)
   herdr_after=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
 
   if [[ "$before" != "$after" && -n "$after" ]]; then
@@ -169,24 +147,6 @@ brewup() {
   # it can reach the gui/$UID domain for the per-user agents. It calls sudo
   # itself for the /Library ones and will prompt if the session has gone stale.
   bash ~/Code/dotfiles/prune-login-items.sh --quiet
-
-  # Only relaunch Raycast if it was actually replaced — upgrading the cask quits
-  # the running app, so it needs reopening; otherwise leave it alone rather than
-  # yanking focus on every brewup.
-  #
-  # Resolve by app name, not path: Raycast left beta on 2026-08-20 and the bundle
-  # moved from "Raycast Beta.app" to "Raycast.app", breaking the old hardcoded
-  # path. `open -a` survives that kind of rename.
-  if [[ "$ray_before" != "$ray_after" && -n "$ray_after" ]]; then
-    echo "Raycast upgraded ($ray_before → $ray_after) — relaunching"
-    # -g: don't bring to the foreground, -j: launch hidden. Raycast is an
-    # LSUIElement app (menu-bar only, no Dock icon), so this just gets the
-    # hotkey listener back without stealing focus or popping the search window.
-    open -gj -a Raycast
-    if [[ -n "$front" && "$(_frontmost_app)" != "$front" ]]; then
-      _focus_app "$front"
-    fi
-  fi
 
   # claude/skills/herdr/SKILL.md is a snapshot of `herdr --skill`, which prints
   # from the binary — so it goes stale silently on upgrade (202 -> 214 lines

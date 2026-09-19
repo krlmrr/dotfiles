@@ -96,6 +96,47 @@ link "$DOTFILES_DIR/claude/skills/vue" ~/.claude/skills/vue
 # Snapshot of `herdr --skill`; regenerate after a herdr upgrade
 link "$DOTFILES_DIR/claude/skills/herdr" ~/.claude/skills/herdr
 
+# Claude Code hooks — symlinked, so edits are live. The hook itself is tracked,
+# but its registration lives in ~/.claude/settings.json, which is untracked
+# machine state holding unrelated entries (herdr's SessionStart hook, MCP
+# servers, permissions). So merge the entry in rather than writing the file:
+# add it only when absent, and leave everything else untouched.
+mkdir -p ~/.claude/hooks
+link "$DOTFILES_DIR/claude/hooks/comment-check.py" ~/.claude/hooks/comment-check.py
+python3 - "$HOME/.claude/settings.json" <<'PYHOOK'
+import json, os, sys
+
+path = sys.argv[1]
+command = "python3 '%s/.claude/hooks/comment-check.py'" % os.path.expanduser("~")
+
+try:
+    with open(path) as handle:
+        settings = json.load(handle)
+except (OSError, ValueError):
+    settings = {}
+
+hooks = settings.setdefault("hooks", {})
+entries = hooks.setdefault("PostToolUse", [])
+
+for entry in entries:
+    for hook in entry.get("hooks", []):
+        if "comment-check.py" in hook.get("command", ""):
+            hook["command"] = command
+            break
+    else:
+        continue
+    break
+else:
+    entries.append({
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [{"type": "command", "command": command, "timeout": 10}],
+    })
+
+with open(path, "w") as handle:
+    json.dump(settings, handle, indent=2)
+    handle.write("\n")
+PYHOOK
+
 # Ghostty — symlinked in both locations macOS reads from, so edits are live
 link "$DOTFILES_DIR/ghostty/config" ~/.config/ghostty/config
 link "$DOTFILES_DIR/ghostty/themes" ~/.config/ghostty/themes

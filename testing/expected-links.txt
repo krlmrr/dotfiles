@@ -29,3 +29,4 @@ yabai .yabairc yabai/.yabairc
 yabai .skhdrc yabai/.skhdrc
 yabai .config/yabai/helpers yabai/.config/yabai/helpers
 bin .local/bin/dot bin/.local/bin/dot
+yazi .config/yazi/yazi.toml yazi/.config/yazi/yazi.toml

@@ -88,8 +88,7 @@ link_dir() {
     echo "Linked $dest -> $src"
 }
 
-link_dir "$DOTFILES/wallpapers" "$HOME/Pictures/Wallpapers"
-[ "$(uname)" = "Linux" ] && link_dir "$DOTFILES/omarchy-themes" "$HOME/.config/omarchy/themes"
+[ "$(uname)" = "Linux" ] && link_dir "$DOTFILES/assets/omarchy-themes" "$HOME/.config/omarchy/themes"
 
 # --- Omarchy theme links ----------------------------------------------------
 # btop and Neovim read their colours from a symlink into Omarchy's generated

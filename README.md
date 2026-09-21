@@ -206,7 +206,7 @@ Links are per-file, not per-directory. Editing a linked file is live — it is
 the same file on disk. But *adding* a new file to a package needs `stow -R foo`
 (or `dot install`) before it appears in `$HOME`.
 
-## Fonts and wallpapers
+## Fonts, wallpapers and themes
 
 `sketchybar-app-font` ships inside the `sketchybar` package, because that is the
 only thing that uses it and sketchybar is macOS-only. macOS activates it through
@@ -216,18 +216,17 @@ FiraCode and FiraMono come from Homebrew casks rather than being vendored here,
 so they stay updated and do not put ~96MB of binaries in git. MonoLisa is a paid
 per-seat font and is deliberately **not** in this repo; install it by hand.
 
-`wallpapers/` is plain assets at the repo root, not a stow package — nothing
-reads them from a fixed path.
+`wallpapers` is an ordinary stow package — `wallpapers/Pictures/Wallpapers/`
+links per file into `~/Pictures/Wallpapers/`.
 
-`omarchy-themes/` and `wallpapers/` are at the root but still reach `$HOME` —
-as whole-directory symlinks that `dot install` creates, not stow packages:
+`assets/omarchy-themes/` is the exception. It is not a package; `dot install`
+links the whole directory:
 
 ```
-~/.config/omarchy/themes  -> ~/dotfiles/omarchy-themes   (Linux only)
-~/Pictures/Wallpapers     -> ~/dotfiles/wallpapers
+~/.config/omarchy/themes  -> ~/dotfiles/assets/omarchy-themes   (Linux only)
 ```
 
-Stow is wrong for these because it descends and links each file individually.
+Stow is wrong for it because it descends and links each file individually.
 `omarchy theme set` stages a theme with `cp -r`, which copies a per-file symlink
 verbatim — a stow-relative target correct in `~/.config/omarchy/themes/<t>/`
 resolves one level wrong once copied into `current/next-theme/`, so

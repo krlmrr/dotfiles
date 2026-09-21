@@ -4,7 +4,7 @@
 # backgrounds, so a wallpaper that is not part of a theme cannot survive a
 # theme switch without being reapplied here.
 
-wallpaper="${DOTFILES:-$HOME/dotfiles}/wallpapers/lambo.jpg"
+wallpaper="$HOME/Pictures/Wallpapers/lambo.jpg"
 
 [ -f "$wallpaper" ] || exit 0
 omarchy-theme-bg-set "$wallpaper" >/dev/null 2>&1 || true

@@ -1,5 +1,10 @@
 hs.allowAppleScript(true)
 
+-- Runs headless: no dock icon, no menu bar icon. Without this, any activation
+-- of the app raises the console, since Hammerspoon assumes a dock click meant
+-- to show something. Open it deliberately with: hs -c 'hs.openConsole()'
+hs.openConsoleOnDockClick(false)
+
 -- Caps Lock → tap for Escape, hold for Control
 -- Requires: System Preferences > Keyboard > Modifier Keys > Caps Lock → Control
 

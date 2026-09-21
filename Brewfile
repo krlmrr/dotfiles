@@ -45,10 +45,6 @@ brew "koekeishiya/formulae/yabai"
 brew "mole"
 brew "phpantom-lsp"
 brew "qmk/qmk/qmk"
-# rustup, not the `rust` formula: Zed builds dev extensions against the
-# wasm32-wasip2 target, and only a rustup-managed toolchain can add targets.
-# setup force-links it (keg-only) and installs the stable toolchain.
-brew "rustup"
 brew "xcodegen"
 cask "1password"
 cask "1password-cli"

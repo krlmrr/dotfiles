@@ -171,19 +171,18 @@ One include layers on top, optional:
 |---------|-------------|-------|
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
 
-Machine differences use Ghostty's own merge order rather than an include.
-Ghostty reads the XDG file first and, on macOS only, then
-`~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`, with
-later values winning. So the shared config carries the Linux value and the
-`ghostty-mac` package supplies the Mac's:
+Machine differences come from a second package rather than a second
+mechanism. Ghostty ignores the legacy `config` name once `config.ghostty`
+exists — measured, not assumed — so an override needs an explicit
+`config-file` line:
 
-| File | Package | Holds |
-|------|---------|-------|
-| `~/.config/ghostty/config.ghostty` | `ghostty` | everything, `font-size = 10` |
-| `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty` | `ghostty-mac`, Library target | `font-size = 18` for 2× Retina |
+| File | Package | In host list | Holds |
+|------|---------|--------------|-------|
+| `~/.config/ghostty/config.ghostty` | `ghostty` | both | everything, `font-size = 10` |
+| `~/.config/ghostty/mac.ghostty` | `ghostty-mac` | Mac only | `font-size = 18` for 2× Retina |
 
-`ghostty-mac` is stowed alongside `vscode` in `dot install`'s macOS block, not
-from a host list, because its target is `~/Library/Application Support`.
+The include is optional, so on a host without `ghostty-mac` stowed it simply
+does not resolve.
 
 The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty
 skips a family that is not installed, so the Mac gets MonoLisa and Linux falls

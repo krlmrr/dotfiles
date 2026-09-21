@@ -128,13 +128,12 @@ echo "Stowed: $(echo $PACKAGES | tr '\n' ' ')"
 
 # --- macOS extras ----------------------------------------------------------
 if [ "$(uname)" = "Darwin" ]; then
-    for pkg in vscode ghostty-mac; do
-        [ -d "$pkg" ] || continue
-        create_target_dirs "$pkg" "$HOME/Library/Application Support"
+    if [ -d vscode ]; then
+        create_target_dirs vscode "$HOME/Library/Application Support"
         stow -R --dir="$DOTFILES" \
-             --target="$HOME/Library/Application Support" "$pkg"
-        echo "Stowed: $pkg (Library target)"
-    done
+             --target="$HOME/Library/Application Support" vscode
+        echo "Stowed: vscode (Library target)"
+    fi
     # Only when it is not already running: `open -a` on a running Hammerspoon
     # activates it, and activating it raises the console window.
     if [ -d /Applications/Hammerspoon.app ] && ! pgrep -xq Hammerspoon; then

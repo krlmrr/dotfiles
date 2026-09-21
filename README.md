@@ -59,7 +59,7 @@ Three things are not pacman packages and install themselves:
 - `zsh-autosuggestions` and `zsh-syntax-highlighting`, into `~/.oh-my-zsh/custom/plugins`.
 
 Hyprland, the bar and the theme machinery come from Omarchy itself. The `hypr`,
-`omarchy`, `ghostty-linux` and `linuxbin` packages configure those and assume an
+`omarchy` and `linuxbin` packages configure those and assume an
 Omarchy install, so they appear only in `hosts/omarchy.packages`.
 
 ### TrueNAS
@@ -170,7 +170,7 @@ Three includes layer on top, each optional:
 | Include | Provided by | Holds |
 |---------|-------------|-------|
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
-| `~/.config/ghostty/linux.conf` | the `ghostty-linux` package, Linux hosts only | `font-size`, `adjust-cell-height` for that display |
+| `~/.config/ghostty/linux.conf` | the `omarchy` package, Linux hosts only | `font-size`, `adjust-cell-height` for that display |
 | `~/.config/ghostty/local.conf` | nothing — untracked, optional | per-machine overrides |
 
 The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty

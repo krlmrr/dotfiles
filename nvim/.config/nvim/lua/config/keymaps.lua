@@ -37,13 +37,10 @@ vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
 -- Buffers and windows
-vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer (force)" })
 vim.keymap.set("n", "<C-w>", function()
   if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end
   Snacks.bufdelete()
 end, { desc = "Close buffer, keep layout" })
-vim.keymap.set("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete buffer" })
-vim.keymap.set("n", "<leader>bo", function() Snacks.bufdelete.other() end, { desc = "Delete other buffers" })
 vim.keymap.set("n", "<leader>w", function()
   if vim.fn.getcmdwintype() ~= "" then return end
   if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end

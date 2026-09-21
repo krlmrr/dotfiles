@@ -1,0 +1,35 @@
+title = "  "
+macos-titlebar-proxy-icon = hidden
+
+theme = dark:One Half Dark,light:One Half Light
+
+palette = 6=#7aa2f7
+palette = 14=#7aa2f7
+
+# Custom
+split-divider-color = #2C313A
+
+font-family = MonoLisa
+font-style = Medium
+font-style-italic = Medium Italic
+font-style-bold = Medium
+font-style-bold-italic = Medium Italic
+font-size = 18
+
+window-padding-balance = true
+window-save-state = always
+
+cursor-style = bar
+confirm-close-surface = false
+shell-integration-features = sudo
+
+window-padding-y = 8,0
+window-padding-x = 8,8
+macos-option-as-alt = true
+
+keybind = cmd+shift+h=goto_split:left
+keybind = cmd+shift+l=goto_split:right
+keybind = cmd+t=unbind
+keybind = global:cmd+shift+up=toggle_quick_terminal
+keybind = shift+enter=text:\x1b\r
+keybind = ctrl+shift+x=close_surface

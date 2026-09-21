@@ -1,0 +1,13 @@
+# Fallback for a Linux machine with no hosts/<hostname>.packages of its own.
+# Window-manager and macOS-only packages are deliberately absent.
+git
+zsh
+jj
+herdr
+ghostty
+lazygit
+zed
+claude
+nvim-lazyvim
+local
+bin

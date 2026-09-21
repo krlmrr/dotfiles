@@ -1,0 +1,28 @@
+# Beggars - A light theme inspired by Thrice's Beggars album art
+# https://github.com/krlmrr/beggars-theme
+
+background = #E8F0F2
+foreground = #2A2E1D
+cursor-color = #2A2E1D
+selection-background = #B0C4D0
+selection-foreground = #2A2E1D
+
+# Normal colors
+palette = 0=#2A2E1D
+palette = 1=#EE3229
+palette = 2=#8D8308
+palette = 3=#D1A608
+palette = 4=#0176A6
+palette = 5=#3A4364
+palette = 6=#179F90
+palette = 7=#E3EBED
+
+# Bright colors
+palette = 8=#444E43
+palette = 9=#EF0E0E
+palette = 10=#8D8308
+palette = 11=#D1A608
+palette = 12=#0176A6
+palette = 13=#3A4364
+palette = 14=#179F90
+palette = 15=#FFFFFF

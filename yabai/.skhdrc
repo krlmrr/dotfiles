@@ -1,0 +1,98 @@
+# Focus (alt for laptop, meh for Lily58)
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east
+ctrl + alt + cmd - h : yabai -m window --focus west
+ctrl + alt + cmd - j : yabai -m window --focus south
+ctrl + alt + cmd - k : yabai -m window --focus north
+ctrl + alt + cmd - l : yabai -m window --focus east
+
+# omarchy-style focus (cmd+ctrl+hjkl)
+ctrl + cmd - h : yabai -m window --focus west
+ctrl + cmd - j : yabai -m window --focus south
+ctrl + cmd - k : yabai -m window --focus north
+ctrl + cmd - l : yabai -m window --focus east
+
+alt - left : yabai -m window --focus west
+alt - down : yabai -m window --focus south
+alt - up : yabai -m window --focus north
+alt - right : yabai -m window --focus east
+ctrl + alt + cmd - left : yabai -m window --focus west
+ctrl + alt + cmd - down : yabai -m window --focus south
+ctrl + alt + cmd - up : yabai -m window --focus north
+ctrl + alt + cmd - right : yabai -m window --focus east
+
+# Move windows (alt-shift for laptop, meh+shift for Lily58)
+shift + alt - h : yabai -m window --warp west
+shift + alt - j : yabai -m window --warp south
+shift + alt - k : yabai -m window --warp north
+shift + alt - l : yabai -m window --warp east
+shift + ctrl + alt + cmd - h : yabai -m window --warp west
+shift + ctrl + alt + cmd - j : yabai -m window --warp south
+shift + ctrl + alt + cmd - k : yabai -m window --warp north
+shift + ctrl + alt + cmd - l : yabai -m window --warp east
+
+shift + alt - left : yabai -m window --warp west
+shift + alt - down : yabai -m window --warp south
+shift + alt - up : yabai -m window --warp north
+shift + alt - right : yabai -m window --warp east
+shift + ctrl + alt + cmd - left : yabai -m window --warp west
+shift + ctrl + alt + cmd - down : yabai -m window --warp south
+shift + ctrl + alt + cmd - up : yabai -m window --warp north
+shift + ctrl + alt + cmd - right : yabai -m window --warp east
+
+# Switch desktop by number: not bound in skhd — macOS owns ^1..^5 (Mission
+# Control > Switch to Desktop). SIP-on, skhd's event tap would swallow the key and
+# yabai's `space --focus` no-ops (no scripting addition) = dead keys that do
+# nothing ^1..^5 doesn't. SIP-off (SA loaded), add
+# `ctrl - N : yabai -m space --focus N` here to let yabai focus spaces directly.
+
+# Move window to a desktop AND follow it there.
+#
+# yabai moves the window (public API, works with SIP on) but cannot focus a
+# space — `space --focus` needs the scripting addition SIP blocks. So the helper
+# posts macOS's own "Switch to Desktop N" shortcut instead (symbolichotkeys
+# 118-126 = ctrl+1..9, 79/81 = ctrl+left/right).
+#
+# The helper exists rather than a plain `osascript ... key code N using control
+# down` because skhd fires while the chord's OWN ctrl+shift is still physically
+# held: without forcing the event flags, macOS sees ctrl+shift+N, matches no
+# shortcut, and the view never follows. yabai/helpers/space-follow.swift calls
+# CGEventSetFlags to drop the held shift. It needs no Accessibility grant of its
+# own — spawned by skhd, it inherits skhd's.
+#
+# `&&` matters: if the target space does not exist yabai exits non-zero and the
+# follow is skipped, rather than switching to nowhere.
+# ctrl + shift - left  : yabai -m window --space prev && ~/.config/yabai/helpers/space-follow left
+# ctrl + shift - right : yabai -m window --space next && ~/.config/yabai/helpers/space-follow right
+
+# ctrl + shift - 1 : yabai -m window --space 1 && ~/.config/yabai/helpers/space-follow 1
+# ctrl + shift - 2 : yabai -m window --space 2 && ~/.config/yabai/helpers/space-follow 2
+# ctrl + shift - 3 : yabai -m window --space 3 && ~/.config/yabai/helpers/space-follow 3
+# ctrl + shift - 4 : yabai -m window --space 4 && ~/.config/yabai/helpers/space-follow 4
+# ctrl + shift - 5 : yabai -m window --space 5 && ~/.config/yabai/helpers/space-follow 5
+# ctrl + shift - 6 : yabai -m window --space 6 && ~/.config/yabai/helpers/space-follow 6
+# ctrl + shift - 7 : yabai -m window --space 7 && ~/.config/yabai/helpers/space-follow 7
+# ctrl + shift - 8 : yabai -m window --space 8 && ~/.config/yabai/helpers/space-follow 8
+# ctrl + shift - 9 : yabai -m window --space 9 && ~/.config/yabai/helpers/space-follow 9
+
+# Lily58 "meh" equivalents — same move-and-follow behaviour
+# shift + ctrl + alt + cmd - 1 : yabai -m window --space 1 && ~/.config/yabai/helpers/space-follow 1
+# shift + ctrl + alt + cmd - 2 : yabai -m window --space 2 && ~/.config/yabai/helpers/space-follow 2
+# shift + ctrl + alt + cmd - 3 : yabai -m window --space 3 && ~/.config/yabai/helpers/space-follow 3
+# shift + ctrl + alt + cmd - 4 : yabai -m window --space 4 && ~/.config/yabai/helpers/space-follow 4
+# shift + ctrl + alt + cmd - 5 : yabai -m window --space 5 && ~/.config/yabai/helpers/space-follow 5
+# shift + ctrl + alt + cmd - 6 : yabai -m window --space 6 && ~/.config/yabai/helpers/space-follow 6
+# shift + ctrl + alt + cmd - 7 : yabai -m window --space 7 && ~/.config/yabai/helpers/space-follow 7
+# shift + ctrl + alt + cmd - 8 : yabai -m window --space 8 && ~/.config/yabai/helpers/space-follow 8
+# shift + ctrl + alt + cmd - 9 : yabai -m window --space 9 && ~/.config/yabai/helpers/space-follow 9
+
+# Layout
+alt - f : yabai -m window --toggle zoom-fullscreen
+shift + alt - f : yabai -m window --toggle float; yabai -m window --grid 4:4:1:1:2:2
+alt - 0x2F : yabai -m space --layout bsp
+alt - 0x2B : yabai -m space --layout stack
+
+# Balance tree (make all windows equal size)
+shift + alt - 0 : yabai -m space --balance

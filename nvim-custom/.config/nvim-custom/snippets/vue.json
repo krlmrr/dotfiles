@@ -1,0 +1,17 @@
+{
+  "Vue SFC": {
+    "prefix": "vue",
+    "body": [
+      "<script setup lang=\"ts\">",
+      "$1",
+      "</script>",
+      "",
+      "<template>",
+      "    <div>",
+      "        $0",
+      "    </div>",
+      "</template>"
+    ],
+    "description": "Vue 3 SFC with script setup"
+  }
+}

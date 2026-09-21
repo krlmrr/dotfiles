@@ -1,0 +1,35 @@
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#757575'
+ZSH_AUTOSUGGEST_HISTORY_IGNORE="nvr *"
+
+plugins=(
+    git
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+)
+
+source $ZSH/oh-my-zsh.sh
+
+setopt HIST_IGNORE_SPACE
+
+# Silence Homebrew's env/auto-update hint banners
+export HOMEBREW_NO_ENV_HINTS=1
+
+export PATH="$HOME/.local/bin:$PATH:$HOME/.composer/vendor/bin:$HOME/.config/composer/vendor/bin"
+
+export DOTFILES="$HOME/dotfiles"
+export XDG_CONFIG_HOME="$HOME/.config"
+
+# Let sudo prompt via a dialog when there is no TTY (Claude Code's `!` prompt,
+# editor tasks, launchd). Opt-in per command: sudo only uses this with -A, so
+# setting it here changes nothing on its own. See scripts/askpass.sh.
+export SUDO_ASKPASS="$DOTFILES/scripts/askpass.sh"
+
+# Sourced through the stowed path, not $DOTFILES, so a missing symlink fails loudly here instead of silently reading the old repo.
+source "$XDG_CONFIG_HOME/zsh/aliases.sh"
+
+# Which neovim config this machine uses. Both packages are stowed; this picks
+# the default. Override per-invocation: NVIM_APPNAME=nvim-lazyvim nvim
+export NVIM_APPNAME="${NVIM_APPNAME:-nvim-custom}"

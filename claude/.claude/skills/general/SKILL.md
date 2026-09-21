@@ -1,0 +1,128 @@
+---
+name: general
+description: General coding style conventions. Use when writing or modifying any code.
+user-invocable: false
+---
+
+# General Coding Style
+
+Follow these rules when writing or modifying any code:
+
+## No Comments
+
+Never write comments in code. No docblocks, no inline comments, no TODO comments. The code should be self-explanatory through clear naming and structure.
+
+The one exception is PHPStan type annotations that carry information the native type declaration *cannot* — generics like `array<string, string>`, `Collection<int, User>`, `list<string>`, or relation generics like `BelongsTo<Team, $this>`. Always use the single-line format:
+
+```php
+/** @var Collection<int, User> */
+$users = User::all();
+```
+
+A docblock that only restates the signature is redundant — remove it. If a method declares `: void` / `: array` / `: bool`, drop the `@return`; if a property is plainly a string or bool, drop the `@var`. Keep the annotation only when it adds a generic the signature can't hold.
+
+## Descriptive Variable Names
+
+**Never use single-letter variables.** Use the best possible variable name — clear and precise, but not needlessly long.
+
+Wrong: `foreach ($items as $k => $v)`, `fn ($c) =>`, `catch (Throwable $e)`
+Right: `foreach ($items as $key => $item)`, `fn (Credential $credential) =>`, `catch (Throwable $exception)`
+
+## Inline Single-Use Variables
+
+If a variable is only used once, inline it instead of assigning it.
+
+```php
+// Wrong
+$activeUsers = User::where('active', true)->get();
+return response()->json($activeUsers);
+
+// Right
+return response()->json(User::where('active', true)->get());
+```
+
+## Ternaries on Their Own Lines
+
+Break ternary expressions onto separate lines so the logic is easy to follow.
+
+```php
+// Wrong
+$status = $user->isActive() ? 'active' : 'inactive';
+
+// Right
+$status = $user->isActive()
+    ? 'active'
+    : 'inactive';
+```
+
+```js
+// Wrong
+const label = isEnabled ? 'On' : 'Off'
+
+// Right
+const label = isEnabled
+    ? 'On'
+    : 'Off'
+```
+
+## No Flying Vs
+
+Never nest deeply. Deeply indented code (nested ifs, nested divs, nested loops) forms a "Flying V" shape that is hard to read and maintain.
+
+- Use early returns and guard clauses instead of nested `if` statements.
+- Extract components or partials when template nesting gets deep.
+- Prefer flat control flow: validate and bail early, then run the happy path at the top level.
+
+```php
+// Wrong - Flying V
+public function handle(Request $request): Response
+{
+    if ($request->has('token')) {
+        if ($request->user()) {
+            if ($request->user()->isAdmin()) {
+                return response()->json(['ok' => true]);
+            }
+        }
+    }
+
+    return response()->json(['error' => 'Unauthorized'], 403);
+}
+
+// Right - guard clauses
+public function handle(Request $request): Response
+{
+    if (! $request->has('token')) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    if (! $request->user()?->isAdmin()) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    return response()->json(['ok' => true]);
+}
+```
+
+## Test Behavior, Not Tautologies
+
+A test only earns its place if it verifies observable behavior. A unit test that feeds a function an input and asserts the output it was literally written to produce is a tautology, not a test — delete it and cover the behavior through the feature instead.
+
+```php
+// Wrong - restates the function body; proves nothing
+test('it returns a valid timezone unchanged', function () {
+    expect(Timezone::sanitize('America/New_York'))->toBe('America/New_York');
+});
+
+// Right - asserts the outcome that matters, end to end
+test('registration stores the submitted timezone', function () {
+    $this->post(route('register.store'), [...'timezone' => 'America/New_York']);
+
+    expect(User::firstWhere('email', '...')->timezone)->toBe('America/New_York');
+});
+```
+
+Only write a standalone unit test when the unit has non-trivial logic (a real transformation, an algorithm, edge cases) that isn't already exercised in context.
+
+## Atomic Commits
+
+Keep commits small and focused. Each commit should represent one logical change. Keep PRs small and reviewable — don't bundle unrelated changes together.

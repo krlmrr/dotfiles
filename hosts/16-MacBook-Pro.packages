@@ -1,0 +1,17 @@
+# Packages stowed on this machine. One per line; # comments allowed.
+# vscode is handled separately by bootstrap — it needs a different target.
+git
+zsh
+jj
+herdr
+ghostty
+lazygit
+zed
+claude
+nvim-custom
+nvim-lazyvim
+hammerspoon
+sketchybar
+yabai
+local
+bin

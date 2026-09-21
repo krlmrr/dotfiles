@@ -1,0 +1,15 @@
+{
+  "name": "custom-snippets",
+  "contributes": {
+    "snippets": [
+      {
+        "language": "vue",
+        "path": "./vue.json"
+      },
+      {
+        "language": "blade",
+        "path": "./blade.json"
+      }
+    ]
+  }
+}

@@ -1,0 +1,186 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+    {
+        "bindings": {
+            "cmd-alt-c": [
+                "agent::NewExternalAgentThread",
+                {
+                    "agent": {
+                        "custom": {
+                            "name": "claude-acp"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "bindings": {
+            "ctrl-j": "menu::SelectNext",
+            "ctrl-k": "menu::SelectPrevious",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-shift-b": "workspace::ToggleLeftDock",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-b": "workspace::ToggleRightDock",
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-r": null,
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "alt-cmd-b": null,
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-t": "terminal_panel::Toggle",
+            "cmd-e": "project_panel::ToggleFocus",
+            "cmd-g": "git_panel::ToggleFocus",
+        },
+    },
+    {
+        "context": "Editor && !menu",
+        "bindings": {
+            "ctrl-t": "terminal_panel::Toggle",
+        },
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-t": "terminal_panel::Toggle",
+        },
+    },
+    {
+        "context": "vim_mode == normal && !menu",
+        "bindings": {
+            "cmd-e": "project_panel::ToggleFocus",
+            "cmd-g": "git_panel::ToggleFocus",
+        },
+    },
+    {
+        "context": "ProjectPanel",
+        "bindings": {
+            "cmd-e": "workspace::ToggleRightDock",
+        },
+    },
+    {
+        "context": "GitPanel",
+        "bindings": {
+            "cmd-g": "workspace::ToggleRightDock",
+        },
+    },
+    {
+        "context": "Editor",
+        "bindings": {
+            "cmd-;": [
+                "projects::OpenRecent",
+                {
+                    "create_new_window": false,
+                },
+            ],
+        },
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "cmd-;": [
+                "projects::OpenRecent",
+                {
+                    "create_new_window": false,
+                },
+            ],
+        },
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "cmd-;": [
+                "projects::OpenRecent",
+                {
+                    "create_new_window": false,
+                },
+            ],
+        },
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "ctrl-n": "workspace::NewTerminal"
+        }
+    },
+    {
+        "context": "Terminal",
+        "bindings": {
+            "cmd-n": null
+        }
+    },
+    {
+        "bindings": {
+            "cmd-shift-c": null
+        }
+    },
+    {
+        "context": "KeymapEditor",
+        "unbind": {
+            "cmd-e": "zed::OpenKeymapFile"
+        }
+    },
+    {
+        "context": "Editor && mode == full",
+        "unbind": {
+            "cmd-e": [
+                "buffer_search::Deploy",
+                {
+                    "focus": false
+                }
+            ]
+        }
+    },
+    {
+        "bindings": {
+            "ctrl-a": "agent::Toggle"
+        }
+    },
+    {
+        "context": "Workspace",
+        "bindings": {
+            "ctrl-a": "agent::ToggleFocus"
+        }
+    },
+    {
+        "context": "Workspace",
+        "unbind": {
+            "cmd-?": "agent::ToggleFocus"
+        }
+    },
+    {
+        // ;; / ,, in normal mode: append the punct at end of line and stay
+        // in normal mode. Vim's insert mode doesn't evaluate chords, so this
+        // only works after escape. Trade-off: shadows vim's repeat-find on `;`.
+        "context": "vim_mode == normal",
+        "bindings": {
+            "; ;": ["workspace::SendKeystrokes", "shift-a ; escape"],
+            ", ,": ["workspace::SendKeystrokes", "shift-a , escape"]
+        }
+    }
+]

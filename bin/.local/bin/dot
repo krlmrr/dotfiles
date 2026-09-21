@@ -1,0 +1,44 @@
+#!/bin/bash
+# Thin wrapper over git for the dotfiles repo, runnable from any directory.
+# Intended to be replaced by a Go or Rust binary; keep the interface stable.
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+
+case "${1:-help}" in
+    pull)
+        git -C "$DOTFILES" pull --rebase
+        # Edits to existing files are already live through the symlinks; only
+        # newly added files need linking. Restow is idempotent, so always run.
+        "$DOTFILES/bootstrap"
+        ;;
+    push)
+        shift
+        # Tracked modifications only. `git add -A` in a dotfiles repo is how a
+        # secret gets committed — report untracked files, never sweep them in.
+        git -C "$DOTFILES" add -u
+        if [ -n "$(git -C "$DOTFILES" ls-files --others --exclude-standard)" ]; then
+            echo "Untracked files (not staged — add them deliberately):"
+            git -C "$DOTFILES" ls-files --others --exclude-standard | sed 's/^/  /'
+            echo
+        fi
+        if git -C "$DOTFILES" diff --cached --quiet; then
+            echo "Nothing staged."
+            exit 0
+        fi
+        git -C "$DOTFILES" commit -m "${*:-dotfiles: $(date '+%Y-%m-%d %H:%M')}"
+        git -C "$DOTFILES" push
+        ;;
+    status)
+        git -C "$DOTFILES" status --short --branch
+        echo
+        echo "Packages for $(hostname -s):"
+        list="$DOTFILES/hosts/$(hostname -s).packages"
+        [ -f "$list" ] && grep -v -e '^#' -e '^$' "$list" | sed 's/^/  /' \
+            || echo "  (no host list — bootstrap falls back to a default)"
+        ;;
+    *)
+        echo "usage: dot {pull|push [message]|status}"
+        exit 2
+        ;;
+esac

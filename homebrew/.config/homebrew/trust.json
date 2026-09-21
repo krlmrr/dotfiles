@@ -1,4 +1,22 @@
 {
+  "trustedtaps": [
+    "anomalyco/tap",
+    "antoniorodr/memo",
+    "aprilnea/tap",
+    "asmvik/formulae",
+    "entireio/tap",
+    "felixkratz/formulae",
+    "https://github.com/asmvik/homebrew-formulae.git",
+    "malpern/tap",
+    "msitarzewski/brew-browser",
+    "nikitabobko/tap",
+    "osx-cross/arm",
+    "osx-cross/avr",
+    "oven-sh/bun",
+    "qmk/qmk",
+    "steipete/tap",
+    "vheissulabs/tap"
+  ],
   "trustedformulae": [
     "anomalyco/tap/opencode",
     "antoniorodr/memo/memo",

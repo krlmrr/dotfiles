@@ -121,6 +121,33 @@ stowed like any other package, so it lands on `$PATH` at `~/.local/bin/dot`
 once `~/.local/bin` is on it. `local/` (see above) is the gitignored package
 for machine-local, never-committed files.
 
+## Adding a package
+
+The directory structure *is* the configuration — there is no script to edit.
+
+```bash
+cd ~/dotfiles
+mkdir -p foo/.config/foo
+mv ~/.config/foo/config.toml foo/.config/foo/   # move the real file in
+stow foo                                        # link it back
+echo foo >> hosts/$(hostname -s).packages       # so bootstrap picks it up on every machine
+```
+
+The `hosts` line is the one that gets forgotten. Without it the package works
+here but a fresh clone will not stow it.
+
+Two habits worth keeping:
+
+- **Add a line to `testing/expected-links.txt`.** Format is
+  `<package> <path-under-$HOME> <path-in-repo>`. It costs one line and it is
+  what proves a migration worked instead of eyeballing `ls -la`.
+- **`stow -n -v foo` before `stow foo`** when unsure. It prints exactly what
+  would happen without touching anything.
+
+Links are per-file, not per-directory. Editing a linked file is live — it is
+the same file on disk. But *adding* a new file to a package needs `stow -R foo`
+(or `./bootstrap`) before it appears in `$HOME`.
+
 ## Commands
 
 ```bash

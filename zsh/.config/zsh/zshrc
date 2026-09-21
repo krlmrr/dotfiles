@@ -23,5 +23,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 
 export SUDO_ASKPASS="$DOTFILES/scripts/askpass.sh"
 
+source <(fzf --zsh)
+
 source "$XDG_CONFIG_HOME/zsh/aliases.sh"
 

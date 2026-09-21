@@ -22,7 +22,6 @@ end, { desc = '[T]oggle inlay [H]ints' })
 -- Diagnostics
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>q', function() Snacks.picker.diagnostics() end, { desc = 'Open diagnostics list' })
 
 -- Terminal (floating terminal is in floatterm.lua plugin)
 -- Esc exits terminal mode for non-floating terminals

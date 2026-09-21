@@ -170,7 +170,7 @@ Two includes layer on top, both optional:
 | Include | Provided by | Holds |
 |---------|-------------|-------|
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
-| `~/.config/ghostty/local.conf` | nothing — untracked, optional | per-machine overrides |
+| `~/.config/ghostty/local.conf` | the `omarchy` package on that host; untracked elsewhere | per-machine overrides — on omarchy, `font-size` and `adjust-cell-height` for a 1× 1440p panel against the Mac's 2× Retina |
 
 The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty
 skips a family that is not installed, so the Mac gets MonoLisa and Linux falls

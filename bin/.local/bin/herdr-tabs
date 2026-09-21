@@ -1,0 +1,72 @@
+#!/bin/bash
+set -euo pipefail
+
+notify() {
+    herdr notification show "herdr-tabs" --body "$1" >/dev/null 2>&1 || true
+}
+
+for dependency in herdr jq; do
+    if ! command -v "$dependency" >/dev/null 2>&1; then
+        echo "herdr-tabs: $dependency is not on PATH" >&2
+        exit 1
+    fi
+done
+
+focused="$(herdr pane current 2>/dev/null || true)"
+workspace_id="$(jq -r '.result.pane.workspace_id // empty' <<<"$focused")"
+tab_id="$(jq -r '.result.pane.tab_id // empty' <<<"$focused")"
+pane_id="$(jq -r '.result.pane.pane_id // empty' <<<"$focused")"
+target_dir="$(jq -r '.result.pane.cwd // empty' <<<"$focused")"
+occupying_agent="$(jq -r '.result.pane.agent // empty' <<<"$focused")"
+
+if [ -z "$workspace_id" ] || [ -z "$target_dir" ]; then
+    notify "No focused Herdr pane to lay out."
+    exit 1
+fi
+
+if [ -n "$occupying_agent" ]; then
+    notify "$pane_id already runs $occupying_agent — needs an empty shell pane."
+    exit 1
+fi
+
+tab_count="$(herdr tab list --workspace "$workspace_id" | jq -r '.result.tabs | length')"
+
+if [ "$tab_count" -gt 1 ]; then
+    notify "$workspace_id already has $tab_count tabs — nothing to lay out."
+    exit 1
+fi
+
+label="$(basename "$target_dir")"
+
+slug="$(printf '%s' "$label" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -e 's/[^a-z0-9_-]/-/g' -e 's/^[^a-z]*//')"
+slug="${slug:0:32}"
+slug="${slug:-agent}"
+
+live_names="$(herdr agent list | jq -r '.result.agents[]?.name // empty')"
+agent_name="$slug"
+suffix=2
+
+while printf '%s\n' "$live_names" | grep -qxF "$agent_name"; do
+    agent_name="${slug:0:30}-${suffix}"
+    suffix=$((suffix + 1))
+done
+
+create_tab_pane() {
+    herdr tab create --workspace "$workspace_id" --cwd "$target_dir" --label "$1" --no-focus \
+        | jq -r '.result.root_pane.pane_id'
+}
+
+herdr tab rename "$tab_id" claude >/dev/null
+herdr pane run "$(create_tab_pane nvim)" "nvim ." >/dev/null
+create_tab_pane terminal >/dev/null
+herdr pane run "$(create_tab_pane git)" lazygit >/dev/null
+herdr tab focus "$tab_id" >/dev/null
+
+if ! herdr agent start "$agent_name" --kind claude --pane "$pane_id" >/dev/null 2>&1; then
+    notify "$label: tabs ready, $agent_name still starting."
+    exit 0
+fi
+
+notify "$label: claude, nvim, terminal, git"

@@ -11,3 +11,8 @@ hide_tab_bar_when_single_tab = true
 
 [ui.toast]
 delivery = "system"
+
+[[keys.command]]
+key = "prefix+alt+c"
+type = "shell"
+command = "~/.local/bin/herdr-tabs"

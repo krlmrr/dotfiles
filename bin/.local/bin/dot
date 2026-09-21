@@ -22,11 +22,13 @@ case "${1:-help}" in
             git -C "$DOTFILES" ls-files --others --exclude-standard | sed 's/^/  /'
             echo
         fi
+        # Commit only if something is staged, but push either way: a clean
+        # tree with unpushed commits is the common case and must not exit early.
         if git -C "$DOTFILES" diff --cached --quiet; then
-            echo "Nothing staged."
-            exit 0
+            echo "Nothing to commit."
+        else
+            git -C "$DOTFILES" commit -m "${*:-dotfiles: $(date '+%Y-%m-%d %H:%M')}"
         fi
-        git -C "$DOTFILES" commit -m "${*:-dotfiles: $(date '+%Y-%m-%d %H:%M')}"
         git -C "$DOTFILES" push
         ;;
     status)

@@ -19,9 +19,9 @@
 # or Chrome update, or after uninstalling a brew service.
 #
 # Usage:
-#   bash mac/prune-login-items.sh              # prune
-#   bash mac/prune-login-items.sh --dry-run    # show what would be pruned
-#   bash mac/prune-login-items.sh --quiet      # say nothing unless something changed
+#   bash scripts/prune-login-items.sh              # prune
+#   bash scripts/prune-login-items.sh --dry-run    # show what would be pruned
+#   bash scripts/prune-login-items.sh --quiet      # say nothing unless something changed
 #
 # To undo, re-enable a service and let the app reinstall its agent:
 #   launchctl enable gui/$(id -u)/com.adobe.ccxprocess

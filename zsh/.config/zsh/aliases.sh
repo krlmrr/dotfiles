@@ -135,7 +135,7 @@ brewup() {
     env -u TERMINFO sudo yabai --uninstall-sa
     env -u TERMINFO sudo yabai --load-sa
     yabai --restart-service
-    sudo bash "${DOTFILES:-$HOME/dotfiles}/tcc-cleanup.sh"
+    sudo bash "${DOTFILES:-$HOME/dotfiles}/scripts/tcc-cleanup.sh"
   fi
 
   # `brew upgrade --greedy` is exactly what puts the Adobe/Google background
@@ -146,7 +146,7 @@ brewup() {
   # NOT `sudo bash` (unlike tcc-cleanup.sh above): this one must run as you, so
   # it can reach the gui/$UID domain for the per-user agents. It calls sudo
   # itself for the /Library ones and will prompt if the session has gone stale.
-  bash "${DOTFILES:-$HOME/dotfiles}/prune-login-items.sh" --quiet
+  bash "${DOTFILES:-$HOME/dotfiles}/scripts/prune-login-items.sh" --quiet
 
   # claude/skills/herdr/SKILL.md is a snapshot of `herdr --skill`, which prints
   # from the binary — so it goes stale silently on upgrade (202 -> 214 lines

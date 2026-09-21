@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -e
+
+CONFIG="$HOME/.config/torrra/config.toml"
+COLORS="$HOME/.local/state/omarchy/current/theme/colors.toml"
+
+[[ -f $CONFIG ]] || exit 0
+grep -qE '^theme *= *' "$CONFIG" || exit 0
+
+case "$1" in
+onedark-flat) THEME="atom-one-dark" ;;
+onelight-flat) THEME="atom-one-light" ;;
+catppuccin) THEME="catppuccin-mocha" ;;
+catppuccin-latte) THEME="catppuccin-latte" ;;
+gruvbox) THEME="gruvbox" ;;
+nord) THEME="nord" ;;
+rose-pine) THEME="rose-pine-dawn" ;;
+tokyo-night) THEME="tokyo-night" ;;
+*)
+  if grep -qE '^mode *= *"light"' "$COLORS" 2>/dev/null; then
+    THEME="textual-light"
+  else
+    THEME="textual-dark"
+  fi
+  ;;
+esac
+
+sed -i -E "s|^theme *= *.*|theme = \"$THEME\"|" "$CONFIG"

@@ -1,8 +1,11 @@
+tap "FelixKratz/formulae"
 tap "anomalyco/tap"
 tap "antoniorodr/memo"
+tap "koekeishiya/formulae"
 tap "mac-brow-app/tap"
 tap "osx-cross/arm"
 tap "osx-cross/avr"
+tap "oven-sh/bun"
 tap "qmk/qmk"
 
 brew "anomalyco/tap/opencode"

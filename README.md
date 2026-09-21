@@ -131,7 +131,6 @@ nothing links back into this repo:
 |------|------|
 | `~/.config/git/identity` | `[user]` name/email, included by `.gitconfig` |
 | `~/.config/jj/conf.d/00-identity.toml` | the same identity for jj |
-| `~/.config/ghostty/local.ghostty` | optional per-machine Ghostty overrides; never created automatically |
 
 `~/.zshrc` is stowed from `zsh/.zshrc` like any other file. Tools append to
 that path — Herd rewrites `HERD_PHP_*_INI_SCAN_DIR` on every PHP version
@@ -166,12 +165,25 @@ three Ghostty behaviours rather than splitting per OS:
 - `config-file` entries prefixed with `?` are skipped when the file is absent,
   and load *after* the config that names them, so they override it.
 
-Two includes layer on top, both optional:
+One include layers on top, optional:
 
 | Include | Provided by | Holds |
 |---------|-------------|-------|
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
-| `~/.config/ghostty/local.ghostty` | the `omarchy` package on that host; untracked elsewhere | per-machine overrides — on omarchy, `font-size` and `adjust-cell-height` for a 1× 1440p panel against the Mac's 2× Retina |
+
+Machine differences use Ghostty's own merge order rather than an include.
+Ghostty reads the XDG file first and, on macOS only, then
+`~/Library/Application Support/com.mitchellh.ghostty/config.ghostty`, with
+later values winning. So the shared config carries the Linux value and the
+`ghostty-mac` package supplies the Mac's:
+
+| File | Package | Holds |
+|------|---------|-------|
+| `~/.config/ghostty/config.ghostty` | `ghostty` | everything, `font-size = 10` |
+| `~/Library/Application Support/com.mitchellh.ghostty/config.ghostty` | `ghostty-mac`, Library target | `font-size = 18` for 2× Retina |
+
+`ghostty-mac` is stowed alongside `vscode` in `dot install`'s macOS block, not
+from a host list, because its target is `~/Library/Application Support`.
 
 The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty
 skips a family that is not installed, so the Mac gets MonoLisa and Linux falls

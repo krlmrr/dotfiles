@@ -128,12 +128,13 @@ echo "Stowed: $(echo $PACKAGES | tr '\n' ' ')"
 
 # --- macOS extras ----------------------------------------------------------
 if [ "$(uname)" = "Darwin" ]; then
-    if [ -d vscode ]; then
-        create_target_dirs vscode "$HOME/Library/Application Support"
+    for pkg in vscode ghostty-mac; do
+        [ -d "$pkg" ] || continue
+        create_target_dirs "$pkg" "$HOME/Library/Application Support"
         stow -R --dir="$DOTFILES" \
-             --target="$HOME/Library/Application Support" vscode
-        echo "Stowed: vscode (Library target)"
-    fi
+             --target="$HOME/Library/Application Support" "$pkg"
+        echo "Stowed: $pkg (Library target)"
+    done
     if [ -d /Applications/Hammerspoon.app ]; then
         open -a Hammerspoon
     fi

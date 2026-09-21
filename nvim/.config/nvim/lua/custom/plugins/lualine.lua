@@ -53,7 +53,7 @@ return {
           { 'filetype', cond = function() return vim.bo.buftype ~= 'terminal' end, fmt = function(str)
             if str == 'neo-tree' then return '' end
             if str == 'neo-tree-popup' then return '' end
-            if str == 'TelescopePrompt' then return '' end
+            if str == 'snacks_picker_input' then return '' end
             if str == 'DressingInput' then return '' end
             if str == 'DressingSelect' then return '' end
             if str == 'php' then return 'PHP' end

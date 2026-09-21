@@ -81,25 +81,19 @@ vim.keymap.set("n", "<leader>rc", function()
   vim.cmd('qa!')
 end, { desc = "Restart nvim" })
 
--- New vertical split with Telescope
+-- New vertical split, then pick a file into it
 vim.keymap.set("n", "<leader>v", function()
   vim.cmd('rightbelow vnew')
   local new_buf = vim.api.nvim_get_current_buf()
-  require('telescope.builtin').find_files({
+  Snacks.picker.files({
     hidden = true,
     cwd = vim.fn.getcwd(),
-    attach_mappings = function(prompt_bufnr, map)
-      local actions = require('telescope.actions')
-      actions.close:enhance({
-        post = function()
-          vim.schedule(function()
-            if vim.api.nvim_buf_is_valid(new_buf) and vim.api.nvim_buf_get_name(new_buf) == '' then
-              vim.api.nvim_buf_delete(new_buf, { force = true })
-            end
-          end)
-        end,
-      })
-      return true
+    on_close = function()
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(new_buf) and vim.api.nvim_buf_get_name(new_buf) == '' then
+          vim.api.nvim_buf_delete(new_buf, { force = true })
+        end
+      end)
     end,
   })
 end, { desc = "New vertical split" })

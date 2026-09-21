@@ -210,7 +210,6 @@ local function apply_light_theme()
 			treesitter = true,
 			indent_blankline = { enabled = true },
 			native_lsp = { enabled = true },
-			telescope = { enabled = true },
 			dashboard = true,
 		},
 	})

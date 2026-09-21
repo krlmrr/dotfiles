@@ -16,9 +16,9 @@ return {
                     '',
                 },
                 shortcut = {
-                    { desc = ' Find',   group = 'DashboardShortCut', action = 'Telescope find_files', key = 'f' },
-                    { desc = ' Recent', group = 'DashboardShortCut', action = 'Telescope oldfiles',   key = 'r' },
-                    { desc = ' Grep',   group = 'DashboardShortCut', action = 'Telescope live_grep',  key = 'g' },
+                    { desc = ' Find',   group = 'DashboardShortCut', action = function() Snacks.picker.files() end, key = 'f' },
+                    { desc = ' Recent', group = 'DashboardShortCut', action = function() Snacks.picker.recent() end,   key = 'r' },
+                    { desc = ' Grep',   group = 'DashboardShortCut', action = function() Snacks.picker.grep() end,  key = 'g' },
                     { desc = ' Quit',   group = 'DashboardShortCut', action = 'quit',                 key = 'q' },
                 },
                 packages = { enable = false },

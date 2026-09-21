@@ -1,0 +1,21 @@
+{
+  "trustedformulae": [
+    "anomalyco/tap/opencode",
+    "antoniorodr/memo/memo",
+    "felixkratz/formulae/sketchybar",
+    "https://github.com/asmvik/homebrew-formulae.git/skhd",
+    "https://github.com/asmvik/homebrew-formulae.git/yabai",
+    "osx-cross/arm/arm-none-eabi-binutils",
+    "osx-cross/arm/arm-none-eabi-gcc@8",
+    "osx-cross/avr/avr-binutils",
+    "osx-cross/avr/avr-gcc@8",
+    "oven-sh/bun/bun",
+    "qmk/qmk/hid_bootloader_cli",
+    "qmk/qmk/mdloader",
+    "qmk/qmk/qmk"
+  ],
+  "trustedcasks": [
+    "mac-brow-app/tap/brow",
+    "vheissulabs/tap/gitdifferent"
+  ]
+}

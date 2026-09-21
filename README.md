@@ -19,11 +19,12 @@ The dotfiles are inert without the tools they set up. Install these first.
 
 ### macOS
 
-Everything comes from [Homebrew](https://brew.sh). `Brewfile` is the manifest —
+Everything comes from [Homebrew](https://brew.sh). The manifest lives in the
+`homebrew` package at `homebrew/.config/homebrew/Brewfile` —
 41 formulae, 49 casks, 6 taps, including `stow` itself.
 
 ```bash
-brew bundle --file=~/dotfiles/Brewfile
+brew bundle --file=~/dotfiles/homebrew/.config/homebrew/Brewfile
 ```
 
 At minimum, `dot install` itself needs:
@@ -33,6 +34,13 @@ brew install stow git zsh neovim
 ```
 
 (all four are also in the Brewfile, so a `brew bundle` run covers this too).
+
+Once the `homebrew` package is stowed, `~/.config/homebrew/Brewfile` is the
+path `brew bundle --global` resolves to, so `brew bundle`, `brew bundle check`
+and `brew bundle dump --global --force` all work from any directory with no
+`--file`. The package also carries `trust.json`, Homebrew's record of which
+non-official taps you have approved — without it a new machine refuses every
+tapped formula with an `attempted to use a Downloadable without a URL!` error.
 
 ### Linux
 

@@ -20,7 +20,13 @@ return {
     { '<leader>/', function() Snacks.picker.lines() end, desc = '[/] Fuzzily search in current buffer' },
 
     { '<leader>sg', function() Snacks.picker.grep { cwd = project_root() } end, desc = '[S]earch by [G]rep' },
-    { '<leader>sw', function() Snacks.picker.grep_word { cwd = project_root() } end, desc = '[S]earch current [W]ord' },
+    { '<leader>sw', function()
+      if vim.fn.expand('<cword>') == '' then
+        Snacks.picker.grep { cwd = project_root() }
+      else
+        Snacks.picker.grep_word { cwd = project_root() }
+      end
+    end, desc = '[S]earch current [W]ord' },
     { '<leader>s/', function() Snacks.picker.grep_buffers() end, desc = '[S]earch [/] in Open Files' },
 
     { '<leader>sd', function() Snacks.picker.diagnostics() end, desc = '[S]earch [D]iagnostics' },

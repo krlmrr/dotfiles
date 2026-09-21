@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# omarchy theme set resets the background to one of the new theme's own
+# backgrounds, so a wallpaper that is not part of a theme cannot survive a
+# theme switch without being reapplied here.
+
+wallpaper="${DOTFILES:-$HOME/dotfiles}/wallpapers/lambo.jpg"
+
+[ -f "$wallpaper" ] || exit 0
+omarchy-theme-bg-set "$wallpaper" >/dev/null 2>&1 || true

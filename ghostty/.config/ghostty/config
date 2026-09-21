@@ -1,6 +1,9 @@
 title = "  "
 macos-titlebar-proxy-icon = hidden
 macos-option-as-alt = true
+window-theme = ghostty
+gtk-toolbar-style = flat
+async-backend = epoll
 
 theme = dark:One Half Dark,light:One Half Light
 palette = 6=#7aa2f7

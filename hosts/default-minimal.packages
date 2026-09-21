@@ -1,6 +1,4 @@
-# Fallback for a server or NAS: shell, git and an editor, nothing else.
 git
 zsh
 nvim-custom
-local
 bin

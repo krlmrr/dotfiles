@@ -1,5 +1,3 @@
-# Packages stowed on this machine. One per line; # comments allowed.
-# vscode is handled separately by bootstrap — it needs a different target.
 git
 zsh
 jj
@@ -14,5 +12,4 @@ hammerspoon
 sketchybar
 yabai
 yazi
-local
 bin

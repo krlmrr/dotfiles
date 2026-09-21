@@ -1,9 +1,3 @@
-# Machine-local files: the ~/.zshrc shim and generated git/jj identities.
-# Stowed like any package, never committed. `local/*` rather than `local/` —
-# git cannot re-include a file whose parent directory is excluded.
-local/*
-!local/.gitkeep
-
 # lazygit writes runtime state next to its config
 lazygit/.config/lazygit/state.yml
 

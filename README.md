@@ -81,8 +81,8 @@ pre-creates the matching directories under the target (`create_target_dirs`).
 Without this, stow would link a missing target directory as a single symlink
 back to the package directory instead of descending into it — which means
 anything an app later writes under that path (Hammerspoon's `Spoons/`, herdr's
-sockets and logs, Claude's `projects/`/`todos/`, `local/`'s generated files)
-would land inside the git repo instead of in a real directory. The directory
+sockets and logs, Claude's `projects/`/`todos/`) would land inside the git
+repo instead of in a real directory. The directory
 set is derived from each package's contents at bootstrap time, not from a
 hardcoded list, so it can't go stale when a package gains a new subdirectory.
 
@@ -103,11 +103,20 @@ its own) gets `default-minimal.packages`.
 
 ## Machine-local files
 
-`local/` is gitignored and holds the files that must never be committed: the
-`~/.zshrc` shim and the generated git and jj identities. It is stowed like any
-other package. Tools that append to `~/.zshrc` — Herd writes
-`HERD_PHP_*_INI_SCAN_DIR` on every PHP version change — follow the symlink into
-untracked space instead of into tracked source.
+Three files are generated per machine and must never be committed, so they are
+not a stow package at all — `bootstrap` writes them straight to their real
+paths and nothing links back into this repo:
+
+| Path | What |
+|------|------|
+| `~/.zshrc` | shim that sources `~/.config/zsh/zshrc` |
+| `~/.config/git/identity` | `[user]` name/email, included by `.gitconfig` |
+| `~/.config/jj/conf.d/00-identity.toml` | the same identity for jj |
+
+The `~/.zshrc` shim exists because tools append to that path — Herd rewrites
+`HERD_PHP_*_INI_SCAN_DIR` on every PHP version change. Keeping it a real,
+untracked file means those writes never reach tracked source. `bootstrap`
+creates it only when it is absent, so appended lines survive a re-run.
 
 ## Neovim
 
@@ -120,12 +129,11 @@ NVIM_APPNAME=nvim-lazyvim nvim    # the other one
 
 Separate plugin state, separate `lazy-lock.json`. They share no Lua.
 
-## The `bin` and `local` packages
+## The `bin` package
 
 `bin/.local/bin/dot` is the `dot` CLI (`dot status`, `dot pull`, `dot push`) —
 stowed like any other package, so it lands on `$PATH` at `~/.local/bin/dot`
-once `~/.local/bin` is on it. `local/` (see above) is the gitignored package
-for machine-local, never-committed files.
+once `~/.local/bin` is on it.
 
 ## Adding a package
 

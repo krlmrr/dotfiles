@@ -1,0 +1,32 @@
+title = "  "
+macos-titlebar-proxy-icon = hidden
+macos-option-as-alt = true
+window-theme = ghostty
+gtk-toolbar-style = flat
+async-backend = epoll
+
+theme = dark:One Half Dark,light:One Half Light
+palette = 6=#7aa2f7
+palette = 14=#7aa2f7
+split-divider-color = #2C313A
+
+font-size = 18
+font-family = MonoLisa
+font-family = JetBrainsMono Nerd Font
+font-style = Medium
+font-style-italic = Medium Italic
+font-style-bold = Medium
+font-style-bold-italic = Medium Italic
+
+window-padding-x = 14
+window-padding-y = 14
+window-padding-balance = true
+window-save-state = always
+background-opacity = 1.0
+resize-overlay = never
+
+cursor-style = block
+cursor-style-blink = false
+
+confirm-close-surface = false
+shell-integration-features = sudo,no-cursor,ssh-env

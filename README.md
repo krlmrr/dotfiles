@@ -154,8 +154,15 @@ safeguard rather than a problem to work around.
 
 ## Ghostty
 
-One shared `ghostty/.config/ghostty/config.ghostty` serves both machines —
-Ghostty renamed `config` to `config.ghostty` in 1.2.3. It leans on
+Two packages, one per platform, both providing
+`~/.config/ghostty/config.ghostty` — Ghostty renamed `config` to
+`config.ghostty` in 1.2.3. They target the same path, so exactly one is in
+any host list: `ghostty` on Linux, `ghostty-mac` here. The Mac copy is the
+smaller of the two; the Linux one additionally carries the omarchy theme
+include, the keybinds and `font-size = 10` against the Mac's 18.
+
+The shared parts are duplicated between them and kept in step by hand.
+That is the price of not having an override file. It leans on
 three Ghostty behaviours rather than splitting per OS:
 
 - `super` is an alias for `cmd`, so one keybind line works on both.

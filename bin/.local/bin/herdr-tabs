@@ -58,10 +58,10 @@ create_tab_pane() {
         | jq -r '.result.root_pane.pane_id'
 }
 
-herdr tab rename "$tab_id" claude >/dev/null
-herdr pane run "$(create_tab_pane nvim)" "nvim ." >/dev/null
-create_tab_pane terminal >/dev/null
-herdr pane run "$(create_tab_pane git)" lazygit >/dev/null
+herdr tab rename "$tab_id" Claude >/dev/null
+herdr pane run "$(create_tab_pane Neovim)" "nvim ." >/dev/null
+create_tab_pane Terminal >/dev/null
+herdr pane run "$(create_tab_pane LazyGit)" lazygit >/dev/null
 herdr tab focus "$tab_id" >/dev/null
 
 if ! herdr agent start "$agent_name" --kind claude --pane "$pane_id" >/dev/null 2>&1; then
@@ -69,4 +69,4 @@ if ! herdr agent start "$agent_name" --kind claude --pane "$pane_id" >/dev/null 
     exit 0
 fi
 
-notify "$label: claude, nvim, terminal, git"
+notify "$label: Claude, Neovim, Terminal, LazyGit"

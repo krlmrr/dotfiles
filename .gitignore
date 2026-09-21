@@ -1,4 +1,2 @@
 # lazygit writes runtime state next to its config
 lazygit/.config/lazygit/state.yml
-
-.DS_Store

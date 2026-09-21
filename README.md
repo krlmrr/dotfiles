@@ -172,9 +172,10 @@ One include layers on top, optional:
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
 
 
-The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty
-skips a family that is not installed, so the Mac gets MonoLisa and Linux falls
-through to JetBrains without a conditional.
+The font line lists MonoLisa first and JetBrainsMono Nerd Font second.
+MonoLisa is installed on both machines, so both use it; JetBrains is the
+fallback for a machine that lacks it, since Ghostty skips a family that is
+not installed.
 
 ## The `bin` package
 

@@ -40,7 +40,7 @@ Verified on Omarchy (Arch + Hyprland), host `omarchy`. All of these are in the
 official Arch repos:
 
 ```bash
-sudo pacman -S --needed stow git zsh neovim ghostty btop starship \
+sudo pacman -S --needed stow git zsh neovim ghostty btop \
                         lazygit yazi fzf ripdrag python
 ```
 

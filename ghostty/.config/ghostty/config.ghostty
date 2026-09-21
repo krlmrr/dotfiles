@@ -49,4 +49,3 @@ keybind = super+control+shift+alt+arrow_left=resize_split:left,100
 keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
-config-file = ?"~/.config/ghostty/mac.ghostty"

@@ -7,10 +7,10 @@ One repo, three machines: a MacBook Pro, a personal PC, and a TrueNAS box.
 
 ```bash
 git clone https://github.com/krlmrr/dotfiles.git ~/dotfiles
-cd ~/dotfiles && ./bootstrap
+cd ~/dotfiles && ./bin/.local/bin/dot install
 ```
 
-`bootstrap` is the whole install. On a fresh Mac, install the Brewfile first
+`dot install` is the whole install. On a fresh Mac, install the Brewfile first
 (see Prerequisites), then run it.
 
 ## Prerequisites
@@ -26,7 +26,7 @@ Everything comes from [Homebrew](https://brew.sh). `Brewfile` is the manifest �
 brew bundle --file=~/dotfiles/Brewfile
 ```
 
-At minimum, `bootstrap` itself needs:
+At minimum, `dot install` itself needs:
 
 ```bash
 brew install stow git zsh neovim
@@ -86,16 +86,16 @@ stow -n -v git    # dry run, showing what would happen
 ```
 
 Every package targets `$HOME` except `vscode`, which is macOS-only and targets
-`~/Library/Application Support`. `bootstrap` handles that separately.
+`~/Library/Application Support`. `dot install` handles that separately.
 
-Before stowing, `bootstrap` walks every package's own directory tree and
+Before stowing, `dot install` walks every package's own directory tree and
 pre-creates the matching directories under the target (`create_target_dirs`).
 Without this, stow would link a missing target directory as a single symlink
 back to the package directory instead of descending into it — which means
 anything an app later writes under that path (Hammerspoon's `Spoons/`, herdr's
 sockets and logs, Claude's `projects/`/`todos/`) would land inside the git
 repo instead of in a real directory. The directory
-set is derived from each package's contents at bootstrap time, not from a
+set is derived from each package's contents at install time, not from a
 hardcoded list, so it can't go stale when a package gains a new subdirectory.
 
 **Editing a linked file edits tracked source directly.** There is no copy step
@@ -116,7 +116,7 @@ its own) gets `default-minimal.packages`.
 ## Machine-local files
 
 These are generated per machine and must never be committed, so they are not a
-stow package at all — `bootstrap` writes them straight to their real paths and
+stow package at all — `dot install` writes them straight to their real paths and
 nothing links back into this repo:
 
 | Path | What |
@@ -182,7 +182,7 @@ cd ~/dotfiles
 mkdir -p foo/.config/foo
 mv ~/.config/foo/config.toml foo/.config/foo/   # move the real file in
 stow foo                                        # link it back
-echo foo >> hosts/$(hostname -s).packages       # so bootstrap picks it up on every machine
+echo foo >> hosts/$(hostname -s).packages       # so dot install picks it up on every machine
 ```
 
 The `hosts` line is the one that gets forgotten. Without it the package works
@@ -195,7 +195,7 @@ One habit worth keeping:
 
 Links are per-file, not per-directory. Editing a linked file is live — it is
 the same file on disk. But *adding* a new file to a package needs `stow -R foo`
-(or `./bootstrap`) before it appears in `$HOME`.
+(or `dot install`) before it appears in `$HOME`.
 
 ## Fonts and wallpapers
 
@@ -217,7 +217,7 @@ verbatim. A stow-relative target that is correct inside
 `~/.local/state/omarchy/current/next-theme/`, so `colors.toml` reads as missing
 and `omarchy-theme-set-templates` silently generates nothing — losing
 `btop.theme`, `ghostty.conf`, `hyprland.lua` and 16 others, with exit status 0.
-Absolute links avoid that but make stow disown the files. So `bootstrap` copies
+Absolute links avoid that but make stow disown the files. So `dot install` copies
 the themes in and Omarchy owns the directory.
 
 ## Commands
@@ -227,6 +227,6 @@ dot status        # repo status plus this host's package list
 dot pull           # pull, then restow
 dot push [msg]     # stage tracked changes, commit, push
 
-./bootstrap                            # re-run linking; idempotent
+dot install                            # re-run linking; idempotent
 stow -D <package>...                  # undo links for those packages
 ```

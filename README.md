@@ -131,7 +131,7 @@ nothing links back into this repo:
 |------|------|
 | `~/.config/git/identity` | `[user]` name/email, included by `.gitconfig` |
 | `~/.config/jj/conf.d/00-identity.toml` | the same identity for jj |
-| `~/.config/ghostty/local.conf` | optional per-machine Ghostty overrides; never created automatically |
+| `~/.config/ghostty/local.ghostty` | optional per-machine Ghostty overrides; never created automatically |
 
 `~/.zshrc` is stowed from `zsh/.zshrc` like any other file. Tools append to
 that path — Herd rewrites `HERD_PHP_*_INI_SCAN_DIR` on every PHP version
@@ -155,7 +155,8 @@ safeguard rather than a problem to work around.
 
 ## Ghostty
 
-One shared `ghostty/.config/ghostty/config` serves both machines. It leans on
+One shared `ghostty/.config/ghostty/config.ghostty` serves both machines —
+Ghostty renamed `config` to `config.ghostty` in 1.2.3. It leans on
 three Ghostty behaviours rather than splitting per OS:
 
 - `super` is an alias for `cmd`, so one keybind line works on both.
@@ -170,7 +171,7 @@ Two includes layer on top, both optional:
 | Include | Provided by | Holds |
 |---------|-------------|-------|
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
-| `~/.config/ghostty/local.conf` | the `omarchy` package on that host; untracked elsewhere | per-machine overrides — on omarchy, `font-size` and `adjust-cell-height` for a 1× 1440p panel against the Mac's 2× Retina |
+| `~/.config/ghostty/local.ghostty` | the `omarchy` package on that host; untracked elsewhere | per-machine overrides — on omarchy, `font-size` and `adjust-cell-height` for a 1× 1440p panel against the Mac's 2× Retina |
 
 The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty
 skips a family that is not installed, so the Mac gets MonoLisa and Linux falls

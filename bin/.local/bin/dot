@@ -135,7 +135,9 @@ if [ "$(uname)" = "Darwin" ]; then
              --target="$HOME/Library/Application Support" "$pkg"
         echo "Stowed: $pkg (Library target)"
     done
-    if [ -d /Applications/Hammerspoon.app ]; then
+    # Only when it is not already running: `open -a` on a running Hammerspoon
+    # activates it, and activating it raises the console window.
+    if [ -d /Applications/Hammerspoon.app ] && ! pgrep -xq Hammerspoon; then
         open -a Hammerspoon
     fi
 fi

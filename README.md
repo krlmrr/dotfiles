@@ -210,15 +210,23 @@ per-seat font and is deliberately **not** in this repo; install it by hand.
 `wallpapers/` is plain assets at the repo root, not a stow package — nothing
 reads them from a fixed path.
 
-`omarchy-themes/` is at the root for a different reason: it must not be stowed.
-`omarchy theme set` stages the chosen theme with `cp -r`, which copies a symlink
-verbatim. A stow-relative target that is correct inside
-`~/.config/omarchy/themes/<theme>/` resolves one level wrong once copied into
-`~/.local/state/omarchy/current/next-theme/`, so `colors.toml` reads as missing
-and `omarchy-theme-set-templates` silently generates nothing — losing
-`btop.theme`, `ghostty.conf`, `hyprland.lua` and 16 others, with exit status 0.
-Absolute links avoid that but make stow disown the files. So `dot install` copies
-the themes in and Omarchy owns the directory.
+`omarchy-themes/` and `wallpapers/` are at the root but still reach `$HOME` —
+as whole-directory symlinks that `dot install` creates, not stow packages:
+
+```
+~/.config/omarchy/themes  -> ~/dotfiles/omarchy-themes   (Linux only)
+~/Pictures/Wallpapers     -> ~/dotfiles/wallpapers
+```
+
+Stow is wrong for these because it descends and links each file individually.
+`omarchy theme set` stages a theme with `cp -r`, which copies a per-file symlink
+verbatim — a stow-relative target correct in `~/.config/omarchy/themes/<t>/`
+resolves one level wrong once copied into `current/next-theme/`, so
+`colors.toml` reads as missing and `omarchy-theme-set-templates` silently emits
+nothing while exiting 0, losing `btop.theme`, `ghostty.conf`, `hyprland.lua` and
+16 others. Linking the directory keeps the files inside real, so `cp -r` copies
+content. A theme added later by `omarchy theme install` also lands in the repo
+rather than outside it.
 
 ## Commands
 

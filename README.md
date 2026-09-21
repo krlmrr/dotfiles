@@ -210,6 +210,16 @@ per-seat font and is deliberately **not** in this repo; install it by hand.
 `wallpapers/` is plain assets at the repo root, not a stow package — nothing
 reads them from a fixed path.
 
+`omarchy-themes/` is at the root for a different reason: it must not be stowed.
+`omarchy theme set` stages the chosen theme with `cp -r`, which copies a symlink
+verbatim. A stow-relative target that is correct inside
+`~/.config/omarchy/themes/<theme>/` resolves one level wrong once copied into
+`~/.local/state/omarchy/current/next-theme/`, so `colors.toml` reads as missing
+and `omarchy-theme-set-templates` silently generates nothing — losing
+`btop.theme`, `ghostty.conf`, `hyprland.lua` and 16 others, with exit status 0.
+Absolute links avoid that but make stow disown the files. So `bootstrap` copies
+the themes in and Omarchy owns the directory.
+
 ## Commands
 
 ```bash

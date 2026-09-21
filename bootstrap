@@ -85,6 +85,20 @@ source "$HOME/.config/zsh/zshrc"
 EOF
 fi
 
+# --- Omarchy custom themes --------------------------------------------------
+# Copied, not stowed. `omarchy theme set` stages a theme with `cp -r`, which
+# copies a symlink verbatim; a stow-relative target valid in
+# ~/.config/omarchy/themes/<t>/ resolves one level wrong once copied into
+# current/next-theme/, so colors.toml goes missing and the template generator
+# silently emits nothing — no btop.theme, ghostty.conf or hyprland.lua. Making
+# the links absolute instead makes stow disown them. So Omarchy owns this
+# directory and the repo keeps the source at omarchy-themes/, like wallpapers/.
+if [ "$(uname)" = "Linux" ] && [ -d omarchy-themes ]; then
+    mkdir -p "$HOME/.config/omarchy/themes"
+    cp -RL omarchy-themes/. "$HOME/.config/omarchy/themes/"
+    echo "Copied Omarchy themes: $(ls omarchy-themes | tr '\n' ' ')"
+fi
+
 # --- Omarchy theme links ----------------------------------------------------
 # btop and Neovim read their colours from a symlink into Omarchy's generated
 # theme state, recreated by `omarchy theme set` on every switch. They are state,

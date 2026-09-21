@@ -76,6 +76,12 @@ printf '%s\n' "$HERDR_WORKSPACE_ID" "$HERDR_TAB_ID" "$HERDR_PANE_ID"
 
 Prefer `--current` when a pane command should target the calling pane. An omitted `pane split` target uses the calling pane when `HERDR_PANE_ID` is available, otherwise the focused pane. Other commands may use the UI-focused pane, which can belong to the user or another client.
 
+This fallback order bites when a script is meant to act on whatever the user is looking at. `herdr pane current` with no flag resolves the inherited `HERDR_PANE_ID` first, so run from inside a pane it reports that pane even when a different workspace is focused; `workspace list` will show `focused=true` somewhere else entirely. A detached `[[keys.command]]` with `type = "shell"` inherits no caller context and therefore does resolve the focused pane, which is usually what such a binding wants. To reproduce that resolution while testing from inside a pane, clear the context explicitly:
+
+```bash
+env -u HERDR_PANE_ID -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID herdr pane current
+```
+
 Discover live state with:
 
 ```bash

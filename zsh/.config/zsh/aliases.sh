@@ -103,7 +103,7 @@ gsync() {
 }
 
 # Herd
-export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"
+[ -d "$HOME/Library/Application Support/Herd/bin" ] && export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"
 
 alias a="php artisan"
 

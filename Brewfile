@@ -37,6 +37,7 @@ brew "stow"
 brew "stylua"
 brew "transmission-cli"
 brew "tree-sitter-cli"
+brew "yazi"
 brew "zig"
 
 brew "FelixKratz/formulae/sketchybar"

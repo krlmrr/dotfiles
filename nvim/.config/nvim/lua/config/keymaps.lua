@@ -39,6 +39,23 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
 -- Buffers and windows
 vim.keymap.set("n", "<leader>x", "<cmd>bd!<cr>", { desc = "Close buffer (force)" })
+vim.keymap.set("n", "<C-w>", function()
+  if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end
+  local target = vim.api.nvim_get_current_buf()
+  if vim.bo[target].modified then
+    vim.notify("Unsaved changes — <leader>x to force", vim.log.levels.WARN)
+    return
+  end
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(win) == target then
+      vim.api.nvim_win_call(win, function()
+        pcall(vim.cmd, 'bprevious')
+        if vim.api.nvim_win_get_buf(win) == target then vim.cmd('enew') end
+      end)
+    end
+  end
+  pcall(vim.api.nvim_buf_delete, target, {})
+end, { desc = "Close buffer, keep layout" })
 vim.keymap.set("n", "<leader>w", function()
   if vim.fn.getcmdwintype() ~= "" then return end
   if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end

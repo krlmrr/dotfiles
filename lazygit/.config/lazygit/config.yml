@@ -1,3 +1,5 @@
+disableStartupPopups: true
+
 gui:
     theme:
         selectedLineBgColor:

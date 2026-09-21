@@ -8,6 +8,7 @@ light_name = "one-light"
 
 [ui]
 hide_tab_bar_when_single_tab = true
+pane_borders = "always"
 
 [ui.toast]
 delivery = "system"

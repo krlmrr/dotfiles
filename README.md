@@ -154,6 +154,19 @@ Links are per-file, not per-directory. Editing a linked file is live — it is
 the same file on disk. But *adding* a new file to a package needs `stow -R foo`
 (or `./bootstrap`) before it appears in `$HOME`.
 
+## Fonts and wallpapers
+
+`sketchybar-app-font` ships inside the `sketchybar` package, because that is the
+only thing that uses it and sketchybar is macOS-only. macOS activates it through
+the symlink — no copy step needed.
+
+FiraCode and FiraMono come from Homebrew casks rather than being vendored here,
+so they stay updated and do not put ~96MB of binaries in git. MonoLisa is a paid
+per-seat font and is deliberately **not** in this repo; install it by hand.
+
+`wallpapers/` is plain assets at the repo root, not a stow package — nothing
+reads them from a fixed path.
+
 ## Commands
 
 ```bash

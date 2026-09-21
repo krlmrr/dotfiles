@@ -68,6 +68,8 @@ cask "deskpad"
 cask "discord"
 cask "fantastical"
 cask "figma"
+cask "font-fira-code"
+cask "font-fira-mono"
 cask "font-sf-pro" # SF Symbols glyphs for sketchybar (Apple logo, battery, volume)
 cask "forklift"
 cask "ghostty"

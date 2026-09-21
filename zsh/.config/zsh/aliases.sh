@@ -1,6 +1,7 @@
 # Editor
 unalias nv 2>/dev/null
-nv() { clear && nvim "${1:-.}"; }
+nvim() { if [ $# -eq 0 ]; then command nvim .; else command nvim "$@"; fi; }
+nv() { clear && nvim "$@"; }
 alias nz="nv ~/.zshrc"
 alias vim="nvim"
 alias sourcez="source ~/.zshrc"

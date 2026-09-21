@@ -55,4 +55,3 @@
 -- tag, which covers every window rather than one app at a time.
 o.window({ tag = "default-opacity" }, { opacity = "1 1" })
 
-o.window({ class = "^(it\\.catboy\\.ripdrag)$" }, { float = true, pin = true, center = true })

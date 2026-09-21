@@ -1,29 +1,26 @@
 title = "  "
 window-theme = ghostty
-window-padding-x = 14
-window-padding-y = 14
-window-padding-balance = true
-window-save-state = always
-background-opacity = 1.0
-resize-overlay = never
-
-macos-titlebar-proxy-icon = hidden
-macos-option-as-alt = true
 gtk-toolbar-style = flat
 async-backend = epoll
 
 theme = dark:One Half Dark,light:One Half Light
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
-split-divider-color = #2C313A
 
+font-size = 10
 font-family = MonoLisa
 font-family = JetBrainsMono Nerd Font
 font-style = Medium
 font-style-italic = Medium Italic
 font-style-bold = Medium
 font-style-bold-italic = Medium Italic
-font-size = 10
+
+window-padding-x = 14
+window-padding-y = 14
+window-padding-balance = true
+window-save-state = always
+background-opacity = 1.0
+resize-overlay = never
 
 cursor-style = block
 cursor-style-blink = false
@@ -34,20 +31,18 @@ mouse-scroll-multiplier = 0.95
 
 keybind = super+c=copy_to_clipboard
 keybind = super+v=paste_from_clipboard
-keybind = control+insert=copy_to_clipboard
 keybind = shift+insert=paste_from_clipboard
-
+keybind = control+insert=copy_to_clipboard
 keybind = super+shift+h=goto_split:left
 keybind = super+shift+l=goto_split:right
-keybind = super+control+shift+alt+arrow_up=resize_split:up,100
-keybind = super+control+shift+alt+arrow_down=resize_split:down,100
-keybind = super+control+shift+alt+arrow_left=resize_split:left,100
-keybind = super+control+shift+alt+arrow_right=resize_split:right,100
-keybind = ctrl+shift+x=close_surface
-
 keybind = super+t=unbind
+keybind = ctrl+shift+x=close_surface
 keybind = global:super+shift+up=toggle_quick_terminal
 keybind = shift+enter=csi:13;2u
 keybind = alt+shift+enter=csi:13;4u
+keybind = super+control+shift+alt+arrow_down=resize_split:down,100
+keybind = super+control+shift+alt+arrow_up=resize_split:up,100
+keybind = super+control+shift+alt+arrow_left=resize_split:left,100
+keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"

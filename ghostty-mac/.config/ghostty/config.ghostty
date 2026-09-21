@@ -15,7 +15,6 @@ async-backend = epoll
 theme = dark:One Half Dark,light:One Half Light
 palette = 6=#7aa2f7
 palette = 14=#7aa2f7
-split-divider-color = #2C313A
 
 font-family = MonoLisa
 font-family = JetBrainsMono Nerd Font

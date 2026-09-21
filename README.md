@@ -165,12 +165,11 @@ three Ghostty behaviours rather than splitting per OS:
 - `config-file` entries prefixed with `?` are skipped when the file is absent,
   and load *after* the config that names them, so they override it.
 
-Three includes layer on top, each optional:
+Two includes layer on top, both optional:
 
 | Include | Provided by | Holds |
 |---------|-------------|-------|
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
-| `~/.config/ghostty/linux.conf` | the `omarchy` package, Linux hosts only | `font-size`, `adjust-cell-height` for that display |
 | `~/.config/ghostty/local.conf` | nothing — untracked, optional | per-machine overrides |
 
 The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty

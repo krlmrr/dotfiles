@@ -44,12 +44,14 @@ local keyDownTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function
     return false
 end)
 
-local function restartAll(reason)
+local function restartAll(reason, quiet)
     controlTap:stop()
     keyDownTap:stop()
     controlTap:start()
     keyDownTap:start()
-    log.i("Restarted: " .. reason)
+    if not quiet then
+        log.i("Restarted: " .. reason)
+    end
 end
 
 restartAll("init")
@@ -67,12 +69,12 @@ end)
 watcher:start()
 
 local usbWatcher = hs.usb.watcher.new(function(data)
-    restartAll("USB change")
+    restartAll("USB change", true)
 end)
 usbWatcher:start()
 
 local spaceWatcher = hs.spaces.watcher.new(function()
-    restartAll("space change")
+    restartAll("space change", true)
 end)
 spaceWatcher:start()
 

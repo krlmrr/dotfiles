@@ -37,24 +37,6 @@ return {
       end)
     end
 
-    -- Also patch vim.fn.confirm for any fallback usage
-    local original_fn_confirm = vim.fn.confirm
-    vim.fn.confirm = function(msg, choices, default, type)
-      if msg:match("Neo%-tree") or msg:match("[Dd]elete") then
-        local title = " Confirm "
-        if msg:match("[Dd]elete") then
-          title = " Delete "
-        end
-        vim.ui.select({ "Yes", "No" }, {
-          prompt = title,
-        }, function(choice)
-          -- This is async, so we can't return directly
-          -- Neo-tree should be using inputs.confirm instead
-        end)
-        return 0
-      end
-      return original_fn_confirm(msg, choices, default, type)
-    end
 
     -- Auto-refresh neo-tree on window focus (libuv watcher handles file changes)
     vim.api.nvim_create_autocmd("FocusGained", {

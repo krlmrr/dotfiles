@@ -56,6 +56,12 @@ or run all of this inside a jail or container rather than on the host.
 
 ## How it works
 
+> Why Stow, if you're re-reading this in a year: the directory structure *is*
+> the config. No install script to maintain, no copy step, no sync step — the
+> file in `$HOME` and the file in the repo are the same file on disk.
+> [TypeCraft's walkthrough](https://www.youtube.com/watch?v=NoFiYOqnC4o) is the
+> short version of the idea.
+
 A **package** is a top-level directory whose contents mirror their path under
 `$HOME`. `git/.gitconfig` becomes `~/.gitconfig`. `zsh/.config/zsh/zshrc`
 becomes `~/.config/zsh/zshrc`.

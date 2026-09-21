@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Files
+GenericName=File Manager
+Comment=Browse files with yazi
+Icon=yazi
+Exec=ghostty -e yazi %f
+TryExec=yazi
+Terminal=false
+NoDisplay=false
+MimeType=inode/directory;
+Categories=System;FileTools;FileManager;
+Keywords=File;Manager;Explorer;Browser;

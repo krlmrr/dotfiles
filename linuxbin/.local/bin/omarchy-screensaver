@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Custom screensaver: OneDark Matrix
+# Replaces the default ttfx screensaver
+
+screensaver_in_focus() {
+  hyprctl activewindow -j | jq -e '.class == "org.omarchy.screensaver"' >/dev/null 2>&1
+}
+
+exit_screensaver() {
+  hyprctl eval 'hl.config({ cursor = { invisible = false } })' &>/dev/null || hyprctl keyword cursor:invisible false &>/dev/null || true
+  pkill -f '[m]atrix_screensaver.py' 2>/dev/null
+  pkill -f '[o]rg.omarchy.screensaver' 2>/dev/null
+  exit 0
+}
+
+trap exit_screensaver SIGINT SIGTERM SIGHUP SIGQUIT
+
+printf '\033]11;rgb:28/2c/34\007'  # OneDark background
+
+hyprctl eval 'hl.config({ cursor = { invisible = true } })' &>/dev/null || hyprctl keyword cursor:invisible true &>/dev/null
+
+# The launcher spawns a screensaver window on every monitor and returns focus
+# once all are up. Enforce focus only after it exits; a mid-launch check would
+# tear every window down.
+while pgrep -f '[o]marchy-launch-screensaver' >/dev/null 2>&1; do
+  sleep 0.2
+done
+
+# Background watcher: dismiss once the screensaver loses focus.
+(
+  while kill -0 $$ 2>/dev/null; do
+    if ! screensaver_in_focus; then
+      exit_screensaver
+    fi
+    sleep 0.2
+  done
+) &
+
+# Run the matrix in the foreground so the tty delivers keypresses to it.
+# Any key makes the python exit, then we tear everything down.
+python3 "$(dirname "$(readlink -f "$0")")/matrix_screensaver.py"
+
+exit_screensaver

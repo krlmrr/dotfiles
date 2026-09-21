@@ -10,6 +10,8 @@ plugins=(
     zsh-syntax-highlighting
 )
 
+fpath=("$HOME/.local/share/zsh/site-functions" $fpath)
+
 source $ZSH/oh-my-zsh.sh
 
 setopt HIST_IGNORE_SPACE
@@ -23,7 +25,17 @@ export XDG_CONFIG_HOME="$HOME/.config"
 
 export SUDO_ASKPASS="$DOTFILES/scripts/askpass.sh"
 
+[ -d "$HOME/.lmstudio/bin" ] && export PATH="$PATH:$HOME/.lmstudio/bin"
+
 source <(fzf --zsh)
+
+y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
 
 source "$XDG_CONFIG_HOME/zsh/aliases.sh"
 

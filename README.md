@@ -36,11 +36,23 @@ brew install stow git zsh neovim
 
 ### Linux
 
-Not yet filled in — this needs a human at the actual Linux machine to work out
-which packages it needs. The minimum is `stow git zsh neovim`; do **not**
-derive the rest by translating the Brewfile — a macOS cask list doesn't map
-onto Linux packages, and guessing here has caused problems before. Fill this
-section in when the PC is set up.
+Verified on Omarchy (Arch + Hyprland), host `omarchy`. All of these are in the
+official Arch repos:
+
+```bash
+sudo pacman -S --needed stow git zsh neovim ghostty foot btop starship tmux \
+                        lazygit yazi fzf ripdrag python
+```
+
+Three things are not pacman packages and install themselves:
+
+- `herdr` — install separately; `hosts/omarchy.packages` stows its config either way.
+- oh-my-zsh, into `~/.oh-my-zsh`.
+- `zsh-autosuggestions` and `zsh-syntax-highlighting`, into `~/.oh-my-zsh/custom/plugins`.
+
+Hyprland, the bar and the theme machinery come from Omarchy itself. The `hypr`,
+`omarchy`, `ghostty-linux` and `linuxbin` packages configure those and assume an
+Omarchy install, so they appear only in `hosts/omarchy.packages`.
 
 ### TrueNAS
 
@@ -95,8 +107,8 @@ you commit them.
 
 `hosts/<hostname>.packages`, one package name per line. That file is the only
 place machine-specific knowledge lives. This repo currently ships
-`hosts/16-MacBook-Pro.packages`, `hosts/default-linux.packages`, and
-`hosts/default-minimal.packages`. A machine with no file of its own falls back
+`hosts/16-MacBook-Pro.packages`, `hosts/omarchy.packages`,
+`hosts/default-linux.packages`, and `hosts/default-minimal.packages`. A machine with no file of its own falls back
 to one of the two defaults depending on `uname`: Linux gets
 `default-linux.packages`, anything else (including a Mac with no host file of
 its own) gets `default-minimal.packages`.
@@ -112,6 +124,7 @@ paths and nothing links back into this repo:
 | `~/.zshrc` | shim that sources `~/.config/zsh/zshrc` |
 | `~/.config/git/identity` | `[user]` name/email, included by `.gitconfig` |
 | `~/.config/jj/conf.d/00-identity.toml` | the same identity for jj |
+| `~/.config/ghostty/local.conf` | optional per-machine Ghostty overrides; never created automatically |
 
 The `~/.zshrc` shim exists because tools append to that path — Herd rewrites
 `HERD_PHP_*_INI_SCAN_DIR` on every PHP version change. Keeping it a real,
@@ -120,8 +133,39 @@ creates it only when it is absent, so appended lines survive a re-run.
 
 ## Neovim
 
-One package, `nvim/.config/nvim`, stowed to `~/.config/nvim` — the path
-Neovim reads by default, so no `$NVIM_APPNAME` is involved.
+Two packages target the same path, `~/.config/nvim` — the path Neovim reads by
+default, so no `$NVIM_APPNAME` is involved. Exactly one is ever stowed, chosen
+by the host's package list:
+
+| Package | Host | What it is |
+|---------|------|------------|
+| `nvim`    | macOS | the hand-rolled config, `lua/custom/plugins`, blade/PHP tooling |
+| `lazyvim` | `omarchy` | LazyVim underneath, with the Omarchy theme hot-reload plugin |
+
+Listing both on one machine is a stow conflict, which is the intended
+safeguard rather than a problem to work around.
+
+## Ghostty
+
+One shared `ghostty/.config/ghostty/config` serves both machines. It leans on
+three Ghostty behaviours rather than splitting per OS:
+
+- `super` is an alias for `cmd`, so one keybind line works on both.
+- `macos-*` keys are accepted and ignored on Linux.
+- `config-file` entries prefixed with `?` are skipped when the file is absent,
+  and load *after* the config that names them, so they override it.
+
+Three includes layer on top, each optional:
+
+| Include | Provided by | Holds |
+|---------|-------------|-------|
+| `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
+| `~/.config/ghostty/linux.conf` | the `ghostty-linux` package | `async-backend`, GTK keys, Linux font size |
+| `~/.config/ghostty/local.conf` | nothing — untracked, optional | per-machine overrides |
+
+The font line lists MonoLisa first and JetBrainsMono Nerd Font second. Ghostty
+skips a family that is not installed, so the Mac gets MonoLisa and Linux falls
+through to JetBrains without a conditional.
 
 ## The `bin` package
 
@@ -144,11 +188,8 @@ echo foo >> hosts/$(hostname -s).packages       # so bootstrap picks it up on ev
 The `hosts` line is the one that gets forgotten. Without it the package works
 here but a fresh clone will not stow it.
 
-Two habits worth keeping:
+One habit worth keeping:
 
-- **Add a line to `testing/expected-links.txt`.** Format is
-  `<package> <path-under-$HOME> <path-in-repo>`. It costs one line and it is
-  what proves a migration worked instead of eyeballing `ls -la`.
 - **`stow -n -v foo` before `stow foo`** when unsure. It prints exactly what
   would happen without touching anything.
 
@@ -177,6 +218,5 @@ dot pull           # pull, then restow
 dot push [msg]     # stage tracked changes, commit, push
 
 ./bootstrap                            # re-run linking; idempotent
-./testing/stow-test.sh <package>...    # verify links in a throwaway HOME
 stow -D <package>...                  # undo links for those packages
 ```

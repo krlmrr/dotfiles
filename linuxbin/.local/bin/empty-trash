@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+TRASH="${XDG_DATA_HOME:-$HOME/.local/share}/Trash"
+
+count=$(find "$TRASH/files" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l)
+
+if [ "$count" -eq 0 ]; then
+  gum style --padding "1 2" --border rounded "Trash is already empty."
+  read -rsn1 -p "Press any key to close..."
+  exit 0
+fi
+
+size=$(du -sh "$TRASH" 2>/dev/null | cut -f1)
+
+gum style --padding "1 2" --border rounded --border-foreground 4 \
+  "Trash: $count item(s), $size"
+
+echo "Largest items:"
+du -sh "$TRASH/files"/* 2>/dev/null | sort -rh | head -8 | sed 's/^/  /'
+echo
+
+if gum confirm "Permanently delete everything in the trash?"; then
+  gio trash --empty
+  gum style --padding "1 2" --border rounded --border-foreground 2 "Trash emptied — $size freed."
+else
+  gum style --padding "1 2" --border rounded "Cancelled. Nothing deleted."
+fi
+
+read -rsn1 -p "Press any key to close..."

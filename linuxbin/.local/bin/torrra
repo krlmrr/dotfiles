@@ -1,0 +1,166 @@
+#!/usr/bin/python
+
+import os
+import re
+import sys
+import tomllib
+from pathlib import Path
+
+def colors_path():
+    override = os.environ.get("TORRRA_THEME_COLORS")
+    if override:
+        return Path(override)
+    candidates = (
+        Path.home() / ".local/state/omarchy/current/theme/colors.toml",
+        Path.home() / ".config/torrra/colors.toml",
+    )
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return candidates[0]
+
+CAUGHT = (OSError, KeyError, ValueError, TypeError, AttributeError, ImportError,
+          tomllib.TOMLDecodeError)
+
+
+def _hex(palette, key, fallback):
+    value = palette.get(key)
+    if isinstance(value, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        return value
+    return fallback
+
+
+def retint():
+    from textual.theme import BUILTIN_THEMES, Theme
+
+    from torrra.core.config import CONFIG_FILE
+
+    palette = tomllib.loads(colors_path().read_text())
+    name = tomllib.loads(Path(CONFIG_FILE).read_text())["general"]["theme"]
+
+    base = BUILTIN_THEMES.get(name)
+    if base is None:
+        return
+
+    BUILTIN_THEMES[name] = Theme(
+        name=name,
+        dark=palette.get("mode", "dark") != "light",
+        background=_hex(palette, "background", base.background),
+        foreground=_hex(palette, "foreground", base.foreground),
+        primary=_hex(palette, "accent", base.primary),
+        secondary=_hex(palette, "accent", base.secondary),
+        accent=_hex(palette, "cyan", base.accent),
+        surface=_hex(palette, "lighter_background", base.surface),
+        panel=_hex(palette, "muted", base.panel),
+        error=_hex(palette, "red", base.error),
+        warning=_hex(palette, "yellow", base.warning),
+        success=_hex(palette, "green", base.success),
+    )
+
+
+def add_pane_switching():
+    from textual.binding import Binding
+    from textual.css.query import NoMatches
+    from textual.widgets import ContentSwitcher
+
+    from torrra.app import TorrraApp
+    from torrra.widgets.data_table import AutoResizingDataTable
+    from torrra.widgets.sidebar import Sidebar
+
+    def action_focus_sidebar(self):
+        try:
+            self.screen.query_one(Sidebar).focus()
+        except NoMatches:
+            pass
+
+    def action_focus_content(self):
+        try:
+            visible = self.screen.query_one(ContentSwitcher).visible_content
+        except NoMatches:
+            return
+        if visible is None:
+            return
+        tables = visible.query(AutoResizingDataTable)
+        if tables:
+            tables.first().focus()
+
+    TorrraApp.action_focus_sidebar = action_focus_sidebar
+    TorrraApp.action_focus_content = action_focus_content
+    TorrraApp.BINDINGS = [
+        *TorrraApp.BINDINGS,
+        Binding("ctrl+h", "focus_sidebar", "Focus sidebar"),
+        Binding("ctrl+l", "focus_content", "Focus list"),
+    ]
+    TorrraApp._merged_bindings = TorrraApp._merge_bindings()
+
+
+def patch_prowlarr_normalization():
+    from torrra._types import Torrent
+    from torrra.indexers.prowlarr import ProwlarrIndexer
+
+    def magnet_for(r):
+        uri = r.get("magnetUrl") or r.get("downloadUrl")
+        if uri:
+            return uri
+        guid = r.get("guid")
+        if isinstance(guid, str) and guid.startswith("magnet:"):
+            return guid
+        info_hash = r.get("infoHash")
+        if info_hash:
+            return f"magnet:?xt=urn:btih:{info_hash}"
+        return ""
+
+    def _normalize_result(self, r):
+        return Torrent(
+            title=r.get("title") or "unknown",
+            size=r.get("size") or 0,
+            seeders=r.get("seeders") or 0,
+            leechers=r.get("leechers") or 0,
+            source=r.get("indexer") or "unknown",
+            magnet_uri=magnet_for(r),
+        )
+
+    original_search = ProwlarrIndexer.search
+
+    async def search(self, query, use_cache=True):
+        torrents = await original_search(self, query, use_cache)
+        if torrents is None:
+            return None
+        return [t for t in torrents if t.magnet_uri]
+
+    ProwlarrIndexer._normalize_result = _normalize_result
+    ProwlarrIndexer.search = search
+
+
+def add_start_command():
+    import click
+
+    from torrra.__main__ import cli
+    from torrra.core.config import get_config
+    from torrra.utils.indexer import run_with_indexer
+
+    @cli.command(name="start", help="Downloads view with the configured indexer available.")
+    @click.option("--no-cache", is_flag=True, help="Disable caching mechanism.")
+    def start(no_cache):
+        name = get_config().get("indexers.default", "prowlarr")
+        run_with_indexer(
+            name=name,
+            indexer_cls_str=f"torrra.indexers.{name}.{name.capitalize()}Indexer",
+            url=None,
+            api_key=None,
+            no_cache=no_cache,
+            show_downloads=True,
+        )
+
+
+for _patch in (retint, add_pane_switching, patch_prowlarr_normalization, add_start_command):
+    try:
+        _patch()
+    except CAUGHT:
+        pass
+
+from torrra.__main__ import cli
+
+if __name__ == "__main__":
+    sys.argv[0] = re.sub(r"(-script\.pyw|\.exe)?$", "", sys.argv[0])
+    sys.exit(cli())

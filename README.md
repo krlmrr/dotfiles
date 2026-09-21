@@ -209,9 +209,11 @@ the same file on disk. But *adding* a new file to a package needs `stow -R foo`
 
 ## Fonts, wallpapers and themes
 
-`sketchybar-app-font` ships inside the `sketchybar` package, because that is the
-only thing that uses it and sketchybar is macOS-only. macOS activates it through
-the symlink — no copy step needed.
+`sketchybar-app-font` lives in `assets/fonts/` and `dot install` **copies** it
+to `~/Library/Fonts` on macOS. It cannot be stowed: macOS registers fonts
+through CoreText, which ignores a symlink there. `fc-list` follows the symlink
+and reports the font as present, so the failure is silent — the bar renders
+`:mail:` and `:discord:` as literal text instead of glyphs.
 
 FiraCode and FiraMono come from Homebrew casks rather than being vendored here,
 so they stay updated and do not put ~96MB of binaries in git. MonoLisa is a paid

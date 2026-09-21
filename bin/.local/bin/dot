@@ -134,6 +134,20 @@ if [ "$(uname)" = "Darwin" ]; then
              --target="$HOME/Library/Application Support" vscode
         echo "Stowed: vscode (Library target)"
     fi
+    # Copied, not stowed. macOS registers fonts through CoreText, which ignores
+    # a symlink in ~/Library/Fonts — fontconfig follows it, so `fc-list` finds
+    # the font while the bar still renders ":mail:" as literal text.
+    if [ -d assets/fonts ]; then
+        mkdir -p "$HOME/Library/Fonts"
+        for font in assets/fonts/*; do
+            [ -f "$font" ] || continue
+            target="$HOME/Library/Fonts/$(basename "$font")"
+            [ -L "$target" ] && rm "$target"
+            cmp -s "$font" "$target" || cp "$font" "$target"
+        done
+        echo "Copied fonts: $(ls assets/fonts | tr '\n' ' ')"
+    fi
+
     # Only when it is not already running: `open -a` on a running Hammerspoon
     # activates it, and activating it raises the console window.
     if [ -d /Applications/Hammerspoon.app ] && ! pgrep -xq Hammerspoon; then

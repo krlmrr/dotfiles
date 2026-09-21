@@ -37,5 +37,17 @@ y() {
 	rm -f -- "$tmp"
 }
 
+if [ -d "$HOME/Library/Application Support/Herd" ]; then
+    for php_version in 74 83 84 85 86; do
+        export "HERD_PHP_${php_version}_INI_SCAN_DIR=$HOME/Library/Application Support/Herd/config/php/$php_version"
+    done
+
+    export NVM_DIR="$HOME/Library/Application Support/Herd/config/nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+fi
+
+[ -f "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh" ] \
+    && builtin source "/Applications/Herd.app/Contents/Resources/config/shell/zshrc.zsh"
+
 source "$XDG_CONFIG_HOME/zsh/aliases.sh"
 

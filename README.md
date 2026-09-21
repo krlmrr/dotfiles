@@ -75,8 +75,8 @@ or run all of this inside a jail or container rather than on the host.
 > short version of the idea.
 
 A **package** is a top-level directory whose contents mirror their path under
-`$HOME`. `git/.gitconfig` becomes `~/.gitconfig`. `zsh/.config/zsh/zshrc`
-becomes `~/.config/zsh/zshrc`.
+`$HOME`. `git/.gitconfig` becomes `~/.gitconfig`. `zsh/.zshrc` becomes
+`~/.zshrc`.
 
 ```bash
 stow git          # link the git package into $HOME
@@ -115,21 +115,21 @@ its own) gets `default-minimal.packages`.
 
 ## Machine-local files
 
-Three files are generated per machine and must never be committed, so they are
-not a stow package at all — `bootstrap` writes them straight to their real
-paths and nothing links back into this repo:
+These are generated per machine and must never be committed, so they are not a
+stow package at all — `bootstrap` writes them straight to their real paths and
+nothing links back into this repo:
 
 | Path | What |
 |------|------|
-| `~/.zshrc` | shim that sources `~/.config/zsh/zshrc` |
 | `~/.config/git/identity` | `[user]` name/email, included by `.gitconfig` |
 | `~/.config/jj/conf.d/00-identity.toml` | the same identity for jj |
 | `~/.config/ghostty/local.conf` | optional per-machine Ghostty overrides; never created automatically |
 
-The `~/.zshrc` shim exists because tools append to that path — Herd rewrites
-`HERD_PHP_*_INI_SCAN_DIR` on every PHP version change. Keeping it a real,
-untracked file means those writes never reach tracked source. `bootstrap`
-creates it only when it is absent, so appended lines survive a re-run.
+`~/.zshrc` is stowed from `zsh/.zshrc` like any other file. Tools append to
+that path — Herd rewrites `HERD_PHP_*_INI_SCAN_DIR` on every PHP version
+change — so expect it to go dirty after a PHP switch, and commit or discard
+as you like. The Herd block in it is guarded and derives its paths from
+`$HOME`, so it is inert on a machine without Herd.
 
 ## Neovim
 

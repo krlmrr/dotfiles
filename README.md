@@ -120,14 +120,8 @@ creates it only when it is absent, so appended lines survive a re-run.
 
 ## Neovim
 
-Two packages, both stowed, selected by `$NVIM_APPNAME`:
-
-```bash
-nvim                              # uses $NVIM_APPNAME, default nvim-custom
-NVIM_APPNAME=nvim-lazyvim nvim    # the other one
-```
-
-Separate plugin state, separate `lazy-lock.json`. They share no Lua.
+One package, `nvim/.config/nvim`, stowed to `~/.config/nvim` — the path
+Neovim reads by default, so no `$NVIM_APPNAME` is involved.
 
 ## The `bin` package
 

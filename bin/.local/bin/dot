@@ -103,6 +103,12 @@ if [ "$(uname)" = "Linux" ] && [ -d "$HOME/.local/state/omarchy" ]; then
             "$HOME/.config/nvim/lua/plugins/theme.lua"
 fi
 
+if [ "$(uname)" = "Darwin" ]; then
+    mkdir -p "$HOME/.config/btop/themes"
+    ln -snf "$DOTFILES/btop/.config/btop/themes/onehalfdark.theme" \
+            "$HOME/.config/btop/themes/current.theme"
+fi
+
 # --- Directories that must exist before stowing -----------------------------
 # Where a target directory is absent, stow links the DIRECTORY itself rather
 # than descending into it — folding it into a single symlink back at the

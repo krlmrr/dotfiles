@@ -2,7 +2,29 @@ disableStartupPopups: true
 
 gui:
     theme:
+        activeBorderColor:
+            - "#61afef"
+            - bold
+        inactiveBorderColor:
+            - "#5d677a"
+        searchingActiveBorderColor:
+            - "#e5c07b"
+            - bold
+        optionsTextColor:
+            - "#61afef"
         selectedLineBgColor:
+            - "#474e5d"
+        inactiveViewSelectedLineBgColor:
             - "#3e4452"
-        selectedRangeBgColor:
-            - "#3e4452"
+        cherryPickedCommitFgColor:
+            - "#282c34"
+        cherryPickedCommitBgColor:
+            - "#56b6c2"
+        markedBaseCommitFgColor:
+            - "#282c34"
+        markedBaseCommitBgColor:
+            - "#e5c07b"
+        unstagedChangesColor:
+            - "#e06c75"
+        defaultFgColor:
+            - "#dcdfe4"

@@ -49,7 +49,7 @@ official Arch repos:
 
 ```bash
 sudo pacman -S --needed stow git zsh neovim ghostty btop \
-                        lazygit yazi fzf python
+                        lazygit yazi fzf python superfile
 ```
 
 Three things are not pacman packages and install themselves:

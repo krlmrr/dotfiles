@@ -34,6 +34,8 @@ hide_tab_bar_when_single_tab = true
 
 tab_bar_right = [{ type = "zoom" }]
 
+sidebar_collapsed_mode="hidden"
+
 # What Hyprland shows in the group bar. Resolved on the server, so a remote
 # session names the remote host.
 window_title = "{hostname}: {workspace}"

@@ -22,6 +22,7 @@ export PATH="$HOME/.local/bin:$PATH:$HOME/.composer/vendor/bin:$HOME/.config/com
 
 export DOTFILES="$HOME/dotfiles"
 export XDG_CONFIG_HOME="$HOME/.config"
+export EDITOR="nvim"
 
 export SUDO_ASKPASS="$DOTFILES/scripts/askpass.sh"
 

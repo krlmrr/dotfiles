@@ -55,3 +55,9 @@
 -- tag, which covers every window rather than one app at a time.
 o.window({ tag = "default-opacity" }, { opacity = "1 1" })
 
+
+hl.config({
+  decoration = {
+    rounding = 8,
+  },
+})

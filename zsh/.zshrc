@@ -52,3 +52,23 @@ fi
 
 source "$XDG_CONFIG_HOME/zsh/aliases.sh"
 
+
+
+# Herd injected PHP 8.4 configuration.
+export HERD_PHP_84_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/84"
+
+
+# Herd injected PHP 8.6 configuration.
+export HERD_PHP_86_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/86"
+
+
+# Herd injected PHP 8.5 configuration.
+export HERD_PHP_85_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/85"
+
+
+# Herd injected PHP 8.3 configuration.
+export HERD_PHP_83_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/83"
+
+
+# Herd injected PHP 7.4 configuration.
+export HERD_PHP_74_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/74"

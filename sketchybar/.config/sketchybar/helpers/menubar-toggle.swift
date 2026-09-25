@@ -7,7 +7,7 @@ import Foundation
 let triggerZone: CGFloat = 27
 let leaveZone: CGFloat = 50
 var state = "sketchy"
-var fullscreen = false
+var nativeOwned = false
 var checking = false
 var reconciling = false
 var mouseWasDown = false
@@ -77,18 +77,18 @@ func unambiguousState(_ distance: CGFloat) -> String? {
 
 // Ask yabai (off the main thread) whether the focused window is native-fullscreen,
 // then flip sketchybar/menubar on any transition. Never blocks the cursor loop.
-func refreshFullscreen() {
+func refreshNativeOwnership() {
     if checking { return }
     checking = true
     DispatchQueue.global(qos: .utility).async {
         let out = capture(
-            "yabai -m query --windows 2>/dev/null | jq -e 'any(.[]; .[\"has-focus\"]==true and .[\"is-native-fullscreen\"]==true)' >/dev/null 2>&1 && echo 1 || echo 0")
-        let nowFull = (out == "1")
+            "w=$(yabai -m query --windows 2>/dev/null) || { echo yabai-down; exit; }; echo \"$w\" | jq -e 'any(.[]; .[\"has-focus\"]==true and .[\"is-native-fullscreen\"]==true)' >/dev/null 2>&1 && echo 1 || echo 0")
+        let fullscreenOrYabaiDown = (out == "1" || out == "yabai-down")
         DispatchQueue.main.async {
             checking = false
-            guard nowFull != fullscreen else { return }
-            fullscreen = nowFull
-            if fullscreen {
+            guard fullscreenOrYabaiDown != nativeOwned else { return }
+            nativeOwned = fullscreenOrYabaiDown
+            if nativeOwned {
                 // Fullscreen: hide sketchybar. Keep the native bar opaque so macOS's
                 // own fullscreen auto-hide/reveal-on-hover shows the real menu bar.
                 showNative()
@@ -103,13 +103,13 @@ func refreshFullscreen() {
 // `state` is only what we last asked for, and --reload or a lost fire-and-forget
 // run() drifts it from reality; edge-triggered transitions never recover from that.
 func reconcile() {
-    if reconciling || fullscreen { return }
+    if reconciling || nativeOwned { return }
     reconciling = true
     DispatchQueue.global(qos: .utility).async {
         let hidden = capture("sketchybar --query bar 2>/dev/null | jq -r '.hidden' 2>/dev/null")
         DispatchQueue.main.async {
             reconciling = false
-            guard hidden == "on" || hidden == "off", !fullscreen else { return }
+            guard hidden == "on" || hidden == "off", !nativeOwned else { return }
             guard let distance = distanceFromTop(NSEvent.mouseLocation),
                   let want = unambiguousState(distance) else { return }
             if (hidden == "on") != (want == "native") {
@@ -128,7 +128,7 @@ func pollCursor() {
 
     // In native fullscreen macOS owns the menu bar (auto-hide + hover reveal);
     // pause the cursor toggle so it can't pop sketchybar back over the app.
-    if fullscreen { return }
+    if nativeOwned { return }
 
     guard let distance = distanceFromTop(NSEvent.mouseLocation) else { return }
 
@@ -175,7 +175,7 @@ showSketchy()
 let signalSources = [trapSignal(SIGTERM), trapSignal(SIGINT)]
 let timers = [
     repeatingTimer(1.0 / 60.0, pollCursor),
-    repeatingTimer(1.0 / 3.0, refreshFullscreen),
+    repeatingTimer(1.0 / 3.0, refreshNativeOwnership),
     repeatingTimer(2.0, reconcile),
 ]
 

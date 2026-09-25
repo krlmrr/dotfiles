@@ -629,6 +629,7 @@ yabai -m rule --add app="^Zed$" title="Settings$" manage=off
 yabai -m rule --add title="^Picture-in-Picture$" manage=off
 yabai -m rule --add app="^TV$" manage=off
 yabai -m rule --add app="^LilyView$" manage=off
+yabai -m rule --add app="^DeskPad$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 

@@ -124,6 +124,7 @@ brewup() {
   before=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
   herdr_before=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
 
+  brew update || return $?
   brew upgrade || return $?
   brew upgrade --greedy
   brew cleanup --prune=all

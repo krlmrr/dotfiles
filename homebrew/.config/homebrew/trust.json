@@ -30,10 +30,11 @@
     "oven-sh/bun/bun",
     "qmk/qmk/hid_bootloader_cli",
     "qmk/qmk/mdloader",
-    "qmk/qmk/qmk"
+    "qmk/qmk/qmk",
+    "vheissulabs/tap/tql",
+    "vheissulabs/tqlverify/tql"
   ],
   "trustedcasks": [
-    "mac-brow-app/tap/brow",
     "vheissulabs/tap/gitdifferent"
   ]
 }

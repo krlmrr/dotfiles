@@ -126,7 +126,7 @@ brewup() {
 
   brew update || return $?
   brew upgrade || return $?
-  brew upgrade --greedy
+  brew upgrade --greedy-auto-updates
   brew cleanup --prune=all
 
   after=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
@@ -140,7 +140,7 @@ brewup() {
     sudo bash "${DOTFILES:-$HOME/dotfiles}/scripts/tcc-cleanup.sh"
   fi
 
-  # `brew upgrade --greedy` is exactly what puts the Adobe/Google background
+  # `brew upgrade --greedy-auto-updates` is exactly what puts the Adobe/Google background
   # agents back — their installers re-register them on every version bump — and
   # a `brew upgrade` that retires a formula leaves its brew-services plist
   # behind as an orphan. So re-prune after every upgrade run, not just on setup.

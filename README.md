@@ -266,7 +266,9 @@ the System Settings approvals left to do. The pin matters: driver v6.2.0 only
 supports kanata below 1.13, so upgrade the two together.
 
 After editing `kanata.kbd`: `sudo launchctl kickstart -k system/dev.kanata.kanata`.
-Logs: `/var/log/kanata.log`.
+Errors and warnings: `/var/log/kanata.log`. Stdout goes to `/dev/null`, because the
+VirtualHIDDevice client library prints `virtual_hid_keyboard_ready` there about
+once a second, forever.
 
 **Lily58: QMK.** The keymap lives in its own repo,
 [krlmrr/lily58-wired-firmware](https://github.com/krlmrr/lily58-wired-firmware).

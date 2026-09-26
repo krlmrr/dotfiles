@@ -106,7 +106,7 @@ install_daemon "$KANATA_LABEL" <<EOF
         <false/>
     </dict>
     <key>StandardOutPath</key>
-    <string>/var/log/kanata.log</string>
+    <string>/dev/null</string>
     <key>StandardErrorPath</key>
     <string>/var/log/kanata.log</string>
 </dict>
@@ -130,6 +130,6 @@ Almost done. Finish these in System Settings:
   4. Restart kanata:
      sudo launchctl kickstart -k system/$KANATA_LABEL
 
-Logs: /var/log/kanata.log
+Errors and warnings: /var/log/kanata.log
 Reload after editing kanata.kbd: sudo launchctl kickstart -k system/$KANATA_LABEL
 EOF

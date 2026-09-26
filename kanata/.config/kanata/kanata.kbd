@@ -9,7 +9,11 @@
   prior-idle  150
 )
 
-(defsrc caps s d f j k l)
+(defsrc
+  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  caps s    d    f    j    k    l
+  fn
+)
 
 (defalias
   esc-ctl (tap-hold-press $tap-repress $hold-time esc lctl)
@@ -19,6 +23,17 @@
   hrm-j   (tap-hold-release $tap-repress $hold-time j rsft (require-prior-idle $prior-idle))
   hrm-k   (tap-hold-release $tap-repress $hold-time k rctl (require-prior-idle $prior-idle))
   hrm-l   (tap-hold-release $tap-repress $hold-time l ralt (require-prior-idle $prior-idle))
+  fn-row  (multi fn (layer-while-held fkeys))
 )
 
-(deflayer base @esc-ctl @hrm-s @hrm-d @hrm-f @hrm-j @hrm-k @hrm-l)
+(deflayer base
+  brdn brup mctl sls  dtn  dnd  prev pp   next mute vold volu
+  @esc-ctl @hrm-s @hrm-d @hrm-f @hrm-j @hrm-k @hrm-l
+  @fn-row
+)
+
+(deflayer fkeys
+  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  _    _    _    _    _    _    _
+  _
+)

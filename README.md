@@ -21,7 +21,7 @@ The dotfiles are inert without the tools they set up. Install these first.
 
 Everything comes from [Homebrew](https://brew.sh). The manifest lives in the
 `homebrew` package at `homebrew/.config/homebrew/Brewfile` —
-41 formulae, 49 casks, 6 taps, including `stow` itself.
+60 formulae, 41 casks, 8 taps, including `stow` itself.
 
 ```bash
 brew bundle --file=~/dotfiles/homebrew/.config/homebrew/Brewfile
@@ -245,6 +245,39 @@ nothing while exiting 0, losing `btop.theme`, `ghostty.conf`, `hyprland.lua` and
 16 others. Linking the directory keeps the files inside real, so `cp -r` copies
 content. A theme added later by `omarchy theme install` also lands in the repo
 rather than outside it.
+
+## Keyboards
+
+**Built-in MacBook keyboard: kanata.** `kanata/.config/kanata/kanata.kbd` gives
+the built-in keyboard the same home-row mods as the Lily58 (S/L Alt, D/K Ctrl,
+F/J Shift, Caps Lock tap Esc / hold Ctrl). `macos-dev-names-include` limits it
+to `Apple Internal Keyboard / Trackpad`, so the Lily58, which does all of this
+in firmware, is never processed twice.
+
+kanata runs as a root LaunchDaemon and needs Karabiner's VirtualHIDDevice
+driver, which `dot install` cannot do unprivileged. Run once per machine:
+
+```bash
+~/dotfiles/scripts/kanata-setup.sh
+```
+
+It installs the driver, loads both LaunchDaemons, `brew pin`s kanata and prints
+the System Settings approvals left to do. The pin matters: driver v6.2.0 only
+supports kanata below 1.13, so upgrade the two together.
+
+After editing `kanata.kbd`: `sudo launchctl kickstart -k system/dev.kanata.kanata`.
+Logs: `/var/log/kanata.log`.
+
+**Lily58: QMK.** The keymap lives in its own repo,
+[krlmrr/lily58-wired-firmware](https://github.com/krlmrr/lily58-wired-firmware).
+When `qmk` is installed, `dot install` clones `qmk_firmware` to
+`~/qmk_firmware` and the keymap into `keyboards/lily58/keymaps/krlmrr`,
+skipping either one that already exists. The controllers use Atmel DFU, so
+flash with:
+
+```bash
+qmk flash -kb lily58 -km krlmrr -bl dfu
+```
 
 ## Commands
 

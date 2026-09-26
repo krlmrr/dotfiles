@@ -154,6 +154,19 @@ if [ "$(uname)" = "Darwin" ]; then
         echo "Copied fonts: $(ls assets/fonts | tr '\n' ' ')"
     fi
 
+    if command -v qmk >/dev/null 2>&1; then
+        QMK_HOME="$HOME/qmk_firmware"
+        QMK_KEYMAP="$QMK_HOME/keyboards/lily58/keymaps/krlmrr"
+        if [ ! -e "$QMK_HOME" ]; then
+            git clone --recurse-submodules https://github.com/qmk/qmk_firmware.git "$QMK_HOME" \
+                || echo "Could not clone qmk_firmware into $QMK_HOME."
+        fi
+        if [ -d "$QMK_HOME" ] && [ ! -e "$QMK_KEYMAP" ]; then
+            git clone git@github.com:krlmrr/lily58-wired-firmware.git "$QMK_KEYMAP" \
+                || echo "Could not clone the Lily58 keymap into $QMK_KEYMAP."
+        fi
+    fi
+
     # Only when it is not already running: `open -a` on a running Hammerspoon
     # activates it, and activating it raises the console window.
     if [ -d /Applications/Hammerspoon.app ] && ! pgrep -xq Hammerspoon; then

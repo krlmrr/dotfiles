@@ -1,0 +1,24 @@
+(defcfg
+  macos-dev-names-include ("Apple Internal Keyboard / Trackpad")
+  process-unmapped-keys yes
+)
+
+(defvar
+  tap-repress 200
+  hold-time   250
+  prior-idle  150
+)
+
+(defsrc caps s d f j k l)
+
+(defalias
+  esc-ctl (tap-hold-press $tap-repress $hold-time esc lctl)
+  hrm-s   (tap-hold-release $tap-repress $hold-time s lalt (require-prior-idle $prior-idle))
+  hrm-d   (tap-hold-release $tap-repress $hold-time d lctl (require-prior-idle $prior-idle))
+  hrm-f   (tap-hold-release $tap-repress $hold-time f lsft (require-prior-idle $prior-idle))
+  hrm-j   (tap-hold-release $tap-repress $hold-time j rsft (require-prior-idle $prior-idle))
+  hrm-k   (tap-hold-release $tap-repress $hold-time k rctl (require-prior-idle $prior-idle))
+  hrm-l   (tap-hold-release $tap-repress $hold-time l ralt (require-prior-idle $prior-idle))
+)
+
+(deflayer base @esc-ctl @hrm-s @hrm-d @hrm-f @hrm-j @hrm-k @hrm-l)

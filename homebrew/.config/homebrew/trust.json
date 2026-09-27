@@ -19,7 +19,6 @@
   ],
   "trustedformulae": [
     "anomalyco/tap/opencode",
-    "anthonymaley/musictui/musictui",
     "antoniorodr/memo/memo",
     "felixkratz/formulae/sketchybar",
     "https://github.com/asmvik/homebrew-formulae.git/skhd",

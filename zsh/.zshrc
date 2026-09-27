@@ -30,6 +30,7 @@ export SUDO_ASKPASS="$DOTFILES/scripts/askpass.sh"
 [ -d "$HOME/.cargo/bin" ] && export PATH="$PATH:$HOME/.cargo/bin"
 
 source <(fzf --zsh)
+eval "$(atuin init zsh --disable-up-arrow)"
 
 y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd

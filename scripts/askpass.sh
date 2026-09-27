@@ -19,5 +19,6 @@
 # run outside an interactive terminal.
 PROMPT="${1:-sudo password:}"
 osascript \
+  -e 'activate' \
   -e "display dialog \"$PROMPT\" default answer \"\" with hidden answer with title \"sudo (askpass)\" buttons {\"Cancel\",\"OK\"} default button \"OK\"" \
   -e 'text returned of result' 2>/dev/null

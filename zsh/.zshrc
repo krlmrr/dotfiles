@@ -27,6 +27,7 @@ export EDITOR="nvim"
 export SUDO_ASKPASS="$DOTFILES/scripts/askpass.sh"
 
 [ -d "$HOME/.lmstudio/bin" ] && export PATH="$PATH:$HOME/.lmstudio/bin"
+[ -d "$HOME/.cargo/bin" ] && export PATH="$PATH:$HOME/.cargo/bin"
 
 source <(fzf --zsh)
 

@@ -2,6 +2,17 @@
 unalias nv 2>/dev/null
 nvim() { if [ $# -eq 0 ]; then command nvim .; else command nvim "$@"; fi; }
 nv() { clear && nvim "$@"; }
+notes() {
+  [ -d "$HOME/notes" ] || gh repo clone krlmrr/notes "$HOME/notes" || return
+  (
+    cd "$HOME/notes" || exit
+    git pull --rebase --quiet || echo "Couldn't pull notes, using the local copy."
+    glow "$@"
+    git add -A
+    git diff --cached --quiet || git commit --quiet -m "Update notes from $(hostname -s)"
+    git push --quiet || echo "Couldn't push notes, they'll go up next time."
+  )
+}
 alias nz="nv ~/.zshrc"
 alias vim="nvim"
 alias sourcez="source ~/.zshrc"

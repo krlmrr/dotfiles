@@ -1,5 +1,5 @@
 # One Half Dark, matching ghostty's `theme = dark:One Half Dark`.
-# macOS reads this from ~/Library/Application Support/ghgrab, not ~/.config.
+# macOS reads ~/Library/Application Support/ghgrab, which dot links to here.
 
 bg_color = "#282c34" # Main background
 fg_color = "#dcdfe4" # Primary text

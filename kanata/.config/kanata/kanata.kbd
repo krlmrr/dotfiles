@@ -16,7 +16,7 @@
 )
 
 (defalias
-  esc-ctl (tap-hold-press $tap-repress $hold-time esc lctl)
+  esc-ctl (tap-hold-press $tap-repress $hold-time esc (multi lctl (layer-while-held ctl)))
   hrm-s   (tap-hold-release $tap-repress $hold-time s lalt (require-prior-idle $prior-idle))
   hrm-d   (tap-hold-release $tap-repress $hold-time d lctl (require-prior-idle $prior-idle))
   hrm-f   (tap-hold-release $tap-repress $hold-time f lsft (require-prior-idle $prior-idle))
@@ -30,6 +30,12 @@
   brdn brup mctl sls  dtn  dnd  prev pp   next mute vold volu
   @esc-ctl @hrm-s @hrm-d @hrm-f @hrm-j @hrm-k @hrm-l
   @fn-row
+)
+
+(deflayer ctl
+  _    _    _    _    _    _    _    _    _    _    _    _
+  _    s    d    f    j    k    l
+  _
 )
 
 (deflayer fkeys

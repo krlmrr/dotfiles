@@ -1,0 +1,13 @@
+# One Half Dark, matching ghostty's `theme = dark:One Half Dark`.
+# macOS reads this from ~/Library/Application Support/ghgrab, not ~/.config.
+
+bg_color = "#282c34" # Main background
+fg_color = "#dcdfe4" # Primary text
+accent_color = "#61afef" # Borders, highlights, active elements
+warning_color = "#e5c07b" # Warnings
+error_color = "#e06c75" # Errors
+success_color = "#98c379" # Success indicators
+folder_color = "#61afef" # Folder icons
+selected_color = "#c678dd" # Selected items
+border_color = "#5d677a" # Inactive borders
+highlight_bg = "#474e5d" # Highlighted row background

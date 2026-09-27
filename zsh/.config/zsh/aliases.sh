@@ -10,6 +10,7 @@ alias sourcez="source ~/.zshrc"
 alias lzg="lazygit"
 alias yeet="sudo rm -rf"
 alias mkd="mkdir -p"
+alias tux="tuxedo"
 
 # Jujutsu
 alias lzj="lazyjj"

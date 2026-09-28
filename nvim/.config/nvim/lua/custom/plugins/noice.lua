@@ -28,7 +28,7 @@ return {
     },
     routes = {
       -- Skip noisy messages entirely (must be before general routing)
-      { filter = { event = "msg_show", find = "written" }, opts = { skip = true } },
+      { filter = { event = "msg_show", kind = "progress" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "lines in buffer" }, opts = { skip = true } },
       { filter = { event = "notify", find = "lines in buffer" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "E162" }, opts = { skip = true } },

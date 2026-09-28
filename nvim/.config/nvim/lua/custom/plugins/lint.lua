@@ -8,10 +8,17 @@ return {
       php = { 'phpstan' },
     }
 
-    -- Run on save
+    local function phpstan_installed()
+      local phpstan = lint.linters.phpstan
+      local cmd = type(phpstan.cmd) == 'function' and phpstan.cmd() or phpstan.cmd
+      return vim.fn.executable(cmd) == 1
+    end
+
     vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
       callback = function()
-        lint.try_lint()
+        if phpstan_installed() then
+          lint.try_lint()
+        end
       end,
     })
   end,

@@ -61,4 +61,6 @@ return {
 
   -- Auto-close HTML tags
   { 'windwp/nvim-ts-autotag', opts = {} },
+
+  { 'kylechui/nvim-surround', event = 'VeryLazy', opts = {} },
 }

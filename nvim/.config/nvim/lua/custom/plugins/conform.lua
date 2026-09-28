@@ -11,7 +11,7 @@ return {
         -- Vue uses eslint_d which runs Prettier through ESLint (via eslint-plugin-prettier)
         -- This gives you: Prettier formatting + Tailwind class sorting + Vue template rules
         -- All in a single pass - no more cursor jumping!
-        vue = { "eslint_d" },
+        vue = { "eslint_d", "prettier", stop_after_first = true },
         json = { "prettier" },
         xml = { "xmlformat" },
         php = { "pint" },
@@ -50,7 +50,18 @@ return {
           command = "eslint_d",
           args = { "--fix-to-stdout", "--stdin", "--stdin-filename", "$FILENAME" },
           stdin = true,
-          -- Use local eslint config
+          condition = function(_, ctx)
+            return vim.fs.find({
+              "eslint.config.js",
+              "eslint.config.mjs",
+              "eslint.config.cjs",
+              ".eslintrc.js",
+              ".eslintrc.json",
+              ".eslintrc.yml",
+              ".eslintrc.yaml",
+              ".eslintrc",
+            }, { upward = true, path = ctx.dirname })[1] ~= nil
+          end,
           cwd = require("conform.util").root_file({
             "eslint.config.js",
             "eslint.config.mjs",
@@ -72,6 +83,10 @@ return {
         lsp_fallback = true,
       },
     })
+
+    vim.keymap.set({ "n", "v" }, "<leader>cf", function()
+      require("conform").format({ lsp_fallback = true })
+    end, { desc = "Format file" })
 
     -- NOTE: The old BufWritePost autocmd for eslint --fix has been removed.
     -- ESLint now runs through conform via eslint_d, which includes Prettier

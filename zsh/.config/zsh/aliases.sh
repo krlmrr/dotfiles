@@ -6,11 +6,12 @@ notes() {
   [ -d "$HOME/notes" ] || gh repo clone krlmrr/notes "$HOME/notes" || return
   (
     cd "$HOME/notes" || exit
-    git pull --rebase --quiet || echo "Couldn't pull notes, using the local copy."
-    glow "$@"
+    git pull --rebase --autostash --quiet || echo "Couldn't pull notes, using the local copy."
+    [ "$1" = "sync" ] || glow "$@"
     git add -A
     git diff --cached --quiet || git commit --quiet -m "Update notes from $(hostname -s)"
     git push --quiet || echo "Couldn't push notes, they'll go up next time."
+    [ "$1" = "sync" ] && echo "Notes synced."
   )
 }
 alias nz="nv ~/.zshrc"

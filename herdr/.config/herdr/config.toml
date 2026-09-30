@@ -16,8 +16,8 @@ new_cwd = "follow"
 accent = "blue"
 
 pane_gaps = true
-pane_outer_borders = false
-pane_borders = "off"
+pane_outer_borders = true
+pane_borders = "always"
 
 pane_scrollbars = false
 

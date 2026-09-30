@@ -24,6 +24,8 @@ resize-overlay = never
 
 cursor-style = block
 cursor-style-blink = false
+cursor-color = #61afef
+cursor-text = #282c34
 
 confirm-close-surface = false
 shell-integration-features = sudo,no-cursor,ssh-env

@@ -1,7 +1,7 @@
 title = "  "
 window-theme = ghostty
 window-padding-x = 14
-window-padding-y = 14
+window-padding-y = 7
 window-padding-balance = true
 window-save-state = always
 background-opacity = 1.0
@@ -26,6 +26,8 @@ font-size = 18
 
 cursor-style = block
 cursor-style-blink = false
+cursor-color = #61afef
+cursor-text = #282c34
 
 confirm-close-surface = false
 shell-integration-features = sudo,no-cursor,ssh-env

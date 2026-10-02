@@ -150,6 +150,41 @@ func checkClickRestore() {
     report("FAIL", label, "still hidden after the click")
 }
 
+func openFrontmostAppMenu() {
+    _ = shell("(osascript -e 'tell application \"System Events\" to tell (first process whose frontmost is true) to click menu bar item 2 of menu bar 1' >/dev/null 2>&1 &)")
+}
+
+func closeMenu() {
+    _ = shell("osascript -e 'tell application \"System Events\" to key code 53' >/dev/null 2>&1")
+}
+
+func checkOpenMenuHoldsNative() {
+    let label = "open menu holds native"
+    switch settle(bounds.midX, 2, expect: "on") {
+    case nil: skipped += 1; report("SKIP", label, "mouse in use"); return
+    case false: failures += 1; report("FAIL", label, "bar never hid to begin with"); return
+    default: break
+    }
+    openFrontmostAppMenu()
+    Thread.sleep(forTimeInterval: 1.0)
+    let held = settle(bounds.midX, bounds.midY, expect: "on")
+    closeMenu()
+    switch held {
+    case nil: skipped += 1; report("SKIP", label, "mouse in use"); return
+    case false: failures += 1; report("FAIL", label, "bar came back while the menu was open"); return
+    default: break
+    }
+    for step in 1...5 {
+        Thread.sleep(forTimeInterval: 0.4)
+        if barHidden() == "off" {
+            report("PASS", label, String(format: "released ~%.1fs after closing", Double(step) * 0.4))
+            return
+        }
+    }
+    failures += 1
+    report("FAIL", label, "still hidden after the menu closed")
+}
+
 guard shell("pgrep -x menubar-toggle").isEmpty == false else {
     print("menubar-toggle is not running; nothing to test")
     exit(2)
@@ -173,6 +208,7 @@ check("hysteresis band holds native", x: bounds.midX, y: 40, expect: "on")
 check("past leaveZone releases", x: bounds.midX, y: 80, expect: "off")
 
 checkDesyncRecovery()
+checkOpenMenuHoldsNative()
 
 if runClickTest {
     checkClickRestore()

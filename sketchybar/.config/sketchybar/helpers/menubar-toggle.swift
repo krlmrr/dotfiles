@@ -41,6 +41,19 @@ func showSketchy() {
     state = "sketchy"
 }
 
+let popUpMenuLayer = Int(CGWindowLevelForKey(.popUpMenuWindow))
+
+func menuIsOpen() -> Bool {
+    guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] else {
+        return false
+    }
+    return windows.contains { $0[kCGWindowLayer as String] as? Int == popUpMenuLayer }
+}
+
+func keepNativeForOpenMenu(_ want: String) -> Bool {
+    want == "sketchy" && menuIsOpen()
+}
+
 func distanceSquared(_ point: NSPoint, _ rect: NSRect) -> CGFloat {
     let horizontal = max(rect.minX - point.x, 0, point.x - rect.maxX)
     let vertical = max(rect.minY - point.y, 0, point.y - rect.maxY)
@@ -113,6 +126,7 @@ func reconcile() {
             guard let distance = distanceFromTop(NSEvent.mouseLocation),
                   let want = unambiguousState(distance) else { return }
             if (hidden == "on") != (want == "native") {
+                if keepNativeForOpenMenu(want) { return }
                 want == "native" ? showNative() : showSketchy()
             } else {
                 state = want
@@ -134,12 +148,13 @@ func pollCursor() {
 
     // A click below the bar is the user reaching for a window title bar, not the
     // menu, so give the bar back immediately instead of waiting to clear leaveZone.
-    if clicked, state == "native", distance >= triggerZone {
+    if clicked, state == "native", distance >= triggerZone, !menuIsOpen() {
         showSketchy()
         return
     }
 
     guard let want = unambiguousState(distance), want != state else { return }
+    if keepNativeForOpenMenu(want) { return }
     want == "native" ? showNative() : showSketchy()
 }
 

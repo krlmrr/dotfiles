@@ -622,7 +622,8 @@ yabai -m config mouse_drop_action swap
 # Window rules
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
-yabai -m rule --add app="^Finder$" title="^(Copy|Move|Delete|Connecting)" manage=off
+yabai -m rule --add app="^Finder$" manage=off
+yabai -m rule --add app="^iPhone Mirroring$" manage=off
 yabai -m rule --add app="^Logi Options\+$" manage=off
 yabai -m rule --add app="^Herd$" manage=off
 yabai -m rule --add app="^Zed$" title="Settings$" manage=off

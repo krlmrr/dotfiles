@@ -130,6 +130,30 @@ pcall(function()
     table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
 end)
 
+local RESTART_DOCK_WHEN_DISPLAY_ADDED = true
+local displayWatcher
+
+if RESTART_DOCK_WHEN_DISPLAY_ADDED then
+    local SECONDS_FOR_SPACES_TO_SETTLE = 2
+    local knownScreenCount = #hs.screen.allScreens()
+    local pendingDockRestart
+
+    local function restartDockToRevivedDesktopShortcuts()
+        hs.execute("/usr/bin/killall Dock")
+    end
+
+    local function restartDockWhenDisplayAdded()
+        local screenCount = #hs.screen.allScreens()
+        local displayWasAdded = screenCount > knownScreenCount
+        knownScreenCount = screenCount
+        if not displayWasAdded then return end
+        if pendingDockRestart then pendingDockRestart:stop() end
+        pendingDockRestart = hs.timer.doAfter(SECONDS_FOR_SPACES_TO_SETTLE, restartDockToRevivedDesktopShortcuts)
+    end
+
+    displayWatcher = hs.screen.watcher.new(restartDockWhenDisplayAdded):start()
+end
+
 -- ── Auto-reload this config when it changes ─────────────────────────────────
 -- Saves a trip to the menu bar on every edit. Only reacts to .lua files, since
 -- the watcher fires for anything in the directory.

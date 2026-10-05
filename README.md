@@ -281,6 +281,21 @@ flash with:
 qmk flash -kb lily58 -km krlmrr -bl dfu
 ```
 
+## Zen
+
+`scripts/zen-space-extensions/` switches password managers by Zen Space:
+Proton Pass in the `NotaryDash` Space, 1Password everywhere else. It runs as an
+fx-autoconfig script, which needs two files inside `Zen.app`. Quit Zen, then:
+
+```bash
+~/dotfiles/scripts/zen-space-extensions/install-macos.sh ~/Library/Application\ Support/zen/Profiles/0adh67j4.Default\ \(release\)
+```
+
+With no argument it uses the default profile from `profiles.ini`. Zen updates
+replace the app bundle and take `config.js` and `config-prefs.js` with them, so
+re-run it after each update. A `sudo cp` that says "Operation not permitted"
+needs Ghostty allowed under Privacy & Security → App Management.
+
 ## Commands
 
 ```bash

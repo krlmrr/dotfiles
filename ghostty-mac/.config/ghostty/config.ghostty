@@ -1,7 +1,7 @@
 title = "  "
 window-theme = ghostty
-window-padding-x = 14
-window-padding-y = 7
+window-padding-x = 12
+#window-padding-y = 7
 window-padding-balance = true
 window-save-state = always
 background-opacity = 1.0

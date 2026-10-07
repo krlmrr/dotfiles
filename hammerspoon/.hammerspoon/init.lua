@@ -130,6 +130,19 @@ pcall(function()
     table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
 end)
 
+local GHOSTTY = "com.mitchellh.ghostty"
+
+local function ghosttyOrNewWindow()
+    local ghostty = hs.application.get(GHOSTTY)
+    if ghostty and ghostty:isFrontmost() then
+        ghostty:selectMenuItem({ "File", "New Window" })
+    else
+        hs.application.launchOrFocusByBundleID(GHOSTTY)
+    end
+end
+
+local ghosttyKey = hs.hotkey.bind({ "cmd" }, "return", ghosttyOrNewWindow)
+
 local RESTART_DOCK_WHEN_DISPLAY_ADDED = true
 local displayWatcher
 

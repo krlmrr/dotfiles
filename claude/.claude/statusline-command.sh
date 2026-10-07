@@ -1,7 +1,7 @@
 #!/bin/sh
 # Claude Code status line
 #
-# [context bar] | 📊 5h: X%  7d: X% | ⏱ elapsed
+# [context bar] | 📊 5h: X%  7d: X% | 🤖 model
 
 input=$(cat)
 
@@ -86,30 +86,13 @@ if [ -f "$stats_file" ]; then
   fi
 fi
 
-# ── Elapsed session time ───────────────────────────────────────────────────
-elapsed_seg=""
-transcript=$(echo "$input" | jq -r '.transcript_path // empty')
-if [ -n "$transcript" ] && [ -f "$transcript" ]; then
-  start_ts=$(stat -f %B "$transcript" 2>/dev/null)
-  if [ -z "$start_ts" ] || [ "$start_ts" = "0" ]; then
-    start_ts=$(stat -f %m "$transcript" 2>/dev/null)
-  fi
-  if [ -n "$start_ts" ]; then
-    now=$(date +%s)
-    elapsed=$(( now - start_ts ))
-    mins=$(( elapsed / 60 ))
-    secs=$(( elapsed % 60 ))
-    elapsed_seg=$(printf "⏱  ${grey}${mins}m ${secs}s${reset}")
-  fi
-fi
-
 model_seg=""
 model=$(echo "$input" | jq -r '.model.display_name // empty')
 if [ -n "$model" ]; then
   model_seg=$(printf "🤖 ${cyan}${model}${reset}")
 fi
 
-# ── Line 2: context bar | usage | elapsed ─────────────────────────────────
+# ── Line 2: context bar | usage | model ───────────────────────────────────
 line2=""
 if [ -n "$bar_seg" ]; then
   line2="${bar_seg}"
@@ -119,13 +102,6 @@ if [ -n "$usage_seg" ]; then
     line2="${line2} ${grey}|${reset} ${usage_seg}"
   else
     line2="${usage_seg}"
-  fi
-fi
-if [ -n "$elapsed_seg" ]; then
-  if [ -n "$line2" ]; then
-    line2="${line2} ${grey}|${reset} ${elapsed_seg}"
-  else
-    line2="${elapsed_seg}"
   fi
 fi
 if [ -n "$model_seg" ]; then

@@ -103,6 +103,12 @@ if [ -n "$transcript" ] && [ -f "$transcript" ]; then
   fi
 fi
 
+model_seg=""
+model=$(echo "$input" | jq -r '.model.display_name // empty')
+if [ -n "$model" ]; then
+  model_seg=$(printf "🤖 ${cyan}${model}${reset}")
+fi
+
 # ── Line 2: context bar | usage | elapsed ─────────────────────────────────
 line2=""
 if [ -n "$bar_seg" ]; then
@@ -120,6 +126,13 @@ if [ -n "$elapsed_seg" ]; then
     line2="${line2} ${grey}|${reset} ${elapsed_seg}"
   else
     line2="${elapsed_seg}"
+  fi
+fi
+if [ -n "$model_seg" ]; then
+  if [ -n "$line2" ]; then
+    line2="${line2} ${grey}|${reset} ${model_seg}"
+  else
+    line2="${model_seg}"
   fi
 fi
 

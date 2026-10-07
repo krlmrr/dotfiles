@@ -1,0 +1,8 @@
+#!/bin/sh
+# Toggle the Claude Code status line (~/.claude/statusline-command.sh prints nothing while the flag exists)
+flag="$HOME/.claude/statusline-off"
+if [ -f "$flag" ]; then
+  rm "$flag" && echo "Claude status line on."
+else
+  touch "$flag" && echo "Claude status line off."
+fi

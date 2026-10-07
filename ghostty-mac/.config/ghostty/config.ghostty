@@ -33,3 +33,4 @@ confirm-close-surface = false
 shell-integration-features = sudo,no-cursor,ssh-env
 
 keybind = super+t=unbind
+keybind = super+enter=new_window

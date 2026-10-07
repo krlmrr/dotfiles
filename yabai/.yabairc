@@ -61,8 +61,7 @@ sa_capable() {
 # NEWLINE-delimited. Order is not significant any more: with a single invariant,
 # "a browser is leftmost" is satisfied by whichever browser is already furthest
 # left, so there is nothing to prioritise and no tie to break.
-BROWSER_APPS='Google Chrome
-Safari
+BROWSER_APPS='Safari
 Arc
 Zen'
 

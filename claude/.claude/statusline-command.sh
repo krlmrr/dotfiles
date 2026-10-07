@@ -5,9 +5,6 @@
 
 input=$(cat)
 
-# Hidden while ~/.claude/statusline-off exists (toggled by `statusline` in zsh aliases)
-[ -f "$HOME/.claude/statusline-off" ] && exit 0
-
 # ── Colors ──────────────────────────────────────────────────────────────────
 bold='\033[1m'
 cyan='\033[96m'

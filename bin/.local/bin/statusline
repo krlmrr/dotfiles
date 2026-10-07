@@ -1,8 +1,12 @@
 #!/bin/sh
-# Toggle the Claude Code status line (~/.claude/statusline-command.sh prints nothing while the flag exists)
-flag="$HOME/.claude/statusline-off"
-if [ -f "$flag" ]; then
-  rm "$flag" && echo "Claude status line on."
+# Toggle the Claude Code status line by adding or removing statusLine in settings.json.
+# Removing the key (not just printing nothing) frees the row Claude Code reserves for it.
+settings="$HOME/.claude/settings.json"
+if jq -e 'has("statusLine")' "$settings" >/dev/null; then
+  filter='del(.statusLine)'
+  msg="Claude status line off."
 else
-  touch "$flag" && echo "Claude status line off."
+  filter='.statusLine = {type: "command", command: "bash \(env.HOME)/.claude/statusline-command.sh"}'
+  msg="Claude status line on."
 fi
+tmp=$(mktemp) && jq "$filter" "$settings" > "$tmp" && cat "$tmp" > "$settings" && rm "$tmp" && echo "$msg"

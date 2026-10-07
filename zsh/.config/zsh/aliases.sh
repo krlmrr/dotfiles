@@ -34,8 +34,6 @@ alias jn="jj new"
 # Nvim restart helper
 nvr() { cd "$1" && clear && nvim "${2:-}"; }
 
-export CLAUDE_STATUSLINE_MIN_ROWS=30
-
 # Laravel
 alias solo="a solo"
 alias pail="a pail"

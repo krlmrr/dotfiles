@@ -19,7 +19,7 @@ reset='\033[0m'
 
 # ── Context progress bar ───────────────────────────────────────────────────
 used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
-ctx_size=$(echo "$input" | jq -r '.context_window.tokens_total // 0')
+ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
 bar_seg=""
 if [ -n "$used_pct" ]; then
   used_int=${used_pct%.*}
@@ -54,36 +54,10 @@ fi
 
 # ── API usage (5h + 7d) ────────────────────────────────────────────────────
 usage_seg=""
-stats_file="$HOME/.claude/stats-usage.json"
-CACHE_MAX_AGE=150
-
-needs_refresh=true
-if [ -f "$stats_file" ]; then
-  cache_age=$(( $(date +%s) - $(stat -f %m "$stats_file") ))
-  if [ "$cache_age" -lt "$CACHE_MAX_AGE" ]; then
-    needs_refresh=false
-  fi
-fi
-
-if $needs_refresh; then
-  creds=$(security find-generic-password -s "Claude Code-credentials" -a "$(whoami)" -w 2>/dev/null)
-  token=$(echo "$creds" | jq -r '.claudeAiOauth.accessToken // empty' 2>/dev/null)
-  if [ -n "$token" ]; then
-    usage_json=$(curl -s --max-time 5 https://api.anthropic.com/api/oauth/usage \
-      -H "Authorization: Bearer $token" \
-      -H "anthropic-beta: oauth-2025-04-20" 2>/dev/null)
-    if echo "$usage_json" | jq -e '.five_hour' >/dev/null 2>&1; then
-      echo "$usage_json" > "$stats_file"
-    fi
-  fi
-fi
-
-if [ -f "$stats_file" ]; then
-  pct_5h=$(jq -r '.five_hour.utilization | floor' "$stats_file" 2>/dev/null)
-  pct_7d=$(jq -r '.seven_day.utilization | floor' "$stats_file" 2>/dev/null)
-  if [ -n "$pct_5h" ] && [ -n "$pct_7d" ]; then
-    usage_seg=$(printf "📊 ${yellow}5h:${reset} ${white}${pct_5h}%%${reset}  ${yellow}7d:${reset} ${white}${pct_7d}%%${reset}")
-  fi
+pct_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty | floor')
+pct_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty | floor')
+if [ -n "$pct_5h" ] && [ -n "$pct_7d" ]; then
+  usage_seg=$(printf "📊 ${yellow}5h:${reset} ${white}${pct_5h}%%${reset}  ${yellow}7d:${reset} ${white}${pct_7d}%%${reset}")
 fi
 
 model_seg=""

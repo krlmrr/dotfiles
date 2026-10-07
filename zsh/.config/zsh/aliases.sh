@@ -34,6 +34,15 @@ alias jn="jj new"
 # Nvim restart helper
 nvr() { cd "$1" && clear && nvim "${2:-}"; }
 
+export CLAUDE_STATUSLINE_MIN_ROWS=30
+claude() {
+  if [[ ! -f ~/.claude/statusline-off ]] && (( ${LINES:-0} >= CLAUDE_STATUSLINE_MIN_ROWS )); then
+    command claude --settings "{\"statusLine\":{\"type\":\"command\",\"command\":\"bash $HOME/.claude/statusline-command.sh\"}}" "$@"
+  else
+    command claude "$@"
+  fi
+}
+
 # Laravel
 alias solo="a solo"
 alias pail="a pail"

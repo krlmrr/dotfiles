@@ -1,0 +1,19 @@
+#!/bin/bash
+
+step="${1:-}"
+[[ -n $step ]] || exit 1
+
+exec {lock_fd}>"${XDG_RUNTIME_DIR:-/tmp}/brightness-all-displays.lock"
+flock -n "$lock_fd" || exit 0
+
+focused="$(omarchy-hyprland-monitor-focused)"
+[[ -n $focused ]] || exit 1
+
+target="$(omarchy-brightness-display-ddc "$focused" "$step")" || exit 1
+
+for monitor in $(hyprctl monitors -j | jq -r '.[].name'); do
+  [[ $monitor == "$focused" ]] || omarchy-brightness-display-ddc "$monitor" "$target%" >/dev/null &
+done
+wait
+
+omarchy-osd -i brightness -p "$target"

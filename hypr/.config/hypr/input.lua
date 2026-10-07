@@ -7,6 +7,12 @@ hl.device({
   natural_scroll = true,
 })
 
+hl.config({
+  cursor = {
+    default_monitor = "desc:ASUSTek COMPUTER INC VG27AQL1A",
+  },
+})
+
 -- Keyboard layout and options.
 -- See https://wiki.hypr.land/Configuring/Basics/Variables/#input
 -- hl.config({

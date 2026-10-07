@@ -49,14 +49,19 @@
 --   },
 -- })
 
--- No window transparency. Omarchy tags every window "default-opacity" and then
--- applies "0.985 0.96", so unfocused windows sit at 96% and the wallpaper
--- bleeds through them. This runs after those defaults and overrides the same
--- tag, which covers every window rather than one app at a time.
+-- Omarchy strips "default-opacity" from browsers and gives them their own "1.0 0.985" rule.
 o.window({ tag = "default-opacity" }, { opacity = "1 1" })
+o.window({ tag = "firefox-based-browser" }, { opacity = "1 1" })
+o.window({ tag = "chromium-based-browser" }, { opacity = "1 1" })
+
+o.window({ class = "^steam$" }, { tile = true })
 
 
 hl.config({
+  general = {
+    resize_on_border = true,
+  },
+
   decoration = {
     rounding = 8,
   },

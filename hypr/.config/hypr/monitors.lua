@@ -2,11 +2,14 @@
 -- List current monitors and supported resolutions with: hyprctl monitors all
 
 local omarchy_gdk_scale = 1
-local omarchy_monitor_scale = "auto"
+local omarchy_monitor_scale = 1
 
 hl.env("GDK_SCALE", tostring(omarchy_gdk_scale))
-hl.monitor({ output = "DP-3", mode = "2560x1440@144.01Hz", position = "0x0", scale = omarchy_monitor_scale })
-hl.monitor({ output = "DP-1", mode = "preferred", position = "0x1440", scale = omarchy_monitor_scale })
+hl.monitor({ output = "desc:Ancor Communications Inc ASUS PB278", mode = "preferred", position = "0x0", scale = omarchy_monitor_scale })
+hl.monitor({ output = "desc:ASUSTek COMPUTER INC VG27AQL1A", mode = "2560x1440@144.01Hz", position = "0x1440", scale = omarchy_monitor_scale })
+
+hl.workspace_rule({ workspace = "1", monitor = "desc:ASUSTek COMPUTER INC VG27AQL1A", default = true })
+hl.workspace_rule({ workspace = "2", monitor = "desc:Ancor Communications Inc ASUS PB278", default = true })
 
 -- Configure a specific monitor.
 -- hl.monitor({ output = "DP-2", mode = "2560x1440@144", position = "0x0", scale = 1 })

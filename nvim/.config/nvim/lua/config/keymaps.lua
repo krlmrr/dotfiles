@@ -13,6 +13,9 @@ vim.keymap.set('n', ';', ':', { noremap = true, desc = "Command mode" })
 -- Add punctuation at end of line
 vim.keymap.set("i", ";;", "<Esc>A;<Esc>", { desc = "Add semicolon at end" })
 vim.keymap.set("i", ",,", "<Esc>A,<Esc>", { desc = "Add comma at end" })
+vim.keymap.set("n", ";;", "A;<Esc>", { desc = "Add semicolon at end" })
+vim.keymap.set("n", ",,", "A,<Esc>", { desc = "Add comma at end" })
+vim.keymap.set("n", "..", "A.<Esc>", { desc = "Add period at end" })
 
 -- Toggle inlay hints
 vim.keymap.set('n', '<leader>th', function()

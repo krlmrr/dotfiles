@@ -6,7 +6,7 @@
   },
   "bar": {
     "position": "top",
-    "transparent": false,
+    "transparent": true,
     "centerAnchor": "omarchy.clock",
     "layout": {
       "left": [
@@ -20,6 +20,9 @@
       "center": [
         {
           "id": "omarchy.indicators"
+        },
+        {
+          "id": "omarchy.media"
         },
         {
           "id": "omarchy.clock",
@@ -38,6 +41,12 @@
         }
       ],
       "right": [
+        {
+          "id": "okgo.mailpit"
+        },
+        {
+          "id": "okgo.xdebug"
+        },
         {
           "id": "omarchy.tray"
         },

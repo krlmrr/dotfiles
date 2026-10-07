@@ -27,3 +27,4 @@ export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 # End of LM Studio CLI section
 
 [ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"

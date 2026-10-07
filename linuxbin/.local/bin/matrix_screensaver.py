@@ -26,8 +26,10 @@ CHAR_POOLS = {
     "numbers": string.digits,
     "symbols": "!@#$%^&*()_+-=[]{}|;':\",./<>?",
 }
+ALL_CHARS = "".join(CHAR_POOLS.values())
 
 DECAY = 0.88
+MUTATE_CHANCE = 0.03
 THRESHOLD = 0.05
 DROPS_PER_COL = 2
 
@@ -46,17 +48,11 @@ class Drop:
         self.y = phase
         self.phase = phase
         self.speed = random.randint(*speed_range)
-        self.pool = random.choice(list(CHAR_POOLS.values()))
         self.color_idx = random.choice([1, 2, 3, 4, 5, 6])
-        self.char = random.choice(self.pool)
-        self.change_timer = 0
         self.length = random.randint(10, 24)
 
     def next_char(self):
-        self.change_timer += 1
-        if self.change_timer % 5 == 0:
-            self.char = random.choice(self.pool)
-        return self.char
+        return random.choice(ALL_CHARS)
 
     def move(self, max_y):
         cells = []
@@ -65,9 +61,6 @@ class Drop:
             if self.y - self.length > max_y:
                 self.y = self.phase
                 self.speed = random.randint(1, 3)
-                self.pool = random.choice(list(CHAR_POOLS.values()))
-                self.change_timer = 0
-                self.char = random.choice(self.pool)
             cells.append(self.y)
         return cells
 
@@ -157,6 +150,8 @@ def main(stdscr):
                     if v < THRESHOLD:
                         continue
                     row_i[x] = v * DECAY
+                    if random.random() < MUTATE_CHANCE:
+                        row_g[x] = random.choice(ALL_CHARS)
                     try:
                         stdscr.addstr(y, x, row_g[x], attr_for(v, row_c[x]))
                     except curses.error:

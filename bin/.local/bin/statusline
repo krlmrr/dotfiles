@@ -1,7 +1,7 @@
 #!/bin/sh
 flag="$HOME/.claude/statusline-off"
 if [ -f "$flag" ]; then
-  rm "$flag" && echo "Claude status line on for new sessions in panes with at least ${CLAUDE_STATUSLINE_MIN_ROWS:-30} rows."
+  rm "$flag" && echo "Claude status line on in panes with at least ${CLAUDE_STATUSLINE_MIN_ROWS:-30} rows."
 else
-  touch "$flag" && echo "Claude status line off for new sessions."
+  touch "$flag" && echo "Claude status line off."
 fi

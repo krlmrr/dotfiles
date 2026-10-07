@@ -5,6 +5,9 @@
 
 input=$(cat)
 
+[ -f "$HOME/.claude/statusline-off" ] && exit 0
+[ "${LINES:-999}" -lt "${CLAUDE_STATUSLINE_MIN_ROWS:-30}" ] && exit 0
+
 # ── Colors ──────────────────────────────────────────────────────────────────
 bold='\033[1m'
 cyan='\033[96m'

@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import re
+import signal
+import subprocess
+import sys
+
+MODEL = os.path.expanduser("~/.local/share/piper/glados/glados.onnx")
+PIPER = os.path.expanduser("~/.local/bin/piper")
+STATE_DIR = os.path.expanduser("~/.local/state/glados")
+PID_FILE = os.path.join(STATE_DIR, "speaking.pid")
+PRIORITY_FILE = os.path.join(STATE_DIR, "priority.pid")
+VOLUME_FILE = os.path.join(STATE_DIR, "volume")
+DEFAULT_VOLUME = 0.3
+PRONUNCIATIONS = {
+    r"\bGLaDOS\b": "Gladoss",
+}
+
+
+def speakable(markdown, max_chars):
+    text = re.sub(r"```.*?```", " ", markdown, flags=re.S)
+    text = re.sub(r"^\s*\|.*\|\s*$", " ", text, flags=re.M)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = re.sub(r"https?://\S+", " ", text)
+    text = re.sub(r"`([^`]*)`", r"\1", text)
+    text = re.sub(r"^\s*#+\s*", "", text, flags=re.M)
+    text = re.sub(r"^\s*[-*+]\s+", "", text, flags=re.M)
+    text = re.sub(r"[*_~>]+", "", text)
+    for pattern, spoken in PRONUNCIATIONS.items():
+        text = re.sub(pattern, spoken, text, flags=re.I)
+    text = re.sub(r"\s*\n\s*", "\n", text).strip()
+    if max_chars and len(text) > max_chars:
+        text = text[:max_chars].rsplit(".", 1)[0] + "."
+    return text
+
+
+def read_pid(path):
+    try:
+        with open(path) as handle:
+            return int(handle.read().strip())
+    except (OSError, ValueError):
+        return None
+
+
+def is_alive(pid):
+    try:
+        os.killpg(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def current_volume():
+    try:
+        with open(VOLUME_FILE) as handle:
+            return min(max(float(handle.read().strip()), 0.0), 1.0)
+    except (OSError, ValueError):
+        return DEFAULT_VOLUME
+
+
+def save_volume(value):
+    os.makedirs(STATE_DIR, exist_ok=True)
+    with open(VOLUME_FILE, "w") as handle:
+        handle.write(f"{min(max(value, 0.0), 1.0):.2f}")
+
+
+def stop_previous():
+    for path in (PID_FILE, PRIORITY_FILE):
+        pid = read_pid(path)
+        if pid:
+            try:
+                os.killpg(pid, signal.SIGTERM)
+            except OSError:
+                pass
+
+
+def speak(text, wait, priority):
+    os.makedirs(STATE_DIR, exist_ok=True)
+    stop_previous()
+    os.environ.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+    pipeline = (
+        f"{PIPER} -m {MODEL} --output-raw 2>/dev/null"
+        " | pw-cat --playback --raw --format s16 --rate 22050 --channels 1"
+        f" --volume {current_volume():.2f} - 2>/dev/null"
+    )
+    speaker = subprocess.Popen(
+        ["bash", "-c", pipeline],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    with open(PRIORITY_FILE if priority else PID_FILE, "w") as handle:
+        handle.write(str(speaker.pid))
+    speaker.stdin.write(text.encode())
+    speaker.stdin.close()
+    if wait:
+        speaker.wait()
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Read text aloud in the GLaDOS voice.")
+    parser.add_argument("text", nargs="*", help="text to speak; reads stdin when omitted")
+    parser.add_argument("--max", type=int, default=0, help="truncate to this many characters")
+    parser.add_argument("--wait", action="store_true", help="block until speech finishes")
+    parser.add_argument("--stop", action="store_true", help="stop whatever is being spoken")
+    parser.add_argument("--priority", action="store_true", help="keep --yield speech from interrupting this")
+    parser.add_argument("--yield", dest="yield_", action="store_true", help="stay silent while a --priority reading plays")
+    parser.add_argument("--volume", type=float, metavar="0-1", help="save the playback volume and exit")
+    args = parser.parse_args()
+
+    if args.volume is not None:
+        save_volume(args.volume)
+        print(f"glados-say volume: {current_volume():.2f}")
+        return
+    if args.stop:
+        stop_previous()
+        return
+    priority_pid = read_pid(PRIORITY_FILE)
+    if args.yield_ and priority_pid and is_alive(priority_pid):
+        return
+    if not os.path.exists(MODEL):
+        sys.exit(f"glados-say: voice model missing at {MODEL}")
+
+    text = speakable(" ".join(args.text) if args.text else sys.stdin.read(), args.max)
+    if text:
+        speak(text, args.wait, args.priority)
+
+
+if __name__ == "__main__":
+    main()

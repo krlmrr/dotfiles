@@ -40,6 +40,24 @@ local function ancestor_process_named(name)
   return false
 end
 
+local function wayland_display()
+  if vim.env.WAYLAND_DISPLAY then
+    return vim.env.WAYLAND_DISPLAY
+  end
+
+  local runtime = vim.env.XDG_RUNTIME_DIR
+  if not runtime then
+    return nil
+  end
+
+  local ok, names = pcall(vim.fn.readdir, runtime)
+  for _, name in ipairs(ok and names or {}) do
+    if name:match("^wayland%-%d+$") then
+      return name
+    end
+  end
+end
+
 function M.setup()
   local in_tmux = vim.env.TMUX ~= nil
   local in_ssh = vim.env.SSH_TTY ~= nil or vim.env.SSH_CONNECTION ~= nil
@@ -50,7 +68,12 @@ function M.setup()
   end
 
   local osc52 = require("vim.ui.clipboard.osc52")
-  local has_wayland = vim.env.WAYLAND_DISPLAY ~= nil
+  local display = wayland_display()
+  if display then
+    vim.env.WAYLAND_DISPLAY = display
+  end
+
+  local has_wayland = display ~= nil
     and vim.fn.executable("wl-copy") == 1
     and vim.fn.executable("wl-paste") == 1
 

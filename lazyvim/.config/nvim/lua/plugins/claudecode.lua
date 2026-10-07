@@ -1,6 +1,6 @@
 return {
   "coder/claudecode.nvim",
-  event = "VeryLazy", -- Start the IDE server so `claude` in another pane can /ide connect
+  event = "VeryLazy",
   dependencies = {
     "folke/snacks.nvim",
   },

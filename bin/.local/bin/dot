@@ -179,6 +179,12 @@ if [ "$(uname)" = "Darwin" ]; then
     fi
 fi
 
+if command -v herdr >/dev/null 2>&1 \
+    && ! herdr plugin list --json 2>/dev/null | grep -q '"plugin_id": *"heeler"'; then
+    herdr plugin install ZingerLittleBee/Heeler/plugin --ref main --yes \
+        || echo "Could not install the Heeler herdr plugin."
+fi
+
 # --- Register the Claude hook ----------------------------------------------
 # ~/.claude/settings.json holds unrelated machine state: a large permissions
 # allowlist, model, statusLine, enabledPlugins, theme, and a SessionStart hook

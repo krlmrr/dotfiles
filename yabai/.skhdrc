@@ -42,42 +42,6 @@ shift + ctrl + alt + cmd - down : yabai -m window --warp south
 shift + ctrl + alt + cmd - up : yabai -m window --warp north
 shift + ctrl + alt + cmd - right : yabai -m window --warp east
 
-# Cmd+N goes to desktop N; Cmd+Shift+N moves the window there and follows.
-#
-# yabai moves the window (public API, works with SIP on) but cannot focus a
-# space — `space --focus` needs the scripting addition SIP blocks. So the helper
-# posts macOS's own "Switch to Desktop N" shortcut instead (symbolichotkeys
-# 118-126 = ctrl+1..9, 79/81 = ctrl+left/right).
-#
-# The helper exists rather than a plain `osascript ... key code N using control
-# down` because skhd fires while the chord's OWN cmd(+shift) is still physically
-# held: without forcing the event flags, macOS sees cmd+ctrl+N, matches no
-# shortcut, and the view never follows. yabai/helpers/space-follow.swift calls
-# CGEventSetFlags to drop the held modifiers. It needs no Accessibility grant of its
-# own — spawned by skhd, it inherits skhd's.
-#
-# `&&` matters: if the target space does not exist yabai exits non-zero and the
-# follow is skipped, rather than switching to nowhere.
-cmd - 1 : ~/.config/yabai/helpers/space-follow 1
-cmd - 2 : ~/.config/yabai/helpers/space-follow 2
-cmd - 3 : ~/.config/yabai/helpers/space-follow 3
-cmd - 4 : ~/.config/yabai/helpers/space-follow 4
-cmd - 5 : ~/.config/yabai/helpers/space-follow 5
-cmd - 6 : ~/.config/yabai/helpers/space-follow 6
-cmd - 7 : ~/.config/yabai/helpers/space-follow 7
-cmd - 8 : ~/.config/yabai/helpers/space-follow 8
-cmd - 9 : ~/.config/yabai/helpers/space-follow 9
-
-shift + cmd - 1 : yabai -m window --space 1 && ~/.config/yabai/helpers/space-follow 1
-shift + cmd - 2 : yabai -m window --space 2 && ~/.config/yabai/helpers/space-follow 2
-shift + cmd - 3 : yabai -m window --space 3 && ~/.config/yabai/helpers/space-follow 3
-shift + cmd - 4 : yabai -m window --space 4 && ~/.config/yabai/helpers/space-follow 4
-shift + cmd - 5 : yabai -m window --space 5 && ~/.config/yabai/helpers/space-follow 5
-shift + cmd - 6 : yabai -m window --space 6 && ~/.config/yabai/helpers/space-follow 6
-shift + cmd - 7 : yabai -m window --space 7 && ~/.config/yabai/helpers/space-follow 7
-shift + cmd - 8 : yabai -m window --space 8 && ~/.config/yabai/helpers/space-follow 8
-shift + cmd - 9 : yabai -m window --space 9 && ~/.config/yabai/helpers/space-follow 9
-
 # Layout
 alt - f : yabai -m window --toggle zoom-fullscreen
 shift + alt - f : yabai -m window --toggle float; yabai -m window --grid 4:4:1:1:2:2

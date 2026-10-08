@@ -12,8 +12,8 @@ hs.openConsoleOnDockClick(false)
 pcall(function() require("hs.ipc") end)
 
 -- ── Move window to a space AND follow it ────────────────────────────────────
--- ctrl+shift+1..9 / ctrl+shift+arrows: move the focused window to that desktop
--- and go there too. yabai does the move (public API, fine with SIP on) but
+-- cmd+1..9 goes to that desktop; cmd+shift+1..9 moves the focused window to
+-- that desktop and goes there too. yabai does the move (public API, fine with SIP on) but
 -- cannot focus a space — `space --focus` needs the scripting addition SIP blocks
 -- — so we post macOS's own "Switch to Desktop N" shortcut and let Apple do the
 -- switching with its native animation.
@@ -124,10 +124,10 @@ local moveFollowKeys = {}
 pcall(function()
     for i = 1, 9 do
         table.insert(moveFollowKeys,
-            hs.hotkey.bind({ "ctrl", "shift" }, tostring(i), moveAndFollow(i)))
+            hs.hotkey.bind({ "cmd" }, tostring(i), function() post(KEYCODE[i]) end))
+        table.insert(moveFollowKeys,
+            hs.hotkey.bind({ "cmd", "shift" }, tostring(i), moveAndFollow(i)))
     end
-    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "left",  moveAndFollow("prev")))
-    table.insert(moveFollowKeys, hs.hotkey.bind({ "ctrl", "shift" }, "right", moveAndFollow("next")))
 end)
 
 local GHOSTTY = "com.mitchellh.ghostty"
@@ -142,6 +142,19 @@ local function ghosttyOrNewWindow()
 end
 
 local ghosttyKey = hs.hotkey.bind({ "cmd" }, "return", ghosttyOrNewWindow)
+
+local ghosttyLinkClick = hs.eventtap.new(
+    { hs.eventtap.event.types.leftMouseDown, hs.eventtap.event.types.leftMouseUp },
+    function(event)
+        local flags = event:getFlags()
+        if not flags.ctrl or flags.cmd then return false end
+        local app = hs.application.frontmostApplication()
+        if not app or app:bundleID() ~= GHOSTTY then return false end
+        event:setFlags({ cmd = true, shift = flags.shift, alt = flags.alt })
+        return false
+    end
+)
+ghosttyLinkClick:start()
 
 local RESTART_DOCK_WHEN_DISPLAY_ADDED = true
 local displayWatcher

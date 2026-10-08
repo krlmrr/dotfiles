@@ -143,16 +143,6 @@ hl.unbind("SUPER + ALT + SHIFT + F")
 hl.unbind("SUPER + comma")
 hl.unbind("ALT + PRINT")
 hl.unbind("SUPER + PRINT")
-hl.unbind("SUPER + SHIFT + code:10")
-hl.unbind("SUPER + SHIFT + code:11")
-hl.unbind("SUPER + SHIFT + code:12")
-hl.unbind("SUPER + SHIFT + code:13")
-hl.unbind("SUPER + SHIFT + code:14")
-hl.unbind("SUPER + SHIFT + code:15")
-hl.unbind("SUPER + SHIFT + code:16")
-hl.unbind("SUPER + SHIFT + code:17")
-hl.unbind("SUPER + SHIFT + code:18")
-hl.unbind("SUPER + SHIFT + code:19")
 
 local function send_shortcut_once(mods, key)
   hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
@@ -179,10 +169,6 @@ end
 
 o.bind("SUPER + Q", "Close window", hl.dsp.window.close())
 
-for workspace = 1, 9 do
-  o.bind("CTRL + SHIFT + code:" .. tostring(workspace + 9), "Move window to workspace " .. workspace, hl.dsp.window.move({ workspace = tostring(workspace) }))
-end
-
 o.bind("SUPER + A", "Universal select all", function()
   if active_window_is_terminal() then
     send_shortcut_once("CTRL SHIFT", "A")
@@ -199,8 +185,8 @@ o.bind("SUPER + SHIFT + F", "File manager (cwd)", "omarchy-launch-terminal spf")
 
 o.bind("SUPER + comma", "Dismiss all notifications", "omarchy-shell notifications dismissAll")
 
-o.bind("SUPER + SHIFT + code:13", "Screenshot", "omarchy-capture-screenshot")
-o.bind("SUPER + SHIFT + code:14", "Screenrecording", "omarchy-capture-screenrecording --stop-recording || omarchy-menu toggle trigger.capture.screenrecord")
+o.bind("SUPER + CTRL + code:13", "Screenshot", "omarchy-capture-screenshot")
+o.bind("SUPER + CTRL + code:14", "Screenrecording", "omarchy-capture-screenrecording --stop-recording || omarchy-menu toggle trigger.capture.screenrecord")
 o.bind("SUPER + CTRL + code:15", "Color picker", "pkill hyprpicker || hyprpicker -a")
 
 o.bind("SUPER + SHIFT + M", "Apple Music", "omarchy-launch-or-focus-webapp 'chrome-music\\.apple' https://music.apple.com/us/new")

@@ -11,7 +11,7 @@ COLUMNS = {
     "herdr": ("Keys", "Setting name"),
     "Yabai": ("Shortcut", "What it does"),
 }
-GENERATED_NOTE_PREFIXES = ("Now: ", "Replaces an Omarchy default", "Maps the key to itself", "From ~/.config/herdr")
+GENERATED_NOTE_PREFIXES = ("Now: ", "Replaces an Omarchy default", "Replaces Omarchy's: ", "Maps the key to itself", "From ~/.config/herdr")
 
 
 def header_index(ws):

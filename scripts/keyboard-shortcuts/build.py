@@ -115,22 +115,22 @@ def omarchy_rows():
             continue
         rows[k] = dict(r)
     table = []
+    replaced = {}
     for (file, norm), r in rows.items():
         if norm in yours:
-            status, note = "Replaced by yours", "Now: " + (yours[norm]["desc"] or "custom")
-        elif norm in unbound:
+            replaced[norm] = r["desc"] or LID.get(r["keys"], ("", ""))[1]
+            continue
+        if norm in unbound:
             status, note = "Removed by you", ""
         else:
             status, note = "Active", ""
         desc = r["desc"] or LID.get(r["keys"], ("", ""))[1]
-        table.append([hypr_pretty(r["keys"]), desc, OMARCHY_GROUPS.get(file, file), "Omarchy", status, None, note])
-    defaults = {n for (_, n) in rows}
+        table.append([hypr_pretty(r["keys"]), desc, None, OMARCHY_GROUPS.get(file, file), "Omarchy", status, None, note])
     for norm, r in yours.items():
-        table.append([hypr_pretty(r["keys"]), r["desc"], "Yours", "You", "Active", None,
-                      "Replaces an Omarchy default" if norm in defaults else ""])
+        table.append([hypr_pretty(r["keys"]), r["desc"], replaced.get(norm), "Yours", "You", "Active", None, None])
     order = list(OMARCHY_GROUPS.values()) + ["Yours"]
     hardware = {name for name, _ in LID.values()}
-    table.sort(key=lambda row: (row[4] != "Active", row[0].endswith(" key") or row[0] in hardware, order.index(row[2])))
+    table.sort(key=lambda row: (row[5] != "Active", row[0].endswith(" key") or row[0] in hardware, order.index(row[3])))
     return table
 
 
@@ -476,6 +476,10 @@ def skhd_describe(command):
     if m:
         target = m.group(1)
         return ("Go to desktop " + target if target.isdigit() else "Go to " + DIRECTIONS.get(target, target)), "Desktops"
+    if "color-picker" in command:
+        return "Color picker (Raycast)", "Apps"
+    if re.search(r"-e spf\b", command):
+        return "File manager (spf in Ghostty)", "Apps"
     if "zoom-fullscreen" in command:
         return "Toggle zoom-fullscreen", "Layout"
     if "--toggle float" in command:
@@ -503,12 +507,12 @@ def yabai_rows():
         text = line.strip()
         active = not text.startswith("#")
         body = text.lstrip("#").strip()
-        if not re.search(r" : .*(yabai|space-follow)", body) or not re.match(r"^[a-z0-9 +]+ - \S+\s*:", body):
+        if " : " not in body or not re.match(r"^[a-z0-9 +]+ - \S+\s*:", body):
             continue
         chord, _, command = body.partition(" : ")
         desc, group = skhd_describe(command)
         rows.append([skhd_pretty(chord), desc, group, skhd_keyboard(chord), "Active" if active else "Commented out", None, None])
-    order = ["Focus", "Move windows", "Layout", "Desktops", "Other"]
+    order = ["Focus", "Move windows", "Layout", "Desktops", "Apps", "Other"]
     rows.sort(key=lambda r: (r[4] != "Active", order.index(r[2])))
     return rows
 
@@ -520,10 +524,10 @@ summary.title = "Summary"
 tabs = []
 
 ws = wb.create_sheet("Omarchy")
-last, call = style_sheet(ws, ["#", "Shortcut", "What it does", "Group", "Set by", "Status", "Your call", "Notes"],
-                         omarchy_rows(), {"A": 5, "B": 30, "C": 46, "D": 26, "E": 10, "F": 18, "G": 12, "H": 34}, (3, 8),
-                         grey_when=("F", ["Removed by you", "Replaced by yours"]))
-tabs.append(("Omarchy", "D", last, call, "Omarchy / Hyprland, this machine. Grey rows: defaults you already removed or replaced."))
+last, call = style_sheet(ws, ["#", "Shortcut", "What it does", "Omarchy default", "Group", "Set by", "Status", "Your call", "Notes"],
+                         omarchy_rows(), {"A": 5, "B": 30, "C": 40, "D": 30, "E": 26, "F": 10, "G": 16, "H": 12, "I": 34}, (3, 4, 9),
+                         grey_when=("G", ["Removed by you"]))
+tabs.append(("Omarchy", "E", last, call, "Omarchy / Hyprland, this machine. Grey rows are Omarchy defaults you removed; Omarchy default shows what your own shortcuts replaced."))
 
 for title, rows, note in (
     ("LazyVim", lazyvim_rows(), "LazyVim on this machine (~/.config/nvim). Space is the leader key."),

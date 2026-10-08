@@ -86,3 +86,6 @@ alt - 0x2B : yabai -m space --layout stack
 
 # Balance tree (make all windows equal size)
 shift + alt - 0 : yabai -m space --balance
+
+cmd + ctrl - 6 : open -g "raycast://extensions/thomas/color-picker/pick-color"
+cmd + shift - f : open -na Ghostty.app --args -e spf

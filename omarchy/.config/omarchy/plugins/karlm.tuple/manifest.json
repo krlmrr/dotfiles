@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "karlm.tuple",
+  "name": "Tuple",
+  "version": "0.1.0",
+  "author": "Karl Murray",
+  "description": "Start, join and control Tuple pairing calls from the bar",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Widget.qml"
+  },
+  "barWidget": {
+    "displayName": "Tuple",
+    "description": "Start, join and control Tuple pairing calls from the bar",
+    "category": "Development",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

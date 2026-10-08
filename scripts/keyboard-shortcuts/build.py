@@ -75,7 +75,13 @@ def hypr_norm(keys):
     return re.sub(r"\s+", "", keys).upper()
 
 
+LID = {"switch:on:Lid Switch": ("Laptop lid closed", "Runs omarchy-system-lid-close"),
+       "switch:off:Lid Switch": ("Laptop lid opened", "Runs omarchy-hyprland-monitor-clamshell")}
+
+
 def hypr_pretty(keys):
+    if keys in LID:
+        return LID[keys][0]
     out = []
     for p in [p.strip() for p in keys.split("+")]:
         if p in HYPR_KEYS or p.upper() in HYPR_KEYS:
@@ -116,13 +122,15 @@ def omarchy_rows():
             status, note = "Removed by you", ""
         else:
             status, note = "Active", ""
-        table.append([hypr_pretty(r["keys"]), r["desc"], OMARCHY_GROUPS.get(file, file), "Omarchy", status, None, note])
+        desc = r["desc"] or LID.get(r["keys"], ("", ""))[1]
+        table.append([hypr_pretty(r["keys"]), desc, OMARCHY_GROUPS.get(file, file), "Omarchy", status, None, note])
     defaults = {n for (_, n) in rows}
     for norm, r in yours.items():
         table.append([hypr_pretty(r["keys"]), r["desc"], "Yours", "You", "Active", None,
                       "Replaces an Omarchy default" if norm in defaults else ""])
     order = list(OMARCHY_GROUPS.values()) + ["Yours"]
-    table.sort(key=lambda row: order.index(row[2]))
+    hardware = {name for name, _ in LID.values()}
+    table.sort(key=lambda row: (row[4] != "Active", row[0].endswith(" key") or row[0] in hardware, order.index(row[2])))
     return table
 
 

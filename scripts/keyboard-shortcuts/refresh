@@ -1,0 +1,52 @@
+#!/bin/bash
+set -euo pipefail
+
+here="$(cd "$(dirname "$0")" && pwd)"
+dotfiles="$(cd "$here/../.." && pwd)"
+sheet="$dotfiles/docs/keyboard-shortcuts.xlsx"
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/keyboard-shortcuts"
+
+if [ ! -d /usr/share/omarchy ]; then
+    echo "Run this on the Omarchy machine: the Omarchy and LazyVim tabs are read from it." >&2
+    exit 1
+fi
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+if [ ! -x "$cache/venv/bin/python" ]; then
+    python3 -m venv "$cache/venv"
+    "$cache/venv/bin/pip" install -q openpyxl
+fi
+python="$cache/venv/bin/python"
+
+echo "Reading Omarchy bindings..."
+lua "$here/dump-hypr-binds.lua" > "$work/hypr-binds.jsonl"
+
+echo "Reading LazyVim keymaps..."
+DUMP_OUT="$work/lazyvim-maps.json" timeout 120 nvim --headless "+doautocmd User VeryLazy" \
+    "+lua vim.defer_fn(function() dofile('$here/dump-nvim-maps.lua'); vim.cmd('qa!') end, 1500)" >/dev/null 2>&1
+
+echo "Reading your Neovim config (first run installs its plugins into $cache)..."
+mkdir -p "$work/cfg" "$cache/nvim-data" "$cache/nvim-state" "$cache/nvim-cache"
+cp -r "$dotfiles/nvim/.config/nvim" "$work/cfg/nvim"
+nvim_env=(XDG_CONFIG_HOME="$work/cfg" XDG_DATA_HOME="$cache/nvim-data" XDG_STATE_HOME="$cache/nvim-state" XDG_CACHE_HOME="$cache/nvim-cache")
+env "${nvim_env[@]}" timeout 600 nvim --headless "+Lazy! restore" +qa >/dev/null 2>&1
+env "${nvim_env[@]}" DUMP_OUT="$work/nvim-maps.json" timeout 120 nvim --headless "+doautocmd User VeryLazy" \
+    "+lua vim.defer_fn(function() dofile('$here/dump-nvim-maps.lua'); vim.cmd('qa!') end, 2500)" >/dev/null 2>&1
+
+echo "Reading herdr defaults..."
+strings -n 4 "$(command -v herdr)" \
+    | awk '/^# prefix = "/ && !done { on = 1 } on && /^# [a-z_]+ = "/ { print } on && /^# navigate_pane_right = / { on = 0; done = 1 }' \
+    | sed -E 's/^# ([a-z_]+) = "([^"]*)"[[:space:]]*(#[[:space:]]*(.*))?$/\1\t\2\t\4/' > "$work/herdr-keys.tsv"
+
+echo "Building the workbook..."
+"$python" "$here/build.py" "$work" "$dotfiles" "$work/keyboard-shortcuts.xlsx"
+
+if [ -f "$sheet" ]; then
+    "$python" "$here/carry-over.py" "$sheet" "$work/keyboard-shortcuts.xlsx"
+fi
+
+mkdir -p "$(dirname "$sheet")"
+mv "$work/keyboard-shortcuts.xlsx" "$sheet"
+echo "Updated $sheet"

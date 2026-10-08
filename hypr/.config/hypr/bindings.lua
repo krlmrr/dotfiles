@@ -195,7 +195,7 @@ o.bind("SUPER + S", "Universal save", function()
   send_shortcut_once("CTRL", "S")
 end)
 
-o.bind("SUPER + SHIFT + F", "File manager (cwd)", "omarchy-launch-terminal yazi")
+o.bind("SUPER + SHIFT + F", "File manager (cwd)", "omarchy-launch-terminal spf")
 
 o.bind("SUPER + comma", "Dismiss all notifications", "omarchy-shell notifications dismissAll")
 

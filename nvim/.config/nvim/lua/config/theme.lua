@@ -99,7 +99,7 @@ local function apply_plugin_highlights()
 	-- Dashboard
 	vim.api.nvim_set_hl(0, "DashboardShortCut", { fg = colors.accent, bg = "NONE" })
 	vim.api.nvim_set_hl(0, "DashboardShortCutCursor", { fg = colors.accent, bg = colors.bg_highlight })
-	vim.api.nvim_set_hl(0, "DashboardHeader", { fg = colors.fg, bg = "NONE" })
+	vim.api.nvim_set_hl(0, "DashboardHeader", { fg = colors.accent, bg = "NONE" })
 	vim.api.nvim_set_hl(0, "DashboardMruTitle", { fg = colors.fg, bg = "NONE" })
 	vim.api.nvim_set_hl(0, "DashboardMruIcon", { fg = colors.fg, bg = "NONE" })
 	vim.api.nvim_set_hl(0, "DashboardFiles", { fg = colors.fg, bg = "NONE" })

@@ -96,11 +96,11 @@ link_dir() {
 # not config, so no package owns them; stow also refuses an absolute symlink as
 # a package source. Linux only: the path does not exist on macOS.
 if [ "$(uname)" = "Linux" ] && [ -d "$HOME/.local/state/omarchy" ]; then
-    mkdir -p "$HOME/.config/btop/themes" "$HOME/.config/nvim/lua/plugins"
+    mkdir -p "$HOME/.config/btop/themes" "$HOME/.config/lvim/lua/plugins"
     ln -snf "$HOME/.local/state/omarchy/current/theme/btop.theme" \
             "$HOME/.config/btop/themes/current.theme"
     ln -snf "$HOME/.local/state/omarchy/current/theme/neovim.lua" \
-            "$HOME/.config/nvim/lua/plugins/theme.lua"
+            "$HOME/.config/lvim/lua/plugins/theme.lua"
 fi
 
 if [ "$(uname)" = "Darwin" ]; then

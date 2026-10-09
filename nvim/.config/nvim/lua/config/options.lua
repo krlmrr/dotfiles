@@ -92,6 +92,9 @@ vim.api.nvim_create_autocmd('BufDelete', {
 -- Mouse and clipboard
 vim.o.mouse = 'a'
 vim.o.clipboard = 'unnamedplus'
+if vim.fn.has('linux') == 1 then
+  require('config.remote_clipboard').setup()
+end
 
 -- Prevent scrolling past end of file with mouse
 vim.keymap.set({ 'n', 'v', 'i' }, '<ScrollWheelDown>', function()

@@ -17,6 +17,7 @@ Panel {
   property bool inCall: false
   property bool muted: false
   property bool sharing: false
+  property bool holdingIdle: false
   property string callUrl: ""
   property string notice: ""
   property var contacts: []
@@ -33,6 +34,19 @@ Panel {
     return parts.join(" · ")
   }
 
+  onInCallChanged: {
+    if (inCall) {
+      if (!idleHoldProc.running) idleHoldProc.running = true
+    } else if (holdingIdle) {
+      releaseIdle()
+    }
+  }
+
+  function releaseIdle() {
+    holdingIdle = false
+    Quickshell.execDetached(["omarchy-shell", "idle", "enable"])
+  }
+
   function tuple(args) {
     Quickshell.execDetached(["tuple"].concat(args))
     refreshSoon.restart()
@@ -45,6 +59,7 @@ Panel {
 
   function refresh() {
     if (!statusProc.running) statusProc.running = true
+    if (!callStateProc.running) callStateProc.running = true
     if (root.opened && root.daemonRunning && !contactsProc.running) contactsProc.running = true
   }
 
@@ -80,10 +95,18 @@ Panel {
   }
 
   function joinFromClipboard() {
-    Quickshell.execDetached(["bash", "-c", "url=$(wl-paste --no-newline 2>/dev/null); [[ $url == http* ]] && tuple join \"$url\""])
+    if (!clipboardProc.running) clipboardProc.running = true
+  }
+
+  function joinUrl(text) {
+    var m = String(text || "").match(/https?:\/\/\S*tuple\S*/)
+    if (!m) {
+      say("No Tuple link on your clipboard")
+      return
+    }
+    tuple(["join", m[0]])
     inCall = true
-    say("Joining the link on your clipboard…")
-    refreshSoon.restart()
+    say("Joining…")
   }
 
   function callContact(contact) {
@@ -101,7 +124,7 @@ Panel {
   function toggleShare() {
     if (!inCall) return
     tuple([sharing ? "unshare" : "share"])
-    sharing = !sharing
+    say(sharing ? "Stopping share…" : "Pick a screen to share…")
   }
 
   function endCall() {
@@ -143,6 +166,36 @@ Panel {
   }
 
   Process {
+    id: callStateProc
+    command: ["bash", "-c", "pactl list source-outputs 2>/dev/null | grep -qiE 'application\\.(process\\.binary|name) = \"tuple' && echo in-call; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        var out = String(text || "")
+        var connected = out.indexOf("in-call") !== -1
+        root.sharing = connected && out.indexOf("sharing") !== -1
+        if (connected === root.inCall) return
+        root.inCall = connected
+        if (!connected) {
+          root.muted = false
+          root.callUrl = ""
+        }
+      }
+    }
+  }
+
+  Process {
+    id: idleHoldProc
+    command: ["bash", "-c", "omarchy-shell idle status 2>/dev/null | grep -q '\"stayAwake\":false' && omarchy-shell idle disable >/dev/null && echo held"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        if (String(text || "").indexOf("held") === -1) return
+        root.holdingIdle = true
+        if (!root.inCall) root.releaseIdle()
+      }
+    }
+  }
+
+  Process {
     id: contactsProc
     command: ["tuple", "ls"]
     stdout: StdioCollector {
@@ -151,13 +204,22 @@ Panel {
   }
 
   Process {
+    id: clipboardProc
+    command: ["wl-paste", "--no-newline"]
+    stdout: StdioCollector {
+      onStreamFinished: root.joinUrl(text)
+    }
+  }
+
+  Process {
     id: newProc
-    command: ["tuple", "new"]
+    command: ["bash", "-c", "out=$(tuple new 2>&1); if [[ $out == *'already joining'* ]]; then tuple end >/dev/null 2>&1; sleep 1; out=$(tuple new 2>&1); fi; printf '%s\\n' \"$out\""]
     stdout: StdioCollector {
       onStreamFinished: {
-        var m = String(text || "").match(/https?:\/\/\S+/)
+        var output = String(text || "")
+        var m = output.match(/https?:\/\/\S+/)
         if (!m) {
-          root.say("Couldn't start a call")
+          root.say(output.trim().split("\n")[0] || "Couldn't start a call")
           return
         }
         root.callUrl = m[0]

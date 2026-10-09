@@ -2,6 +2,7 @@
 unalias nv 2>/dev/null
 nvim() { if [ $# -eq 0 ]; then command nvim .; else command nvim "$@"; fi; }
 nv() { clear && nvim "$@"; }
+lvim() { NVIM_APPNAME=lvim nvim "$@"; }
 notes() {
   [ -d "$HOME/notes" ] || gh repo clone krlmrr/notes "$HOME/notes" || return
   (

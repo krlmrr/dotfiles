@@ -42,6 +42,7 @@ keybind = ctrl+shift+x=close_surface
 keybind = global:super+shift+up=toggle_quick_terminal
 keybind = shift+enter=csi:13;2u
 keybind = alt+shift+enter=csi:13;4u
+keybind = ctrl+enter=unbind
 keybind = super+control+shift+alt+arrow_down=resize_split:down,100
 keybind = super+control+shift+alt+arrow_up=resize_split:up,100
 keybind = super+control+shift+alt+arrow_left=resize_split:left,100

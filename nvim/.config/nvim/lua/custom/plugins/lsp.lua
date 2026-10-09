@@ -82,6 +82,8 @@ return {
 
     local servers = {
       intelephense = {}, -- Configured separately below with vim.lsp.config
+      ts_ls = {},
+      vue_ls = {},
       lua_ls = {
         settings = {
           Lua = {

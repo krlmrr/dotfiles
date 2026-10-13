@@ -5,6 +5,15 @@ return {
     "MunifTanjim/nui.nvim",
     "rcarriga/nvim-notify",
   },
+  config = function(_, opts)
+    require("noice").setup(opts)
+    local cmdline = require("noice.ui.cmdline")
+    local on_confirm = cmdline.on_confirm
+    cmdline.on_confirm = function(message)
+      message:newline()
+      return on_confirm(message)
+    end
+  end,
   opts = {
     views = {
       mini = {
@@ -46,6 +55,7 @@ return {
       { filter = { event = "notify", find = "Operation canceled" }, opts = { skip = true } },
       { filter = { event = "notify", find = "Deleted" }, opts = { skip = true } },
       { filter = { event = "msg_show", find = "Deleted" }, opts = { skip = true } },
+      { filter = { event = "msg_show", kind = { "confirm", "confirm_sub" } }, view = "confirm" },
       -- Route remaining messages to mini view
       { filter = { event = "msg_show" }, view = "mini" },
       { filter = { event = "notify" }, view = "mini" },

@@ -18,7 +18,12 @@ return {
     views = {
       mini = {
         timeout = 3000,
-        position = { row = -2 },
+        position = { row = -3 },
+        border = { style = "rounded", padding = { 0, 1 } },
+        win_options = {
+          winblend = 0,
+          winhighlight = { Normal = "NoiceMiniText", FloatBorder = "NoiceMiniBorder" },
+        },
       },
     },
     lsp = {

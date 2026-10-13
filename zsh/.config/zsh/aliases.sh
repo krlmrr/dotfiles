@@ -75,7 +75,6 @@ alias pip="pip3"
 
 # Apps
 alias code.="code ."
-alias zed.="zed ."
 
 publish() {
     local repo_name visibility="--private"

@@ -114,7 +114,6 @@ cask "transmission"
 cask "transmit"
 cask "tuple"
 cask "visual-studio-code"
-cask "zed"
 cask "zen"
 cask "zoom"
 

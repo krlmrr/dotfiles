@@ -625,12 +625,12 @@ yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^iPhone Mirroring$" manage=off
 yabai -m rule --add app="^Logi Options\+$" manage=off
 yabai -m rule --add app="^Herd$" manage=off
-yabai -m rule --add app="^Zed$" title="Settings$" manage=off
 yabai -m rule --add title="^Picture-in-Picture$" manage=off
 yabai -m rule --add app="^TV$" manage=off
 yabai -m rule --add app="^LilyView$" manage=off
 yabai -m rule --add app="^DeskPad$" manage=off
 yabai -m rule --add app="^osascript$" manage=off
+yabai -m rule --add app="^DaisyDisk$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 

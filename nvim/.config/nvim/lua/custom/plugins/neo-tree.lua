@@ -47,6 +47,20 @@ return {
       end,
     })
 
+    local tree_focus = vim.api.nvim_create_augroup("NeoTreeFocusLine", { clear = true })
+    vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter" }, {
+      group = tree_focus,
+      callback = function()
+        if vim.bo.filetype == "neo-tree" then vim.wo.cursorline = true end
+      end,
+    })
+    vim.api.nvim_create_autocmd("WinLeave", {
+      group = tree_focus,
+      callback = function()
+        if vim.bo.filetype == "neo-tree" then vim.wo.cursorline = false end
+      end,
+    })
+
     require('neo-tree').setup {
       use_popups_for_input = false, -- Use vim.ui.input (dressing.nvim)
       close_if_last_window = true,

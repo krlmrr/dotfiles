@@ -6,6 +6,7 @@ ZSH_AUTOSUGGEST_HISTORY_IGNORE="nvr *"
 
 plugins=(
     git
+    herdr
     zsh-autosuggestions
     zsh-syntax-highlighting
 )

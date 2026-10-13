@@ -107,6 +107,9 @@ local function apply_plugin_highlights()
 
 	vim.api.nvim_set_hl(0, "NoiceMiniBorder", { fg = colors.accent, bg = colors.bg_float })
 	vim.api.nvim_set_hl(0, "NoiceMiniText", { fg = colors.fg, bg = colors.bg_float })
+	vim.api.nvim_set_hl(0, "NoiceConfirmBorder", { fg = colors.accent, bg = colors.bg_float })
+	vim.api.nvim_set_hl(0, "NoiceFormatConfirm", { fg = colors.fg, bg = colors.bg_highlight })
+	vim.api.nvim_set_hl(0, "NoiceFormatConfirmDefault", { fg = colors.bg_float, bg = colors.accent, bold = true })
 
 	-- Dressing
 	vim.api.nvim_set_hl(0, "DressingInputBorder", { fg = colors.accent, bg = colors.bg_float })

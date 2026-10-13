@@ -20,6 +20,7 @@
   ],
   "trustedformulae": [
     "anomalyco/tap/opencode",
+    "anomalyco/tap/opencode-v2",
     "antoniorodr/memo/memo",
     "felixkratz/formulae/sketchybar",
     "https://github.com/asmvik/homebrew-formulae.git/skhd",

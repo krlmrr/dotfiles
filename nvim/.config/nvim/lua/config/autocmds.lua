@@ -93,3 +93,10 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     vim.cmd('echo "Saved."')
   end,
 })
+
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'QuitPre' }, {
+  group = vim.api.nvim_create_augroup('RelativeBufferNames', { clear = true }),
+  callback = function()
+    vim.cmd('noautocmd silent! cd .')
+  end,
+})

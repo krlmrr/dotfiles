@@ -90,6 +90,7 @@ vim.api.nvim_create_autocmd('BufDelete', {
 })
 
 -- Mouse and clipboard
+vim.o.confirm = true
 vim.o.mouse = 'a'
 vim.o.clipboard = 'unnamedplus'
 if vim.fn.has('linux') == 1 then

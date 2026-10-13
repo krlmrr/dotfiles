@@ -40,11 +40,7 @@ vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
 -- Buffers and windows
-vim.keymap.set("n", "<C-w>", function()
-  if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end
-  Snacks.bufdelete()
-end, { desc = "Close buffer, keep layout" })
-vim.keymap.set("n", "<leader>w", function()
+local function close_split()
   if vim.fn.getcmdwintype() ~= "" then return end
   if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end
   -- Count non-neo-tree windows
@@ -62,7 +58,25 @@ vim.keymap.set("n", "<leader>w", function()
     pcall(vim.cmd, 'bd#')
     vim.cmd('Dashboard')
   end
-end, { desc = "Close split (or return to dashboard)" })
+end
+
+vim.keymap.set("n", "<leader>w", close_split, { desc = "Close split (or return to dashboard)" })
+vim.keymap.set("n", "<C-w>", function()
+  if vim.fn.getcmdwintype() ~= "" then return end
+  if vim.bo.filetype == 'dashboard' or vim.bo.filetype == 'neo-tree' then return end
+  local editor_wins = 0
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
+    local floating = vim.api.nvim_win_get_config(win).relative ~= ''
+    if ft ~= 'neo-tree' and not floating then editor_wins = editor_wins + 1 end
+  end
+  if editor_wins > 1 then
+    vim.cmd('close')
+  else
+    Snacks.bufdelete()
+  end
+  vim.cmd('Neotree focus')
+end, { desc = "Close split or buffer and focus file tree" })
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
 
 -- Restart neovim (saves files, reopens current file in project root)
@@ -76,7 +90,11 @@ vim.keymap.set("n", "<leader>rc", function()
   -- Send space separately, then command (histignorespace skips space-prefixed commands)
   local cmd = 'nvr ' .. vim.fn.shellescape(root)
   if file ~= '' then cmd = cmd .. ' ' .. vim.fn.shellescape(file) end
-  vim.fn.jobstart('sleep 0.1 && tmux send-keys -t ' .. pane .. ' Space && tmux send-keys -t ' .. pane .. ' -l ' .. vim.fn.shellescape(cmd) .. ' && tmux send-keys -t ' .. pane .. ' Enter', { detach = true })
+  vim.fn.jobstart(
+    'sleep 0.1 && tmux send-keys -t ' ..
+    pane ..
+    ' Space && tmux send-keys -t ' ..
+    pane .. ' -l ' .. vim.fn.shellescape(cmd) .. ' && tmux send-keys -t ' .. pane .. ' Enter', { detach = true })
   vim.cmd('qa!')
 end, { desc = "Restart nvim" })
 
@@ -142,3 +160,5 @@ vim.keymap.set('n', '<leader>dd', function()
   local content = line:gsub('^%s*', ''):gsub(';%s*$', '')
   vim.api.nvim_set_current_line(indent .. 'dd(' .. content .. ');')
 end, { desc = "Wrap line with dd()" })
+
+vim.keymap.set('n', 'cc', '"_cc', { desc = "Change line without yanking" })

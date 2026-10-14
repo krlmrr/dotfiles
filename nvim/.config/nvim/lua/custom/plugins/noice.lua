@@ -9,21 +9,63 @@ return {
 		require("noice").setup(opts)
 		local cmdline = require("noice.ui.cmdline")
 		local on_confirm = cmdline.on_confirm
+		local on_show = cmdline.on_show
+		local on_hide = cmdline.on_hide
+		local held_hide
+		local hide_token = 0
+
 		cmdline.on_confirm = function(message)
+			for _, line in ipairs(message._lines) do
+				for _, text in ipairs(line._texts) do
+					if text.extmark then
+						text.extmark.hl_group = "NoiceConfirmText"
+					end
+				end
+			end
 			message:newline()
 			return on_confirm(message)
+		end
+
+		cmdline.on_hide = function(...)
+			if cmdline._on_hide then
+				held_hide = cmdline._on_hide
+				cmdline._on_hide = nil
+				hide_token = hide_token + 1
+				local token = hide_token
+				vim.defer_fn(function()
+					if token == hide_token and held_hide then
+						local release = held_hide
+						held_hide = nil
+						release()
+						require("noice.ui.state").clear("msg_show")
+					end
+				end, 100)
+			end
+			return on_hide(...)
+		end
+
+		cmdline.on_show = function(event, content, pos, firstc, prompt, ...)
+			if firstc == "" and (held_hide or cmdline._on_hide) then
+				if held_hide then
+					cmdline._on_hide = held_hide
+					held_hide = nil
+					hide_token = hide_token + 1
+				end
+				return
+			end
+			return on_show(event, content, pos, firstc, prompt, ...)
 		end
 	end,
 	opts = {
 		views = {
 			cmdline_popup = {
-				position = { row = "35%", col = "50%" },
+				position = { row = "50%", col = "50%" },
 			},
 			cmdline_popupmenu = {
-				position = { row = "43%", col = "50%" },
+				position = { row = "58%", col = "50%" },
 			},
 			confirm = {
-				position = { row = "45%", col = "50%" },
+				position = { row = "50%", col = "50%" },
 			},
 			mini = {
 				timeout = 3000,

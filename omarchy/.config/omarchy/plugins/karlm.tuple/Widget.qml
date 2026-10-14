@@ -21,6 +21,10 @@ Panel {
   property string callUrl: ""
   property string notice: ""
   property var contacts: []
+  property var sinks: []
+  property var sources: []
+  property string defaultSink: ""
+  property string defaultSource: ""
   property bool cursorActive: false
   property int cursorIndex: 0
 
@@ -61,6 +65,32 @@ Panel {
     if (!statusProc.running) statusProc.running = true
     if (!callStateProc.running) callStateProc.running = true
     if (root.opened && root.daemonRunning && !contactsProc.running) contactsProc.running = true
+    if (root.opened && !audioProc.running) audioProc.running = true
+  }
+
+  function parseAudio(text) {
+    var outputs = []
+    var inputs = []
+    var lines = String(text || "").split("\n")
+    for (var i = 0; i < lines.length; i++) {
+      var f = lines[i].split("\t")
+      if (f[0] === "default-sink") defaultSink = f[1] || ""
+      else if (f[0] === "default-source") defaultSource = f[1] || ""
+      else if (f[0] === "sink" && f.length >= 3) outputs.push({ name: f[1], label: f[2] })
+      else if (f[0] === "source" && f.length >= 3) inputs.push({ name: f[1], label: f[2] })
+    }
+    sinks = outputs
+    sources = inputs
+  }
+
+  function setSink(name) {
+    defaultSink = name
+    Quickshell.execDetached(["bash", "-c", "pactl set-default-sink \"$1\"; pactl list sink-inputs | awk '/^Sink Input #/{id=substr($3,2)} /application\\.(process\\.binary|name) = \"[Tt]uple/{print id}' | while read -r i; do pactl move-sink-input \"$i\" \"$1\"; done", "_", name])
+  }
+
+  function setSource(name) {
+    defaultSource = name
+    Quickshell.execDetached(["bash", "-c", "pactl set-default-source \"$1\"; pactl list source-outputs | awk '/^Source Output #/{id=substr($3,2)} /application\\.(process\\.binary|name) = \"[Tt]uple/{print id}' | while read -r i; do pactl move-source-output \"$i\" \"$1\"; done", "_", name])
   }
 
   function parseContacts(text) {
@@ -167,7 +197,7 @@ Panel {
 
   Process {
     id: callStateProc
-    command: ["bash", "-c", "pactl list source-outputs 2>/dev/null | grep -qiE 'application\\.(process\\.binary|name) = \"tuple' && echo in-call; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
+    command: ["bash", "-c", "log=$(ls -t $HOME/.local/share/tuple/*/log.txt 2>/dev/null | head -1); [ -n \"$log\" ] && grep -aE 'call connected|invalidating call' \"$log\" | tail -1 | grep -q 'call connected' && echo in-call; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
     stdout: StdioCollector {
       onStreamFinished: {
         var out = String(text || "")
@@ -200,6 +230,14 @@ Panel {
     command: ["tuple", "ls"]
     stdout: StdioCollector {
       onStreamFinished: root.parseContacts(text)
+    }
+  }
+
+  Process {
+    id: audioProc
+    command: ["bash", "-c", "printf 'default-sink\\t%s\\n' \"$(pactl get-default-sink)\"; printf 'default-source\\t%s\\n' \"$(pactl get-default-source)\"; pactl list sinks | awk -F': ' '/^[ \\t]+Name:/{n=$2} /^[ \\t]+Description:/{print \"sink\\t\" n \"\\t\" $2}'; pactl list sources | awk -F': ' '/^[ \\t]+Name:/{n=$2} /^[ \\t]+Description:/{if (n !~ /\\.monitor$/) print \"source\\t\" n \"\\t\" $2}'"]
+    stdout: StdioCollector {
+      onStreamFinished: root.parseAudio(text)
     }
   }
 
@@ -435,6 +473,121 @@ Panel {
 
         PanelSeparator {
           visible: root.daemonRunning
+          foreground: root.bar.foreground
+        }
+
+        Column {
+          visible: root.daemonRunning && root.sinks.length > 0
+          width: parent.width
+          spacing: Style.space(2)
+
+          Text {
+            text: "Output"
+            color: Qt.darker(root.bar.foreground, 1.4)
+            font.family: root.bar.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1.2
+            font.capitalization: Font.AllUppercase
+          }
+
+          Repeater {
+            model: root.sinks
+
+            Rectangle {
+              id: sinkRow
+              required property var modelData
+              readonly property bool selected: modelData.name === root.defaultSink
+
+              width: parent.width
+              implicitHeight: sinkLabel.implicitHeight + Style.space(10)
+              radius: Style.cornerRadius > 0 ? Style.space(6) : 0
+              color: sinkMouse.containsMouse ? Style.selectedFillFor(root.bar.foreground, Color.accent) : "transparent"
+
+              Text {
+                id: sinkLabel
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: Style.space(8)
+                anchors.rightMargin: Style.space(8)
+                anchors.verticalCenter: parent.verticalCenter
+                textFormat: Text.PlainText
+                text: (sinkRow.selected ? "● " : "○ ") + sinkRow.modelData.label
+                color: root.bar.foreground
+                font.family: root.bar.fontFamily
+                font.pixelSize: Style.font.bodySmall
+                font.bold: sinkRow.selected
+                elide: Text.ElideRight
+              }
+
+              MouseArea {
+                id: sinkMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.setSink(sinkRow.modelData.name)
+              }
+            }
+          }
+        }
+
+        Column {
+          visible: root.daemonRunning && root.sources.length > 0
+          width: parent.width
+          spacing: Style.space(2)
+
+          Text {
+            text: "Microphone"
+            color: Qt.darker(root.bar.foreground, 1.4)
+            font.family: root.bar.fontFamily
+            font.pixelSize: Style.font.caption
+            font.bold: true
+            font.letterSpacing: 1.2
+            font.capitalization: Font.AllUppercase
+          }
+
+          Repeater {
+            model: root.sources
+
+            Rectangle {
+              id: sourceRow
+              required property var modelData
+              readonly property bool selected: modelData.name === root.defaultSource
+
+              width: parent.width
+              implicitHeight: sourceLabel.implicitHeight + Style.space(10)
+              radius: Style.cornerRadius > 0 ? Style.space(6) : 0
+              color: sourceMouse.containsMouse ? Style.selectedFillFor(root.bar.foreground, Color.accent) : "transparent"
+
+              Text {
+                id: sourceLabel
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: Style.space(8)
+                anchors.rightMargin: Style.space(8)
+                anchors.verticalCenter: parent.verticalCenter
+                textFormat: Text.PlainText
+                text: (sourceRow.selected ? "● " : "○ ") + sourceRow.modelData.label
+                color: root.bar.foreground
+                font.family: root.bar.fontFamily
+                font.pixelSize: Style.font.bodySmall
+                font.bold: sourceRow.selected
+                elide: Text.ElideRight
+              }
+
+              MouseArea {
+                id: sourceMouse
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.setSource(sourceRow.modelData.name)
+              }
+            }
+          }
+        }
+
+        PanelSeparator {
+          visible: root.daemonRunning && root.sinks.length > 0
           foreground: root.bar.foreground
         }
 

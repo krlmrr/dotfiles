@@ -23,6 +23,7 @@ return {
 				end
 			end
 			message:newline()
+			require("config.cursor").hide()
 			return on_confirm(message)
 		end
 
@@ -38,6 +39,9 @@ return {
 						held_hide = nil
 						release()
 						require("noice.ui.state").clear("msg_show")
+						if vim.bo.filetype ~= "neo-tree" then
+							require("config.cursor").show()
+						end
 					end
 				end, 100)
 			end

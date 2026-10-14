@@ -229,7 +229,7 @@ return {
 		vim.api.nvim_create_autocmd("FileType", {
 			pattern = "*",
 			callback = function()
-				if vim.bo.filetype ~= "dashboard" and vim.bo.filetype ~= "neo-tree" then
+				if vim.bo.filetype ~= "dashboard" and vim.bo.filetype ~= "neo-tree" and vim.bo.filetype ~= "noice" then
 					require("config.cursor").show()
 				end
 			end,

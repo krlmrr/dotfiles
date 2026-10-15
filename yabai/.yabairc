@@ -402,11 +402,52 @@ space_state() {
     | join("|")'
 }
 
+unfilled_tiles() {
+  u_disp=$(yabai -m query --spaces --space "$1" 2>/dev/null | jq -r '.display // empty')
+  [ -n "$u_disp" ] || return 0
+  u_frame=$(yabai -m query --displays --display "$u_disp" 2>/dev/null | jq -c '.frame')
+  yabai -m query --windows --space "$1" 2>/dev/null | jq -r \
+      --argjson d "$u_frame" \
+      --argjson rp "$(yabai -m config right_padding)" \
+      --argjson bp "$(yabai -m config bottom_padding)" \
+      --argjson gap "$(yabai -m config window_gap)" '
+      [ .[] | select(.subrole=="AXStandardWindow"
+                     and .title!="Picture-in-Picture"
+                     and ."is-floating"==false) ]                       as $w
+    | ($d.x + $d.w - $rp)                                               as $right
+    | ($d.y + $d.h - $bp)                                               as $bottom
+    | def overlaps(a; b; c; e): a < e and c < b;
+      $w[]
+    | . as $t
+    | ($t.frame.x + $t.frame.w) as $r
+    | ($t.frame.y + $t.frame.h) as $b
+    | ( $r >= $right - 4
+        or any($w[]; .id != $t.id
+                 and ((.frame.x - $r - $gap) | fabs) <= 4
+                 and overlaps($t.frame.y; $b; .frame.y; .frame.y + .frame.h)) ) as $rok
+    | ( $b >= $bottom - 4
+        or any($w[]; .id != $t.id
+                 and ((.frame.y - $b - $gap) | fabs) <= 4
+                 and overlaps($t.frame.x; $r; .frame.x; .frame.x + .frame.w)) ) as $bok
+    | select(($rok and $bok) | not)
+    | .id'
+}
+
+retile_unfilled() {
+  space_visible "$1" || return 0
+  for u_id in $(unfilled_tiles "$1"); do
+    log size "window $u_id short of its tile on space $1 ($2) — re-tiled"
+    yabai -m window "$u_id" --toggle float 2>/dev/null
+    yabai -m window "$u_id" --toggle float 2>/dev/null
+  done
+}
+
 # Arrange ONE space. Never pulls a window in from anywhere.
 place_space() {
   p_s="$1"; p_trigger="${2:-window}"
   managed "$p_s" || return 0
   [ "$p_trigger" = space ] && wait_visible "$p_s"
+  case "$p_trigger" in space|display) retile_unfilled "$p_s" "$p_trigger" ;; esac
   # One repair per pass; a second browser window needs a second pass, and the
   # signals that would otherwise supply it are gated out (on_moved only acts
   # on a change of space). Three passes bound a tree that refuses to settle.
@@ -613,7 +654,7 @@ yabai -m config window_gap 10
 # Mouse
 yabai -m config mouse_follows_focus off
 yabai -m config focus_follows_mouse autofocus
-yabai -m config mouse_modifier alt
+yabai -m config mouse_modifier cmd
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize
 yabai -m config mouse_drop_action swap

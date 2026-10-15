@@ -1,12 +1,14 @@
 title = "  "
 window-theme = ghostty
-window-padding-x = 12
-#window-padding-y = 7
-window-padding-balance = true
+window-padding-x = 15
+window-padding-y = 20
+window-padding-balance = false
+
 window-save-state = always
 background-opacity = 1.0
 resize-overlay = never
 
+macos-titlebar-style = hidden
 macos-titlebar-proxy-icon = hidden
 macos-option-as-alt = true
 gtk-toolbar-style = flat

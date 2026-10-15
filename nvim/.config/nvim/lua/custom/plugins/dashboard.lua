@@ -226,7 +226,7 @@ return {
 			end,
 		})
 		-- Restore cursor when leaving dashboard
-		vim.api.nvim_create_autocmd("FileType", {
+		vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
 			pattern = "*",
 			callback = function()
 				if vim.bo.filetype ~= "dashboard" and vim.bo.filetype ~= "neo-tree" and vim.bo.filetype ~= "noice" then

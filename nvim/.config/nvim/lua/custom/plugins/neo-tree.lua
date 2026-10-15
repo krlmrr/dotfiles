@@ -66,7 +66,7 @@ return {
 
 		require("neo-tree").setup({
 			use_popups_for_input = false, -- Use vim.ui.input (dressing.nvim)
-			close_if_last_window = true,
+			close_if_last_window = false, -- Replaced by the QuitPre autocmd in config/autocmds.lua
 			popup_border_style = "rounded",
 			commands = {
 				file_details_float = function(state)

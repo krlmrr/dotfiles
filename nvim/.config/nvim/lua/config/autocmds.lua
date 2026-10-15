@@ -30,6 +30,22 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 })
 
+-- Close neo-tree before quitting the last editor window, so :q quits nvim (and shows the
+-- save prompt for modified buffers) instead of neo-tree re-splitting the file
+vim.api.nvim_create_autocmd("QuitPre", {
+	callback = function()
+		local current = vim.api.nvim_get_current_win()
+		for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+			local floating = vim.api.nvim_win_get_config(win).relative ~= ""
+			local ft = vim.bo[vim.api.nvim_win_get_buf(win)].filetype
+			if win ~= current and not floating and ft ~= "neo-tree" then
+				return
+			end
+		end
+		vim.cmd("Neotree close")
+	end,
+})
+
 -- Show winbar only when multiple editor splits exist (excludes neo-tree)
 vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "WinNew", "WinClosed" }, {
 	callback = function()

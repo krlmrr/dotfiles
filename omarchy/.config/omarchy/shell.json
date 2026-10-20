@@ -31,6 +31,9 @@
           "verticalFormat": "HH\n—\nmm"
         },
         {
+          "id": "omarchy.elsewhen"
+        },
+        {
           "id": "omarchy.keyboard-layout"
         },
         {
@@ -84,5 +87,9 @@
       ]
     }
   },
-  "plugins": []
+  "plugins": [
+    {
+      "id": "typecraft.oma-cast"
+    }
+  ]
 }

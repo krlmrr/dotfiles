@@ -73,6 +73,10 @@ install_daemon "$VHID_LABEL" <<EOF
     <string>root</string>
     <key>RunAtLoad</key>
     <true/>
+    <key>ProcessType</key>
+    <string>Interactive</string>
+    <key>Nice</key>
+    <integer>-20</integer>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
@@ -100,6 +104,10 @@ install_daemon "$KANATA_LABEL" <<EOF
     <string>root</string>
     <key>RunAtLoad</key>
     <true/>
+    <key>ProcessType</key>
+    <string>Interactive</string>
+    <key>Nice</key>
+    <integer>-20</integer>
     <key>KeepAlive</key>
     <dict>
         <key>SuccessfulExit</key>

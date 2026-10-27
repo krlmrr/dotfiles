@@ -7,6 +7,13 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highl
 -- Exit insert mode
 vim.keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode" })
 
+-- gc comments the current line on its own, taking over gcc's job. gcc is removed
+-- so gc fires straight away instead of waiting to see if a second c is coming.
+pcall(vim.keymap.del, "n", "gcc")
+vim.keymap.set("n", "gc", function()
+	return require("vim._comment").operator() .. "_"
+end, { expr = true, desc = "Toggle comment line" })
+
 -- Command mode shortcut
 vim.keymap.set("n", ";", ":", { noremap = true, desc = "Command mode" })
 

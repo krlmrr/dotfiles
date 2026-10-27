@@ -9,7 +9,7 @@ return {
 	-- Show pending keybinds
 	{
 		"folke/which-key.nvim",
-		opts = { delay = 600 },
+		opts = { delay = 300 },
 		config = function(_, opts)
 			local wk = require("which-key")
 			wk.setup(opts)

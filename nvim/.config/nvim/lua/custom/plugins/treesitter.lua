@@ -30,6 +30,7 @@ return {
 				"phpdoc",
 				"regex",
 				"vue",
+				"java",
 			}
 			local parser_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site", "parser")
 			local missing = {}

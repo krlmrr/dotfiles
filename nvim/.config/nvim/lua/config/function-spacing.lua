@@ -7,6 +7,7 @@ local FUNCTION_NODES = {
 	generator_function_declaration = true,
 	method_definition = true,
 	method_declaration = true,
+	constructor_declaration = true,
 }
 
 local DOC_COMMENT_ATTRIBUTE_OR_DECORATOR_PREFIXES = { "//", "#", "/*", "*", "@", "--" }

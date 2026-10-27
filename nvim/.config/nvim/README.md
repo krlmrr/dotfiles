@@ -102,9 +102,9 @@ Install via Mason: `:MasonInstall intelephense lua_ls`
 | `;;` | Insert | Add semicolon at end of line |
 | `,,` | Insert | Add comma at end of line |
 | `<Esc>` | Normal | Clear search highlight |
-| `gc` | Normal | Toggle comment on line (count works: `3gc`) |
-| `gc` | Visual | Toggle comment on selection |
-| `cmd+/` | Normal/Visual | Same as `gc` |
+| `gc` / `gcc` / `<leader>gcc` | Normal | Toggle comment on line and save (count works: `3gc`) |
+| `gc` | Visual | Toggle comment on selection and save |
+| `cmd+/` | Normal/Visual | Toggle comment, without saving |
 
 ### File Navigation
 

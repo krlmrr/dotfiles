@@ -7,14 +7,21 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highl
 -- Exit insert mode
 vim.keymap.set("i", "jj", "<ESC>", { desc = "Exit insert mode" })
 
--- gc comments the current line on its own, taking over gcc's job. gcc is removed
--- so gc fires straight away instead of waiting to see if a second c is coming.
-pcall(vim.keymap.del, "n", "gcc")
-vim.keymap.set("n", "gc", function()
-	return require("vim._comment").operator() .. "_"
-end, { expr = true, desc = "Toggle comment line" })
--- cmd+/ like VS Code. Ghostty leaves cmd+/ unbound, so it reaches Neovim as <D-/>.
-vim.keymap.set({ "n", "x" }, "<D-/>", "gc", { remap = true, desc = "Toggle comment" })
+-- Commenting. gc, gcc and <leader>gcc comment the current line and save; gc on a
+-- visual selection comments it and saves. Bare gc waits out timeoutlen to see if
+-- a second c is coming. The returned keys run after the comment operator finishes.
+local function comment(motion, save)
+	return function()
+		return require("vim._comment").operator() .. motion .. (save and "<Cmd>w<CR>" or "")
+	end
+end
+vim.keymap.set("n", "gc", comment("_", true), { expr = true, desc = "Comment line and save" })
+vim.keymap.set("n", "gcc", comment("_", true), { expr = true, desc = "Comment line and save" })
+vim.keymap.set("n", "<leader>gcc", comment("_", true), { expr = true, desc = "Comment line and save" })
+vim.keymap.set("x", "gc", comment("", true), { expr = true, desc = "Comment selection and save" })
+-- cmd+/ like VS Code, without saving. Ghostty leaves cmd+/ unbound, so it reaches Neovim as <D-/>.
+vim.keymap.set("n", "<D-/>", comment("_", false), { expr = true, desc = "Toggle comment" })
+vim.keymap.set("x", "<D-/>", comment("", false), { expr = true, desc = "Toggle comment" })
 
 -- Command mode shortcut
 vim.keymap.set("n", ";", ":", { noremap = true, desc = "Command mode" })

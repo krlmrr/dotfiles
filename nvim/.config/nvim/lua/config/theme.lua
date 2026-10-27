@@ -6,12 +6,16 @@ Theme.colors = {
 	dark = {
 		-- semantic palette
 		accent = "#61afef",
-		bg_highlight = "#3e4452",
-		fg = "#abb2bf",
+		bg_highlight = "#313640", -- One Half Dark cursor line
+		fg = "#dcdfe4", -- One Half Dark foreground, matches ghostty
 		fg_muted = "#5c6370",
 		bg_float = "#282c34",
 		inlay_hint = "#848B98",
-		-- onedark palette overrides (resolved by $name in highlights)
+		-- onedark palette overrides (resolved by $name in highlights).
+		-- red, bg1 and bg3 retint onedark to One Half Dark, ghostty's theme.
+		red = "#e06c75",
+		bg1 = "#313640",
+		bg3 = "#474e5d",
 		comment = "#61AEEF",
 		cyan = "#7aa2f7",
 		orange = "#e5c07b",
@@ -137,13 +141,17 @@ local function apply_plugin_highlights()
 	vim.api.nvim_set_hl(0, "IblIndent", { fg = colors.bg_highlight })
 end
 
--- Apply dark theme (onedark)
+-- Apply dark theme (onedark, retinted to One Half Dark)
 local function apply_dark_theme()
 	vim.o.background = "dark"
 	local colors = Theme.colors.dark
 	require("onedark").setup({
 		style = "dark",
 		colors = {
+			fg = colors.fg,
+			red = colors.red,
+			bg1 = colors.bg1,
+			bg3 = colors.bg3,
 			comment = colors.comment,
 			cyan = colors.cyan,
 			orange = colors.orange,

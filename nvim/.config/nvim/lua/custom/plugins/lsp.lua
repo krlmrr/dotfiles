@@ -161,6 +161,7 @@ return {
 			intelephense = {}, -- Configured separately below with vim.lsp.config
 			ts_ls = {},
 			vue_ls = {},
+			rust_analyzer = {},
 			lua_ls = {
 				settings = {
 					Lua = {

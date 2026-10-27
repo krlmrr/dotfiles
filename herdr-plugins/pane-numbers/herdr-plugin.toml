@@ -1,0 +1,66 @@
+id = "krlmrr.pane-numbers"
+name = "Pane numbers"
+version = "0.1.0"
+min_herdr_version = "0.9.5"
+description = "Number the panes in a tab and jump to one by its number"
+platforms = ["linux", "macos"]
+
+[[actions]]
+id = "show"
+title = "Show pane numbers"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "show"]
+
+[[actions]]
+id = "jump-1"
+title = "Jump to pane 1"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "1"]
+
+[[actions]]
+id = "jump-2"
+title = "Jump to pane 2"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "2"]
+
+[[actions]]
+id = "jump-3"
+title = "Jump to pane 3"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "3"]
+
+[[actions]]
+id = "jump-4"
+title = "Jump to pane 4"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "4"]
+
+[[actions]]
+id = "jump-5"
+title = "Jump to pane 5"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "5"]
+
+[[actions]]
+id = "jump-6"
+title = "Jump to pane 6"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "6"]
+
+[[actions]]
+id = "jump-7"
+title = "Jump to pane 7"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "7"]
+
+[[actions]]
+id = "jump-8"
+title = "Jump to pane 8"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "8"]
+
+[[actions]]
+id = "jump-9"
+title = "Jump to pane 9"
+contexts = ["workspace"]
+command = ["python3", "pane_numbers.py", "jump", "9"]

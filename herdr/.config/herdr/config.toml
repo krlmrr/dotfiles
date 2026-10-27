@@ -38,6 +38,9 @@ window_title = "{hostname}: {workspace}"
 [ui.toast]
 delivery = "system"
 
+[keys]
+switch_tab = "prefix+shift+1..9"
+
 [[keys.command]]
 key = "prefix+alt+c"
 type = "shell"
@@ -50,3 +53,63 @@ command = "zsh -lc lazygit"
 description = "run lazygit"
 width = "80%"
 height = "80%"
+
+[[keys.command]]
+key = "prefix+y"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.show"
+description = "show pane numbers"
+
+[[keys.command]]
+key = "prefix+1"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-1"
+description = "jump to pane 1"
+
+[[keys.command]]
+key = "prefix+2"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-2"
+description = "jump to pane 2"
+
+[[keys.command]]
+key = "prefix+3"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-3"
+description = "jump to pane 3"
+
+[[keys.command]]
+key = "prefix+4"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-4"
+description = "jump to pane 4"
+
+[[keys.command]]
+key = "prefix+5"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-5"
+description = "jump to pane 5"
+
+[[keys.command]]
+key = "prefix+6"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-6"
+description = "jump to pane 6"
+
+[[keys.command]]
+key = "prefix+7"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-7"
+description = "jump to pane 7"
+
+[[keys.command]]
+key = "prefix+8"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-8"
+description = "jump to pane 8"
+
+[[keys.command]]
+key = "prefix+9"
+type = "plugin_action"
+command = "krlmrr.pane-numbers.jump-9"
+description = "jump to pane 9"

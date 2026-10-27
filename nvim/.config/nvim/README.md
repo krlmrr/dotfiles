@@ -246,8 +246,9 @@ Auto-format on save is enabled via conform.nvim:
 Before the formatter runs, every save also puts a blank line above and below each
 function, in any language with a treesitter parser (`lua/config/function-spacing.lua`).
 Doc comments, attributes and decorators stay attached to their function, and no blank
-line is added just inside a block's opening or closing line. Arrow functions and
-other functions assigned to variables are left alone.
+line is added just inside a block's opening or closing line. Functions assigned as a
+whole statement count too (`const f = () => {}`, `M.f = function() end`, class fields);
+callbacks passed to a call are left alone.
 
 ## Setup
 

@@ -10,6 +10,30 @@ local FUNCTION_NODES = {
 	constructor_declaration = true,
 }
 
+local STATEMENTS_THAT_CAN_ASSIGN_A_FUNCTION = {
+	lexical_declaration = true,
+	variable_declaration = true,
+	expression_statement = true,
+	assignment_statement = true,
+	field_definition = true,
+	public_field_definition = true,
+}
+
+local NODES_BETWEEN_A_NAME_AND_ITS_VALUE = {
+	variable_declarator = true,
+	assignment_statement = true,
+	assignment_expression = true,
+	expression_list = true,
+}
+
+local FUNCTION_VALUES = {
+	arrow_function = true,
+	function_expression = true,
+	["function"] = true,
+	generator_function = true,
+	function_definition = true,
+}
+
 local DOC_COMMENT_ATTRIBUTE_OR_DECORATOR_PREFIXES = { "//", "#", "/*", "*", "@", "--" }
 
 local function trimmed(line)
@@ -53,6 +77,21 @@ local function with_wrappers_like_export(node)
 	return node
 end
 
+local function assigns_a_function(statement)
+	local node = statement:named_child(statement:named_child_count() - 1)
+	while node and NODES_BETWEEN_A_NAME_AND_ITS_VALUE[node:type()] do
+		node = node:named_child(node:named_child_count() - 1)
+	end
+	return node ~= nil and FUNCTION_VALUES[node:type()] == true
+end
+
+local function as_function_unit(node)
+	local type = node:type()
+	if FUNCTION_NODES[type] or (STATEMENTS_THAT_CAN_ASSIGN_A_FUNCTION[type] and assigns_a_function(node)) then
+		return with_wrappers_like_export(node)
+	end
+end
+
 local function sits_on_its_own_lines(lines, node)
 	local start_row, start_col, end_row, end_col = node:range()
 	local before = lines[start_row + 1]:sub(1, start_col)
@@ -78,7 +117,7 @@ local function rows_to_insert_blank_above(buf, lines)
 	local rows = {}
 	parser:for_each_tree(function(tree)
 		local function visit(node)
-			local whole = FUNCTION_NODES[node:type()] and with_wrappers_like_export(node)
+			local whole = as_function_unit(node)
 			if whole and sits_on_its_own_lines(lines, whole) then
 				local start_row, _, end_row = whole:range()
 				local top = first_row_including_attached_lines(lines, start_row)

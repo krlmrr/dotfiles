@@ -23,7 +23,7 @@ alias sourcez="source ~/.zshrc"
 alias lzg="lazygit"
 alias yeet="sudo rm -rf"
 alias mkd="mkdir -p"
-tux() {
+function tux {
     tux-sync 2>/dev/null
     tuxedo "$@"
 }

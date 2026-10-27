@@ -56,6 +56,7 @@ nvim/
 | [fidget.nvim](https://github.com/j-hui/fidget.nvim) | LSP progress indicator |
 | [noice.nvim](https://github.com/folke/noice.nvim) | Modern UI for messages, cmdline, popupmenu |
 | [nvim-notify](https://github.com/rcarriga/nvim-notify) | Fancy notification popups |
+| [render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim) | Renders markdown in normal mode, raw markdown in insert mode |
 
 ### Editing
 

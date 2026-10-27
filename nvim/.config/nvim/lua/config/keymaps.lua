@@ -101,6 +101,7 @@ vim.keymap.set("n", "<C-w>", function()
 end, { desc = "Close split or buffer and focus file tree" })
 
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
+vim.keymap.set({ "n", "i", "v" }, "<D-s>", "<cmd>w<cr>", { desc = "Save file" })
 
 -- Restart neovim (saves files, reopens current file in project root)
 vim.keymap.set("n", "<leader>rc", function()

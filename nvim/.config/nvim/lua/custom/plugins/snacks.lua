@@ -37,9 +37,9 @@ return {
 		{
 			"<leader><space>",
 			function()
-				Snacks.picker.buffers()
+				Snacks.picker.files({ cwd = project_root(), hidden = true, ignored = true })
 			end,
-			desc = "[ ] Find existing buffers",
+			desc = "[ ] Find files",
 		},
 		{
 			"<leader>/",

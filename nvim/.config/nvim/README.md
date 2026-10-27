@@ -113,7 +113,7 @@ Install via Mason: `:MasonInstall intelephense lua_ls`
 | `<leader>ff` | Normal | Find files (includes hidden, e.g. `.env`) |
 | `<leader>gf` | Normal | Search git files |
 | `<leader>?` | Normal | Find recently opened files |
-| `<leader><space>` | Normal | Find open buffers |
+| `<leader><space>` | Normal | Find files (same as `<leader>ff`) |
 
 ### Search (Telescope)
 

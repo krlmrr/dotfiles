@@ -8,7 +8,7 @@ from datetime import date
 from pathlib import Path
 
 TODO_FILE = Path(os.environ.get("TODO_FILE", Path.home() / "todo.txt"))
-ISSUE_TAG = re.compile(r"(?<!\S)gh:([\w.-]+/[\w.-]+#\d+)(?!\S)")
+ISSUE_LINK = re.compile(r"(?<!\S)(?:gh:([\w.-]+/[\w.-]+)#|https://github\.com/([\w.-]+/[\w.-]+)/issues/)(\d+)(?!\S)")
 PRIORITY = re.compile(r"^\([A-Z]\) ")
 TODAY = date.today().isoformat()
 
@@ -43,6 +43,20 @@ def where_issue_lives_now(issue):
     return found[0] if found else None
 
 
+def issue_in(line):
+    link = ISSUE_LINK.search(line)
+    return f"{link[1] or link[2]}#{link[3]}" if link else None
+
+
+def url(issue):
+    repo, number = issue.split("#")
+    return f"https://github.com/{repo}/issues/{number}"
+
+
+def linked(line, issue):
+    return ISSUE_LINK.sub(url(issue), line, count=1)
+
+
 def repo_name(issue):
     return issue.split("#")[0].split("/")[1]
 
@@ -52,7 +66,7 @@ def is_done(line):
 
 
 def moved(line, old, new):
-    line = line.replace(f"gh:{old}", f"gh:{new}")
+    line = linked(line, new)
     return re.sub(rf"(?<!\S)\+{re.escape(repo_name(old))}(?!\S)", f"+{repo_name(new)}", line)
 
 
@@ -64,20 +78,21 @@ def synced(lines, open_issues):
     tracked = set()
     result = []
     for line in lines:
-        tag = ISSUE_TAG.search(line)
-        if tag and not is_done(line) and tag[1] not in open_issues:
-            now = where_issue_lives_now(tag[1])
-            if now and now["id"] != tag[1]:
-                line = moved(line, tag[1], now["id"])
-                tag = ISSUE_TAG.search(line)
+        issue = issue_in(line)
+        if issue and not is_done(line) and issue not in open_issues:
+            now = where_issue_lives_now(issue)
+            if now and now["id"] != issue:
+                line = moved(line, issue, now["id"])
+                issue = now["id"]
             if now and now["state"] == "closed":
                 line = completed(line)
-        if tag:
-            tracked.add(tag[1])
+        if issue:
+            line = linked(line, issue)
+            tracked.add(issue)
         result.append(line)
     for issue, title in open_issues.items():
         if issue not in tracked:
-            result.append(f"{TODAY} {title} +{repo_name(issue)} gh:{issue}")
+            result.append(f"{TODAY} {title} +{repo_name(issue)} {url(issue)}")
     return result
 
 

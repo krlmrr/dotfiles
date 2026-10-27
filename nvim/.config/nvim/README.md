@@ -238,6 +238,7 @@ Auto-format on save is enabled via conform.nvim:
 | PHP | `pint` (Laravel Pint via `vendor/bin/pint`) |
 | Blade | `blade-formatter` |
 | Lua | `stylua` |
+| Rust | `rustfmt` |
 | JavaScript/TypeScript | `prettier` |
 | XML | `xmlformat` |
 

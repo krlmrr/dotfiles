@@ -16,6 +16,7 @@ return {
 				xml = { "xmlformat" },
 				php = { "pint" },
 				blade = { "blade-formatter", "pint", stop_after_first = true },
+				rust = { "rustfmt" },
 			},
 			formatters = {
 				pint = {

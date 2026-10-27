@@ -57,17 +57,8 @@ def linked(line, issue):
     return ISSUE_LINK.sub(url(issue), line, count=1)
 
 
-def repo_name(issue):
-    return issue.split("#")[0].split("/")[1]
-
-
 def is_done(line):
     return line.startswith("x ")
-
-
-def moved(line, old, new):
-    line = linked(line, new)
-    return re.sub(rf"(?<!\S)\+{re.escape(repo_name(old))}(?!\S)", f"+{repo_name(new)}", line)
 
 
 def completed(line):
@@ -81,18 +72,17 @@ def synced(lines, open_issues):
         issue = issue_in(line)
         if issue and not is_done(line) and issue not in open_issues:
             now = where_issue_lives_now(issue)
-            if now and now["id"] != issue:
-                line = moved(line, issue, now["id"])
+            if now:
                 issue = now["id"]
-            if now and now["state"] == "closed":
-                line = completed(line)
+                if now["state"] == "closed":
+                    line = completed(line)
         if issue:
             line = linked(line, issue)
             tracked.add(issue)
         result.append(line)
     for issue, title in open_issues.items():
         if issue not in tracked:
-            result.append(f"{TODAY} {title} +{repo_name(issue)} {url(issue)}")
+            result.append(f"{TODAY} {title} {url(issue)}")
     return result
 
 

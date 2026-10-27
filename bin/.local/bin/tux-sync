@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+import json
+import os
+import re
+import subprocess
+import sys
+from datetime import date
+from pathlib import Path
+
+TODO_FILE = Path(os.environ.get("TODO_FILE", Path.home() / "todo.txt"))
+ISSUE_TAG = re.compile(r"(?<!\S)gh:([\w.-]+/[\w.-]+#\d+)(?!\S)")
+PRIORITY = re.compile(r"^\([A-Z]\) ")
+TODAY = date.today().isoformat()
+
+
+def gh_api(path, jq):
+    result = subprocess.run(
+        ["gh", "api", path, "--paginate", "--jq", jq],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return [json.loads(line) for line in result.stdout.splitlines() if line]
+
+
+def assigned_open_issues():
+    issues = gh_api(
+        "/issues?filter=assigned&state=open&per_page=100",
+        '.[] | select(.pull_request == null) | {id: "\\(.repository.full_name)#\\(.number)", title}',
+    )
+    if issues is None:
+        return None
+    return {issue["id"]: " ".join(issue["title"].split()) for issue in issues}
+
+
+def where_issue_lives_now(issue):
+    repo, number = issue.split("#")
+    found = gh_api(
+        f"repos/{repo}/issues/{number}",
+        '{id: "\\(.repository_url | sub(".*/repos/"; ""))#\\(.number)", state}',
+    )
+    return found[0] if found else None
+
+
+def repo_name(issue):
+    return issue.split("#")[0].split("/")[1]
+
+
+def is_done(line):
+    return line.startswith("x ")
+
+
+def moved(line, old, new):
+    line = line.replace(f"gh:{old}", f"gh:{new}")
+    return re.sub(rf"(?<!\S)\+{re.escape(repo_name(old))}(?!\S)", f"+{repo_name(new)}", line)
+
+
+def completed(line):
+    return f"x {TODAY} {PRIORITY.sub('', line)}"
+
+
+def synced(lines, open_issues):
+    tracked = set()
+    result = []
+    for line in lines:
+        tag = ISSUE_TAG.search(line)
+        if tag and not is_done(line) and tag[1] not in open_issues:
+            now = where_issue_lives_now(tag[1])
+            if now and now["id"] != tag[1]:
+                line = moved(line, tag[1], now["id"])
+                tag = ISSUE_TAG.search(line)
+            if now and now["state"] == "closed":
+                line = completed(line)
+        if tag:
+            tracked.add(tag[1])
+        result.append(line)
+    for issue, title in open_issues.items():
+        if issue not in tracked:
+            result.append(f"{TODAY} {title} +{repo_name(issue)} gh:{issue}")
+    return result
+
+
+def main():
+    open_issues = assigned_open_issues()
+    if open_issues is None:
+        sys.exit("tux-sync: could not reach GitHub")
+    lines = TODO_FILE.read_text().splitlines() if TODO_FILE.exists() else []
+    updated = synced(lines, open_issues)
+    if updated != lines:
+        TODO_FILE.write_text("\n".join(updated) + "\n")
+
+
+main()

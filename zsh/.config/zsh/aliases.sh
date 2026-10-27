@@ -23,7 +23,10 @@ alias sourcez="source ~/.zshrc"
 alias lzg="lazygit"
 alias yeet="sudo rm -rf"
 alias mkd="mkdir -p"
-alias tux="tuxedo"
+tux() {
+    tux-sync 2>/dev/null
+    tuxedo "$@"
+}
 
 # Jujutsu
 alias lzj="lazyjj"

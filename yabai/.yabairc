@@ -654,6 +654,10 @@ yabai -m config window_gap 10
 # Mouse
 yabai -m config mouse_follows_focus off
 yabai -m config focus_follows_mouse autofocus
+# FreeCAD's right-click menus close as soon as the mouse moves, because autofocus
+# refocuses the window under the cursor. Turn it off while FreeCAD is in front.
+yabai -m signal --add label=freecad_focus event=application_front_switched \
+  action='[ "$(ps -p $YABAI_PROCESS_ID -o comm= | xargs basename)" = freecad ] && yabai -m config focus_follows_mouse off || yabai -m config focus_follows_mouse autofocus'
 yabai -m config mouse_modifier cmd
 yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize
@@ -672,6 +676,8 @@ yabai -m rule --add app="^LilyView$" manage=off
 yabai -m rule --add app="^DeskPad$" manage=off
 yabai -m rule --add app="^osascript$" manage=off
 yabai -m rule --add app="^DaisyDisk$" manage=off
+# Tiled, FreeCAD got squeezed into a 3176x868 strip and its task dialogs fought the layout.
+yabai -m rule --add app="^FreeCAD$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 

@@ -118,3 +118,10 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "QuitPre" }, {
 		vim.cmd("noautocmd silent! cd .")
 	end,
 })
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+	group = vim.api.nvim_create_augroup("function-spacing", { clear = true }),
+	callback = function(args)
+		require("config.function-spacing").apply(args.buf)
+	end,
+})

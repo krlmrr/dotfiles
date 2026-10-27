@@ -1,0 +1,33 @@
+name = One Half Dark
+
+bg = #282c34
+panel = #282c34
+border = #5d677a
+
+fg = #dcdfe4
+dim = #919baa
+accent = #61afef
+
+cursor = #313640
+selection = #474e5d
+selected = #474e5d
+
+statusbar = #282c34
+status_fg = #919baa
+mode_fg = #282c34
+mode_bg = #98c379
+
+pri_a = #e06c75
+pri_b = #e5c07b
+pri_c = #98c379
+pri_d = #61afef
+pri_other = #c678dd
+
+project = #61afef
+context = #56b6c2
+
+done = #5d677a
+matched = #e5c07b
+due = #e5c07b
+overdue = #e06c75
+today = #e06c75

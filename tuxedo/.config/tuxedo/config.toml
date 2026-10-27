@@ -1,5 +1,5 @@
 # tuxedo config
-theme = Terminal
+theme = One Half Dark
 density = comfortable
 sort = priority
 show_left = true

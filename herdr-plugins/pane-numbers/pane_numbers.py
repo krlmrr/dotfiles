@@ -45,8 +45,10 @@ def hide_numbers(only_token=None):
     if only_token and shown["token"] != only_token:
         return
     SHOWN.unlink(missing_ok=True)
+    current = labels_of(shown["workspace_id"], list(shown["labels"]))
     for pane_id, label in shown["labels"].items():
-        rename(pane_id, label)
+        if current[pane_id] == shown["numbered"][pane_id]:
+            rename(pane_id, label)
 
 
 def show():
@@ -54,10 +56,13 @@ def show():
     workspace_id, pane_ids = panes_in_reading_order()
     labels = labels_of(workspace_id, pane_ids)
     token = uuid.uuid4().hex
-    SHOWN.write_text(json.dumps({"token": token, "labels": labels}))
-    for number, pane_id in enumerate(pane_ids, start=1):
-        label = labels[pane_id]
-        rename(pane_id, f"{number} · {label}" if label else str(number))
+    numbered = {
+        pane_id: f"{number} · {labels[pane_id]}" if labels[pane_id] else str(number)
+        for number, pane_id in enumerate(pane_ids, start=1)
+    }
+    SHOWN.write_text(json.dumps({"token": token, "workspace_id": workspace_id, "labels": labels, "numbered": numbered}))
+    for pane_id, label in numbered.items():
+        rename(pane_id, label)
     time.sleep(SHOW_FOR_SECONDS)
     hide_numbers(only_token=token)
 

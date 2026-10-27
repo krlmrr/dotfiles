@@ -13,6 +13,8 @@ pcall(vim.keymap.del, "n", "gcc")
 vim.keymap.set("n", "gc", function()
 	return require("vim._comment").operator() .. "_"
 end, { expr = true, desc = "Toggle comment line" })
+-- cmd+/ like VS Code. Ghostty leaves cmd+/ unbound, so it reaches Neovim as <D-/>.
+vim.keymap.set({ "n", "x" }, "<D-/>", "gc", { remap = true, desc = "Toggle comment" })
 
 -- Command mode shortcut
 vim.keymap.set("n", ";", ":", { noremap = true, desc = "Command mode" })

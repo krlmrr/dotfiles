@@ -104,6 +104,7 @@ Install via Mason: `:MasonInstall intelephense lua_ls`
 | `<Esc>` | Normal | Clear search highlight |
 | `gc` | Normal | Toggle comment on line (count works: `3gc`) |
 | `gc` | Visual | Toggle comment on selection |
+| `cmd+/` | Normal/Visual | Same as `gc` |
 
 ### File Navigation
 

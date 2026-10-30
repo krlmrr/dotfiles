@@ -122,6 +122,8 @@ vim.keymap.set("x", "<S-D-Left>", "^", { desc = "Select to start of line" })
 vim.keymap.set("x", "<S-D-Right>", "g_", { desc = "Select to end of line" })
 vim.keymap.set("i", "<S-D-Left>", "<Esc>v^", { desc = "Select to start of line" })
 vim.keymap.set("i", "<S-D-Right>", "<Esc>`^vg_", { desc = "Select to end of line" })
+vim.keymap.set("n", "<C-CR>", "o", { desc = "New line below" })
+vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "New line below" })
 
 -- Restart neovim (saves files, reopens current file in project root)
 vim.keymap.set("n", "<leader>rc", function()

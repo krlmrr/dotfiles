@@ -10,6 +10,7 @@ return {
 		picker = {
 			enabled = true,
 			exclude = { ".DS_Store" },
+			layout = { layout = { backdrop = false } },
 		},
 	},
 	keys = {

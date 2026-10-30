@@ -130,15 +130,7 @@ pcall(function()
     end
 end)
 
-local VIM_KEYS = { h = "West", j = "South", k = "North", l = "East" }
-local ARROW_KEYS = { left = "West", down = "South", up = "North", right = "East" }
-local FOCUS_BINDINGS = {
-    { { "alt" }, VIM_KEYS },
-    { { "alt" }, ARROW_KEYS },
-    { { "ctrl", "alt", "cmd" }, VIM_KEYS },
-    { { "ctrl", "alt", "cmd" }, ARROW_KEYS },
-    { { "ctrl", "cmd" }, VIM_KEYS },
-}
+local FOCUS_KEYS = { h = "West", j = "South", k = "North", l = "East" }
 
 local function focusToward(direction)
     return function()
@@ -148,11 +140,8 @@ local function focusToward(direction)
 end
 
 local focusKeys = {}
-for _, binding in ipairs(FOCUS_BINDINGS) do
-    local mods, keys = binding[1], binding[2]
-    for key, direction in pairs(keys) do
-        table.insert(focusKeys, hs.hotkey.bind(mods, key, focusToward(direction)))
-    end
+for key, direction in pairs(FOCUS_KEYS) do
+    table.insert(focusKeys, hs.hotkey.bind({ "alt" }, key, focusToward(direction)))
 end
 
 local GHOSTTY = "com.mitchellh.ghostty"

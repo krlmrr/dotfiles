@@ -144,12 +144,16 @@
 	<string>useTheme</string>
 	<key>Workspace.lightThemeID</key>
 	<string>custom-7325F5D9-7DDD-4BF6-AE14-E2D0573438BC</string>
+	<key>Workspace.notificationPosition</key>
+	<string>bottom-left</string>
 	<key>Workspace.paneDensity</key>
 	<string>comfortable</string>
 	<key>Workspace.shellIconTheme</key>
 	<string>themedAlt</string>
 	<key>Workspace.showsActivePaneBorder</key>
 	<true/>
+	<key>Workspace.showsPaneHeaders</key>
+	<false/>
 	<key>Workspace.sidebarPosition</key>
 	<string>right</string>
 	<key>Workspace.sidebarShowsActivity</key>
@@ -167,15 +171,17 @@
 	<key>Workspace.terminalFontName</key>
 	<string>MonoLisa</string>
 	<key>Workspace.terminalFontPointSize</key>
-	<real>15.0</real>
+	<real>16.0</real>
 	<key>Workspace.terminalImproveTextContrast</key>
 	<false/>
 	<key>Workspace.terminalPaddingColor</key>
-	<string>extend-always</string>
+	<string>background</string>
 	<key>Workspace.terminalSmoothScrolling</key>
 	<true/>
 	<key>Workspace.terminalUseThemePalette</key>
 	<false/>
+	<key>Workspace.tintsPanesWithProgramBackground</key>
+	<true/>
 	<key>Workspace.usesStandardInactiveWindowPaneStyles</key>
 	<false/>
 	<key>rex.agents.names-sessions</key>

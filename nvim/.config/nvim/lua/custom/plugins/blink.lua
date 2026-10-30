@@ -29,6 +29,6 @@ return {
 				buffer = { name = "Buffer", max_items = 3 },
 			},
 		},
-		signature = { enabled = true },
+		signature = { enabled = true, window = { border = "rounded" } },
 	},
 }

@@ -94,6 +94,8 @@ local function apply_plugin_highlights()
 	vim.api.nvim_set_hl(0, "WinBar", { fg = colors.fg_muted, bg = "NONE" })
 	vim.api.nvim_set_hl(0, "WinBarNC", { fg = colors.fg_muted, bg = "NONE" })
 	vim.api.nvim_set_hl(0, "LspInlayHint", { fg = colors.inlay_hint, bg = "NONE" })
+	local end_of_buffer = vim.api.nvim_get_hl(0, { name = "EndOfBuffer", link = false })
+	vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = end_of_buffer.fg, bg = "NONE" })
 
 	-- Floating windows
 	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })

@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import plistlib
+import subprocess
+import sys
+from pathlib import Path
+
+DOMAIN = "com.superlogical.rex"
+SAVED = Path(__file__).resolve().parents[3] / "rex-settings" / "settings.plist"
+KEPT_PREFIXES = ("Workspace.",)
+KEPT_KEYS = {
+    "rex.agents.names-sessions",
+    "rex.client.remoteControl",
+    "rex.server.automatic-restart-enabled",
+    "rex.server.block-plugin-reload-enabled",
+}
+SKIPPED_KEYS = {"Workspace.lastFocusedSession", "Workspace.programActivitySeen"}
+
+
+def current():
+    result = subprocess.run(["defaults", "export", DOMAIN, "-"], capture_output=True, check=True)
+    return plistlib.loads(result.stdout)
+
+
+def is_setting(key):
+    return key not in SKIPPED_KEYS and (key in KEPT_KEYS or key.startswith(KEPT_PREFIXES))
+
+
+def rex_is_running():
+    return subprocess.run(["pgrep", "-xq", "Rex"]).returncode == 0
+
+
+def export():
+    settings = {key: value for key, value in current().items() if is_setting(key)}
+    SAVED.parent.mkdir(exist_ok=True)
+    SAVED.write_bytes(plistlib.dumps(settings, sort_keys=True))
+    print(f"rex-settings: saved {len(settings)} settings to {SAVED}")
+
+
+def restore():
+    if rex_is_running():
+        sys.exit("rex-settings: quit Rex first, it overwrites its settings when it quits")
+    merged = {**current(), **plistlib.loads(SAVED.read_bytes())}
+    subprocess.run(["defaults", "import", DOMAIN, "-"], input=plistlib.dumps(merged), check=True)
+    print(f"rex-settings: restored settings from {SAVED}")
+
+
+commands = {"export": export, "import": restore}
+if len(sys.argv) != 2 or sys.argv[1] not in commands:
+    sys.exit("usage: rex-settings export|import")
+commands[sys.argv[1]]()

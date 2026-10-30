@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import plistlib
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 DOMAIN = "com.superlogical.rex"
-SAVED = Path(__file__).resolve().parents[3] / "rex-settings" / "settings.plist"
+BACKUP = Path(__file__).resolve().parents[3] / "rex-settings"
+SAVED = BACKUP / "settings.plist"
+SHORTCUTS = Path.home() / "Library/Application Support/com.superlogical.rex/Shortcuts/shortcuts.json"
+SAVED_SHORTCUTS = BACKUP / "shortcuts.json"
 KEPT_PREFIXES = ("Workspace.",)
 KEPT_KEYS = {
     "rex.agents.names-sessions",
@@ -33,7 +37,9 @@ def export():
     settings = {key: value for key, value in current().items() if is_setting(key)}
     SAVED.parent.mkdir(exist_ok=True)
     SAVED.write_bytes(plistlib.dumps(settings, sort_keys=True))
-    print(f"rex-settings: saved {len(settings)} settings to {SAVED}")
+    if SHORTCUTS.exists():
+        shutil.copyfile(SHORTCUTS, SAVED_SHORTCUTS)
+    print(f"rex-settings: saved {len(settings)} settings and the shortcuts to {BACKUP}")
 
 
 def restore():
@@ -41,7 +47,10 @@ def restore():
         sys.exit("rex-settings: quit Rex first, it overwrites its settings when it quits")
     merged = {**current(), **plistlib.loads(SAVED.read_bytes())}
     subprocess.run(["defaults", "import", DOMAIN, "-"], input=plistlib.dumps(merged), check=True)
-    print(f"rex-settings: restored settings from {SAVED}")
+    if SAVED_SHORTCUTS.exists():
+        SHORTCUTS.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(SAVED_SHORTCUTS, SHORTCUTS)
+    print(f"rex-settings: restored settings and the shortcuts from {BACKUP}")
 
 
 commands = {"export": export, "import": restore}

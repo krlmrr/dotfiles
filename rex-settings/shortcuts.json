@@ -1,0 +1,64 @@
+{
+  "layer" : {
+    "bindings" : [
+      {
+        "action" : "client.palette.toggle",
+        "keys" : [
+          "cmd+p"
+        ],
+        "source" : "settings"
+      },
+      {
+        "action" : "client.sidebar.toggle",
+        "keys" : [
+          "cmd+b"
+        ],
+        "source" : "settings"
+      },
+      {
+        "action" : "client.window.close",
+        "keys" : [
+          "cmd+w"
+        ],
+        "source" : "settings"
+      }
+    ],
+    "name" : "settings",
+    "removals" : [
+      {
+        "action" : "client.palette.toggle",
+        "keys" : [
+          "shift+cmd+p"
+        ]
+      },
+      {
+        "action" : "client.sidebar.toggle",
+        "keys" : [
+          "cmd+\/"
+        ]
+      },
+      {
+        "action" : "client.close",
+        "keys" : [
+          "cmd+w"
+        ]
+      },
+      {
+        "action" : "client.window.close",
+        "keys" : [
+          "shift+cmd+w"
+        ]
+      },
+      {
+        "action" : "pane.close",
+        "keys" : [
+          "cmd+w"
+        ]
+      }
+    ]
+  },
+  "migrations" : [
+    "bracket-characters"
+  ],
+  "version" : 1
+}

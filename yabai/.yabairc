@@ -674,6 +674,8 @@ yabai -m rule --add app="^osascript$" manage=off
 yabai -m rule --add app="^DaisyDisk$" manage=off
 yabai -m rule --add app="^Harvest$" manage=off
 yabai -m rule --add app="^Rex" title="^Settings" manage=off
+# Yab titles its Settings window after the open pane, not "Settings".
+yabai -m rule --add app="^Yab$" title="^(About|Agents|AI|Appearance|Autofill|Best Friend|Boosts|Bring In|Calendar|Credits|Developers|Experimental|Extensions|Field|General|History|Inbox|Invite Friends|Live Folders|Mail|Memory|Models|Notifications|Passwords|Privacy|Reading Mode|Reading|Shortcuts|Skills|Small Window|Snippets|Spaces|Sync|Tabs|Websites|While You Browse|Writing)$" manage=off
 yabai -m query --windows | jq -r '.[]|select((.app=="TV" or .title=="Picture-in-Picture") and ."is-floating"==false)|.id' \
   | xargs -I{} yabai -m window {} --toggle float
 

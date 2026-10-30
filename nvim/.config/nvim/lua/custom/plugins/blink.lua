@@ -17,7 +17,6 @@ return {
 		completion = {
 			list = { selection = { auto_insert = false } },
 			menu = {
-				direction_priority = { "n", "s" },
 				draw = {
 					columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
 				},
@@ -32,6 +31,6 @@ return {
 				buffer = { name = "Buffer", max_items = 3 },
 			},
 		},
-		signature = { enabled = true, window = { border = "rounded" } },
+		signature = { enabled = true, window = { border = "rounded", direction_priority = { "s", "n" } } },
 	},
 }

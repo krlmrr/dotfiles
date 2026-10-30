@@ -4,6 +4,8 @@
 <dict>
 	<key>Workspace.animationStyle</key>
 	<string>natural</string>
+	<key>Workspace.balancesSplitsOnCreation</key>
+	<false/>
 	<key>Workspace.customThemes</key>
 	<data>
 	W3siYXBwZWFyYW5jZSI6ImRhcmsiLCJpZCI6ImN1c3RvbS01MURCNzBGNC04QkJFLTQy
@@ -150,12 +152,23 @@
 	<string>bottom-left</string>
 	<key>Workspace.paneDensity</key>
 	<string>comfortable</string>
+	<key>Workspace.programActivityStatusPreferences</key>
+	<data>
+	eyJkb25lIjp7ImlzRW5hYmxlZCI6dHJ1ZSwic291bmQiOiJyZWFkeSIsImJhZGdlc0Rv
+	Y2tJY29uIjp0cnVlLCJwbGF5c1NvdW5kIjp0cnVlLCJzaG93c0luVGFicyI6dHJ1ZSwi
+	c2hvd3NOb3RpZmljYXRpb24iOnRydWV9LCJ3b3JraW5nIjp7ImlzRW5hYmxlZCI6dHJ1
+	ZSwic291bmQiOiJyZWFkeSIsImJhZGdlc0RvY2tJY29uIjp0cnVlLCJwbGF5c1NvdW5k
+	IjpmYWxzZSwic2hvd3NJblRhYnMiOnRydWUsInNob3dzTm90aWZpY2F0aW9uIjp0cnVl
+	fX0=
+	</data>
 	<key>Workspace.shellIconTheme</key>
 	<string>themedAlt</string>
 	<key>Workspace.showsActivePaneBorder</key>
 	<true/>
 	<key>Workspace.showsPaneHeaders</key>
-	<false/>
+	<true/>
+	<key>Workspace.showsProgramStatusInTabs</key>
+	<true/>
 	<key>Workspace.sidebarPosition</key>
 	<string>right</string>
 	<key>Workspace.sidebarShowsActivity</key>
@@ -169,11 +182,15 @@
 	<key>Workspace.tabStyle</key>
 	<string>vertical</string>
 	<key>Workspace.terminalCellHeightPercent</key>
-	<real>9.0</real>
+	<real>10.0</real>
 	<key>Workspace.terminalFontName</key>
 	<string>MonoLisa</string>
 	<key>Workspace.terminalFontPointSize</key>
 	<real>16.0</real>
+	<key>Workspace.terminalFontSmoothing</key>
+	<false/>
+	<key>Workspace.terminalFontStyle</key>
+	<string>Medium</string>
 	<key>Workspace.terminalImproveTextContrast</key>
 	<false/>
 	<key>Workspace.terminalPaddingColor</key>

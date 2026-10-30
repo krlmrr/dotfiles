@@ -9,13 +9,6 @@
         "source" : "settings"
       },
       {
-        "action" : "client.sidebar.toggle",
-        "keys" : [
-          "cmd+b"
-        ],
-        "source" : "settings"
-      },
-      {
         "action" : "client.window.close",
         "keys" : [
           "cmd+w"
@@ -29,12 +22,6 @@
         "action" : "client.palette.toggle",
         "keys" : [
           "shift+cmd+p"
-        ]
-      },
-      {
-        "action" : "client.sidebar.toggle",
-        "keys" : [
-          "cmd+\/"
         ]
       },
       {
@@ -53,6 +40,240 @@
         "action" : "pane.close",
         "keys" : [
           "cmd+w"
+        ]
+      },
+      {
+        "action" : "client.diagnostics",
+        "keys" : [
+          "shift+cmd+,"
+        ]
+      },
+      {
+        "action" : "client.update.accept",
+        "keys" : [
+          "shift+cmd+u"
+        ]
+      },
+      {
+        "action" : "client.notice.dismiss",
+        "keys" : [
+          "shift+cmd+."
+        ]
+      },
+      {
+        "action" : "session.new",
+        "keys" : [
+          "shift+cmd+n"
+        ]
+      },
+      {
+        "action" : "session.switch",
+        "keys" : [
+          "cmd+k"
+        ]
+      },
+      {
+        "action" : "client.tab.new",
+        "keys" : [
+          "cmd+t"
+        ]
+      },
+      {
+        "action" : "client.tab.close",
+        "keys" : [
+          "alt+cmd+w"
+        ]
+      },
+      {
+        "action" : "client.tab.next",
+        "keys" : [
+          "shift+cmd+]"
+        ]
+      },
+      {
+        "action" : "client.tab.next",
+        "keys" : [
+          "ctrl+tab"
+        ]
+      },
+      {
+        "action" : "client.tab.previous",
+        "keys" : [
+          "shift+cmd+["
+        ]
+      },
+      {
+        "action" : "client.tab.previous",
+        "keys" : [
+          "ctrl+shift+tab"
+        ]
+      },
+      {
+        "action" : "client.tab.move.backward",
+        "keys" : [
+          "ctrl+shift+pageup"
+        ]
+      },
+      {
+        "action" : "client.tab.move.forward",
+        "keys" : [
+          "ctrl+shift+pagedown"
+        ]
+      },
+      {
+        "action" : "pane.split.left",
+        "keys" : [
+          "shift+cmd+left"
+        ]
+      },
+      {
+        "action" : "pane.split.right",
+        "keys" : [
+          "shift+cmd+right"
+        ]
+      },
+      {
+        "action" : "pane.split.right",
+        "keys" : [
+          "cmd+d"
+        ]
+      },
+      {
+        "action" : "pane.split.up",
+        "keys" : [
+          "shift+cmd+up"
+        ]
+      },
+      {
+        "action" : "pane.split.down",
+        "keys" : [
+          "shift+cmd+down"
+        ]
+      },
+      {
+        "action" : "pane.split.down",
+        "keys" : [
+          "shift+cmd+d"
+        ]
+      },
+      {
+        "action" : "pane.split.auto",
+        "keys" : [
+          "cmd+enter"
+        ]
+      },
+      {
+        "action" : "pane.focus.left",
+        "keys" : [
+          "alt+cmd+left"
+        ]
+      },
+      {
+        "action" : "pane.focus.right",
+        "keys" : [
+          "alt+cmd+right"
+        ]
+      },
+      {
+        "action" : "pane.focus.up",
+        "keys" : [
+          "alt+cmd+up"
+        ]
+      },
+      {
+        "action" : "pane.focus.down",
+        "keys" : [
+          "alt+cmd+down"
+        ]
+      },
+      {
+        "action" : "pane.focus_next",
+        "keys" : [
+          "cmd+]"
+        ]
+      },
+      {
+        "action" : "pane.focus_previous",
+        "keys" : [
+          "cmd+["
+        ]
+      },
+      {
+        "action" : "pane.move.left",
+        "keys" : [
+          "alt+shift+cmd+left"
+        ]
+      },
+      {
+        "action" : "pane.move.right",
+        "keys" : [
+          "alt+shift+cmd+right"
+        ]
+      },
+      {
+        "action" : "pane.move.up",
+        "keys" : [
+          "alt+shift+cmd+up"
+        ]
+      },
+      {
+        "action" : "pane.move.down",
+        "keys" : [
+          "alt+shift+cmd+down"
+        ]
+      },
+      {
+        "action" : "pane.float",
+        "keys" : [
+          "alt+cmd+enter"
+        ]
+      },
+      {
+        "action" : "pane.zoom",
+        "keys" : [
+          "shift+cmd+enter"
+        ]
+      },
+      {
+        "action" : "pane.go_to_directory",
+        "keys" : [
+          "shift+cmd+g"
+        ]
+      },
+      {
+        "action" : "pane.insert_path",
+        "keys" : [
+          "ctrl+cmd+i"
+        ]
+      },
+      {
+        "action" : "client.find.open",
+        "keys" : [
+          "cmd+f"
+        ]
+      },
+      {
+        "action" : "client.find.next",
+        "keys" : [
+          "cmd+g"
+        ]
+      },
+      {
+        "action" : "client.find.previous",
+        "keys" : [
+          "shift+cmd+g"
+        ]
+      },
+      {
+        "action" : "client.sidebar.toggle",
+        "keys" : [
+          "cmd+\/"
+        ]
+      },
+      {
+        "action" : "client.tab_style.toggle",
+        "keys" : [
+          "shift+cmd+s"
         ]
       }
     ]

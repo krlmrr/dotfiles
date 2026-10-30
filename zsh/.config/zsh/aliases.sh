@@ -128,7 +128,7 @@ alias a="php artisan"
 unalias brewup 2>/dev/null
 
 # Installed version of a cask. Casks need --json=v2 --cask; the v1 form the
-# yabai check uses returns nothing for them.
+# herdr check uses returns nothing for them.
 _cask_version() {
   brew info --json=v2 --cask "$1" 2>/dev/null \
     | jq -r '.casks[0].installed // empty' 2>/dev/null
@@ -136,8 +136,7 @@ _cask_version() {
 
 brewup() {
   # Save versions up front so we can tell what was actually upgraded
-  local before after herdr_before herdr_after
-  before=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
+  local herdr_before herdr_after
   herdr_before=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
 
   brew update || return $?
@@ -145,23 +144,14 @@ brewup() {
   brew upgrade --greedy-auto-updates
   brew cleanup --prune=all
 
-  after=$(brew info --json yabai 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
   herdr_after=$(brew info --json herdr 2>/dev/null | jq -r '.[0].installed[0].version' 2>/dev/null)
-
-  if [[ "$before" != "$after" && -n "$after" ]]; then
-    echo "yabai upgraded ($before → $after) — reloading SA, restarting, cleaning TCC"
-    env -u TERMINFO sudo yabai --uninstall-sa
-    env -u TERMINFO sudo yabai --load-sa
-    yabai --restart-service
-    sudo bash "${DOTFILES:-$HOME/dotfiles}/scripts/tcc-cleanup.sh"
-  fi
 
   # `brew upgrade --greedy-auto-updates` is exactly what puts the Adobe/Google background
   # agents back — their installers re-register them on every version bump — and
   # a `brew upgrade` that retires a formula leaves its brew-services plist
   # behind as an orphan. So re-prune after every upgrade run, not just on setup.
   #
-  # NOT `sudo bash` (unlike tcc-cleanup.sh above): this one must run as you, so
+  # NOT `sudo bash`: this one must run as you, so
   # it can reach the gui/$UID domain for the per-user agents. It calls sudo
   # itself for the /Library ones and will prompt if the session has gone stale.
   bash "${DOTFILES:-$HOME/dotfiles}/scripts/prune-login-items.sh" --quiet

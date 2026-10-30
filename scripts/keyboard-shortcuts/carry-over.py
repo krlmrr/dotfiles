@@ -9,7 +9,6 @@ COLUMNS = {
     "LazyVim": ("Keys", "What it does"),
     "Nvim": ("Keys", "What it does"),
     "herdr": ("Keys", "Setting name"),
-    "Yabai": ("Shortcut", "What it does"),
 }
 GENERATED_NOTE_PREFIXES = ("Now: ", "Replaces an Omarchy default", "Replaces Omarchy's: ", "Maps the key to itself", "From ~/.config/herdr")
 

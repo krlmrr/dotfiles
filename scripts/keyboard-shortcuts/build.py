@@ -446,77 +446,6 @@ def herdr_rows():
     return rows
 
 
-SKHDRC = os.path.join(DOTFILES, "yabai/.skhdrc")
-SKHD_KEYS = {"0x2F": ".", "0x2B": ",", "left": "Left", "right": "Right", "up": "Up", "down": "Down"}
-DIRECTIONS = {"west": "left", "east": "right", "north": "up", "south": "down", "prev": "previous desktop", "next": "next desktop",
-              "left": "previous desktop", "right": "next desktop"}
-
-
-def skhd_pretty(chord):
-    mods, _, key = chord.partition(" - ")
-    parts = [m.strip().capitalize() for m in mods.split("+") if m.strip()]
-    key = key.strip()
-    parts.append(SKHD_KEYS.get(key, key.upper() if len(key) == 1 else key))
-    return " + ".join(parts)
-
-
-def skhd_describe(command):
-    m = re.search(r"window --focus (\w+)", command)
-    if m:
-        return "Focus window " + DIRECTIONS[m.group(1)], "Focus"
-    m = re.search(r"window --warp (\w+)", command)
-    if m:
-        return "Move window " + DIRECTIONS[m.group(1)], "Move windows"
-    m = re.search(r"window --space (\w+)", command)
-    if m:
-        target = m.group(1)
-        where = "desktop " + target if target.isdigit() else DIRECTIONS.get(target, target)
-        return "Move window to " + where + " and follow", "Desktops"
-    m = re.match(r"\S*space-follow (\w+)$", command.strip())
-    if m:
-        target = m.group(1)
-        return ("Go to desktop " + target if target.isdigit() else "Go to " + DIRECTIONS.get(target, target)), "Desktops"
-    if "color-picker" in command:
-        return "Color picker (Raycast)", "Apps"
-    if re.search(r"-e spf\b", command):
-        return "File manager (spf in Ghostty)", "Apps"
-    if "zoom-fullscreen" in command:
-        return "Toggle zoom-fullscreen", "Layout"
-    if "--toggle float" in command:
-        return "Float window and centre it", "Layout"
-    m = re.search(r"space --layout (\w+)", command)
-    if m:
-        return {"bsp": "Tiling layout (bsp)", "stack": "Stacked layout"}.get(m.group(1), m.group(1)), "Layout"
-    if "--balance" in command:
-        return "Balance: make all windows equal size", "Layout"
-    return command, "Other"
-
-
-def skhd_keyboard(chord):
-    mods = chord.partition(" - ")[0]
-    if "ctrl" in mods and "alt" in mods and "cmd" in mods:
-        return "Lily58"
-    if "ctrl" in mods and "cmd" in mods:
-        return "Omarchy-style"
-    return "MacBook"
-
-
-def yabai_rows():
-    rows = []
-    for line in open(SKHDRC):
-        text = line.strip()
-        active = not text.startswith("#")
-        body = text.lstrip("#").strip()
-        if " : " not in body or not re.match(r"^[a-z0-9 +]+ - \S+\s*:", body):
-            continue
-        chord, _, command = body.partition(" : ")
-        desc, group = skhd_describe(command)
-        rows.append([skhd_pretty(chord), desc, group, skhd_keyboard(chord), "Active" if active else "Commented out", None, None])
-    order = ["Focus", "Move windows", "Layout", "Desktops", "Apps", "Other"]
-    rows.sort(key=lambda r: (r[4] != "Active", order.index(r[2])))
-    return rows
-
-
 wb = Workbook()
 summary = wb.active
 summary.title = "Summary"
@@ -544,12 +473,6 @@ last, call = style_sheet(ws, ["#", "Keys", "Setting name", "What it does", "Grou
                          grey_when=("G", ["Not bound"]))
 tabs.append(("herdr", "E", last, call, "herdr 0.9.1 defaults plus your config. Every shortcut starts with Ctrl+B (shown as \"Ctrl+B ▸\")."))
 
-ws = wb.create_sheet("Yabai")
-last, call = style_sheet(ws, ["#", "Shortcut", "What it does", "Group", "Keyboard", "Status", "Your call", "Notes"],
-                         yabai_rows(), {"A": 5, "B": 32, "C": 40, "D": 16, "E": 16, "F": 16, "G": 12, "H": 40}, (3, 8),
-                         grey_when=("F", ["Commented out"]))
-tabs.append(("Yabai", "D", last, call, "skhd bindings for yabai on the Mac (~/dotfiles/yabai/.skhdrc). Grey rows are commented out."))
-
 summary.column_dimensions["A"].width = 36
 for col in "BCDE":
     summary.column_dimensions[col].width = 12
@@ -559,7 +482,7 @@ notes = [
     "One tab per tool. Fill in the yellow \"Your call\" column: Keep, Remove or Rebind.",
     "Example: Omarchy | Super + Shift + Y | YouTube | Your call = Remove | Notes = never use it.",
 ] + [f"{t}: {n}" for t, _, _, _, n in tabs] + [
-    f"Generated {date.today().isoformat()} by scripts/keyboard-shortcuts/refresh from the live Hyprland, LazyVim, Neovim, herdr and skhd configs.",
+    f"Generated {date.today().isoformat()} by scripts/keyboard-shortcuts/refresh from the live Hyprland, LazyVim, Neovim and herdr configs.",
 ]
 for n in notes:
     summary.append([n])

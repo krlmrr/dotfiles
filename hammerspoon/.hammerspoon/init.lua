@@ -13,10 +13,7 @@ pcall(function() require("hs.ipc") end)
 
 -- ── Move window to a space AND follow it ────────────────────────────────────
 -- cmd+1..9 goes to that desktop; cmd+shift+1..9 moves the focused window to
--- that desktop and goes there too. yabai does the move (public API, fine with SIP on) but
--- cannot focus a space — `space --focus` needs the scripting addition SIP blocks
--- — so we post macOS's own "Switch to Desktop N" shortcut and let Apple do the
--- switching with its native animation.
+-- that desktop and goes there too.
 --
 -- setFlags is the load-bearing part. The chord's own ctrl+shift is still
 -- physically held when this runs, and without forcing the flags the posted event
@@ -36,68 +33,8 @@ pcall(function() require("hs.ipc") end)
 --     space-follow.swift, still in the repo, unused) — worked, then stopped
 --     following for reasons never pinned down. Hammerspoon is where this has
 --     been reliable.
---
--- NO TIMERS here on purpose: an earlier version polled for shift-release and
--- queued keystrokes that fired later, which produced stray space switches and
--- broke plain ctrl+N.
-local YABAI = "/opt/homebrew/bin/yabai"
 local KEYCODE = { [1]=18, [2]=19, [3]=20, [4]=21, [5]=23, [6]=22, [7]=26, [8]=28, [9]=25 }
--- Arrow keycodes are deliberately NOT posted. macOS's "Move left/right a space"
--- (symbolichotkeys 79/81) ignores synthetic events -- it only responds to real
--- hardware keys -- so posting ctrl+arrow, with or without the Fn flag those
--- shortcuts are registered with (mask 0x840000), moves nothing and the view
--- stays put while the window leaves. "Switch to Desktop N" (118-126, plain ctrl,
--- mask 0x40000) DOES accept a posted event. So prev/next resolve to an absolute
--- space index and reuse the digit path, which is the only mechanism that works.
---
--- macOS only has "Switch to Desktop N" shortcuts for 1-9, so past desktop 9 --
--- which is where a second display's spaces land, since yabai indexes globally --
--- there is no chord to post and the view used to stay behind. Those cases fall
--- back to focusing the window instead: activating a window pulls the view to its
--- space, which needs no shortcut and is not limited to 9. That relies on
--- AppleSpacesSwitchOnActivate, which is on unless deliberately turned off.
---
--- The post is still preferred where a chord exists: it is the long-proven path
--- here, and it switches the desktop without touching window focus or app
--- activation, which focusing necessarily does.
 
-local function query(args)
-    -- No user-environment shell here: hs.execute(cmd, true) runs the command via
-    -- `$SHELL -l -i -c`, which sources the whole zsh profile -- ~700ms per call,
-    -- versus ~10ms for a plain sh. This fires on every keypress and YABAI is an
-    -- absolute path, so there is nothing the profile is needed for.
-    local out = hs.execute(string.format("%s -m query %s", YABAI, args))
-    if not out or out == "" then return nil end
-    local ok, decoded = pcall(hs.json.decode, out)
-    if not ok then return nil end
-    return decoded
-end
-
--- Absolute index of the neighbouring space on the current display, or nil when
--- there is no space that way (so an edge press is a no-op instead of a surprise).
--- One query, not two: --spaces --display already flags the focused space, and
--- this runs synchronously on Hammerspoon's main thread on every keypress.
-local function neighbour(direction)
-    local onDisplay = query("--spaces --display")
-    if not onDisplay then return nil end
-    local current, first, last
-    for _, sp in ipairs(onDisplay) do
-        if sp.index then
-            if sp["has-focus"] then current = sp.index end
-            if not first or sp.index < first then first = sp.index end
-            if not last or sp.index > last then last = sp.index end
-        end
-    end
-    if not current then return nil end
-    local want = current + (direction == "prev" and -1 or 1)
-    if want < first or want > last then return nil end
-    return want
-end
-
--- Posts macOS's own "Switch to Desktop N" chord. setFlags is the load-bearing
--- part: the triggering chord's ctrl+shift is still physically held, and without
--- forcing the flags the posted event merges with the real modifier state into
--- ctrl+shift+N, which matches no shortcut.
 local function post(kc)
     local down = hs.eventtap.event.newKeyEvent(kc, true)
     down:setFlags({ ctrl = true }); down:post()
@@ -105,17 +42,44 @@ local function post(kc)
     up:setFlags({ ctrl = true }); up:post()
 end
 
--- target is 1-9, or "prev"/"next" for the adjacent desktop.
-local function moveAndFollow(target)
+local function click(type, point)
+    local event = hs.eventtap.event.newMouseEvent(type, point)
+    event:setFlags({})
+    event:post()
+end
+
+local function titleBarGrabPoint(win)
+    local zoom = hs.axuielement.windowElement(win):attributeValue("AXZoomButton")
+    local zoomFrame = zoom and zoom:attributeValue("AXFrame")
+    if zoomFrame then
+        return hs.geometry.point(zoomFrame.x + zoomFrame.w + 6, zoomFrame.y + zoomFrame.h / 2)
+    end
+    local frame = win:frame()
+    return hs.geometry.point(frame.x + 80, frame.y + 12)
+end
+
+local function moveAndFollow(index)
     return function()
         pcall(function()
             local win = hs.window.focusedWindow()
             if not win then return end
-            local index = type(target) == "number" and target or neighbour(target)
-            if not index then return end
-            hs.execute(string.format("%s -m window %d --space %d", YABAI, win:id(), index))
-            local kc = KEYCODE[index]
-            if kc then post(kc) else win:focus() end
+            local spaces = hs.spaces.spacesForScreen(win:screen())
+            if not spaces or not spaces[index] or spaces[index] == hs.spaces.focusedSpace() then return end
+            local types = hs.eventtap.event.types
+            local grab = titleBarGrabPoint(win)
+            local held = hs.geometry.point(grab.x + 1, grab.y)
+            local mouse = hs.mouse.absolutePosition()
+            click(types.leftMouseDown, grab)
+            hs.timer.doAfter(0.06, function()
+                click(types.leftMouseDragged, held)
+                hs.timer.doAfter(0.06, function()
+                    post(KEYCODE[index])
+                    hs.timer.doAfter(0.7, function()
+                        click(types.leftMouseUp, held)
+                        hs.mouse.absolutePosition(mouse)
+                    end)
+                end)
+            end)
         end)
     end
 end

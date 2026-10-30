@@ -7,6 +7,8 @@ return {
 			["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
 			["<C-n>"] = { "select_next", "fallback" },
 			["<C-p>"] = { "select_prev", "fallback" },
+			["<C-j>"] = { "select_next", "fallback" },
+			["<C-k>"] = { "select_prev", "fallback" },
 			["<C-b>"] = { "scroll_documentation_up", "fallback" },
 			["<C-f>"] = { "scroll_documentation_down", "fallback" },
 			["<CR>"] = { "accept", "fallback" },
@@ -15,6 +17,7 @@ return {
 		completion = {
 			list = { selection = { auto_insert = false } },
 			menu = {
+				direction_priority = { "n", "s" },
 				draw = {
 					columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "source_name" } },
 				},

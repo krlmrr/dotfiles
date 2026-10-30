@@ -2,7 +2,7 @@ id = "krlmrr.pane-numbers"
 name = "Pane numbers"
 version = "0.1.0"
 min_herdr_version = "0.9.5"
-description = "Number the panes in a tab and jump to one by its number"
+description = "Number the panes in a tab, jump to one by its number, and name panes after their program"
 platforms = ["linux", "macos"]
 
 [[actions]]
@@ -64,3 +64,11 @@ id = "jump-9"
 title = "Jump to pane 9"
 contexts = ["workspace"]
 command = ["python3", "pane_numbers.py", "jump", "9"]
+
+[[events]]
+on = "pane.updated"
+command = ["python3", "pane_numbers.py", "autoname"]
+
+[[events]]
+on = "pane.created"
+command = ["python3", "pane_numbers.py", "autoname"]

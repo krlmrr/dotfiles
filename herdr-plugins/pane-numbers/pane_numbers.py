@@ -8,7 +8,9 @@ from pathlib import Path
 
 HERDR = os.environ.get("HERDR_BIN_PATH", "herdr")
 SHOWN = Path(os.environ.get("HERDR_PLUGIN_STATE_DIR", ".")) / "shown.json"
+AUTONAMED = Path(os.environ.get("HERDR_PLUGIN_STATE_DIR", ".")) / "autonamed.json"
 SHOW_FOR_SECONDS = 3
+SHELLS = {"zsh", "bash", "sh", "fish", "dash", "nu", "login"}
 
 
 def herdr(*args):
@@ -74,7 +76,55 @@ def jump(number):
         herdr("pane", "zoom", pane_ids[number - 1], "--off")
 
 
+def pane_in_event():
+    event = json.loads(os.environ.get("HERDR_PLUGIN_EVENT_JSON", "{}"))
+    while isinstance(event, dict):
+        if "pane_id" in event:
+            return event["pane_id"]
+        event = event.get("data") or event.get("pane") or event.get("payload")
+    return None
+
+
+def program_in(pane_id):
+    info = herdr("pane", "process-info", "--pane", pane_id)
+    if not info:
+        return None
+    info = info["process_info"]
+    leaders = [p["name"] for p in info["foreground_processes"] if p["pid"] == info["foreground_process_group_id"]]
+    name = (leaders or [None])[0]
+    if not name or name.lstrip("-") in SHELLS:
+        return None
+    return name[0].upper() + name[1:]
+
+
+def autoname():
+    pane_id = pane_in_event()
+    if not pane_id:
+        return
+    pane = herdr("pane", "get", pane_id)
+    if not pane:
+        return
+    current = pane["pane"].get("label")
+    try:
+        autonamed = json.loads(AUTONAMED.read_text())
+    except (FileNotFoundError, json.JSONDecodeError):
+        autonamed = {}
+    if current is not None and current != autonamed.get(pane_id):
+        return
+    name = program_in(pane_id)
+    if name == current:
+        return
+    rename(pane_id, name)
+    if name:
+        autonamed[pane_id] = name
+    else:
+        autonamed.pop(pane_id, None)
+    AUTONAMED.write_text(json.dumps(autonamed))
+
+
 if sys.argv[1] == "show":
     show()
+elif sys.argv[1] == "autoname":
+    autoname()
 else:
     jump(int(sys.argv[2]))

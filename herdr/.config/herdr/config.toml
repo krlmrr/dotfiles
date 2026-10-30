@@ -21,7 +21,7 @@ hide_tab_bar_when_single_tab = true
 
 mouse_capture = true
 
-pane_gaps = true
+pane_gaps = false
 pane_outer_borders = true
 pane_borders = "auto"
 pane_scrollbars = false

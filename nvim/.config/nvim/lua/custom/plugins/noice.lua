@@ -87,7 +87,6 @@ return {
 				["vim.lsp.util.stylize_markdown"] = true,
 				["cmp.entry.get_documentation"] = true,
 			},
-			-- blink.cmp shows signature help; noice's adds a blank line under it
 			signature = { enabled = false },
 		},
 		presets = {

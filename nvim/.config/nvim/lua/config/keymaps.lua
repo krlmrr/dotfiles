@@ -110,6 +110,13 @@ end, { desc = "Close split or buffer and focus file tree" })
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
 vim.keymap.set({ "n", "i", "v" }, "<D-s>", "<cmd>w<cr>", { desc = "Save file" })
 
+vim.keymap.set("n", "<D-Left>", "^", { desc = "Start of line" })
+vim.keymap.set("n", "<D-Right>", "$", { desc = "End of line" })
+vim.keymap.set("x", "<D-Left>", "^", { desc = "Start of line" })
+vim.keymap.set("x", "<D-Right>", "g_", { desc = "End of line" })
+vim.keymap.set("i", "<D-Left>", "<C-o>^", { desc = "Start of line" })
+vim.keymap.set("i", "<D-Right>", "<End>", { desc = "End of line" })
+
 -- Restart neovim (saves files, reopens current file in project root)
 vim.keymap.set("n", "<leader>rc", function()
 	local file = vim.fn.expand("%:p")

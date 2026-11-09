@@ -98,15 +98,27 @@ if vim.fn.has("linux") == 1 then
 end
 
 -- Prevent scrolling past end of file with mouse
+-- The wheel scrolls the window under the mouse, not the focused one, so measure that window
 vim.keymap.set({ "n", "v", "i" }, "<ScrollWheelDown>", function()
-	local win_height = vim.api.nvim_win_get_height(0)
-	local last_line = vim.fn.line("$")
-	local top_line = vim.fn.line("w0")
-	-- Only scroll if there's more content below
-	if top_line + win_height <= last_line then
-		return "<ScrollWheelDown>"
+	local win = vim.fn.getmousepos().winid
+	if win == 0 then
+		win = vim.api.nvim_get_current_win()
 	end
-	return ""
+	local max_top = vim.api.nvim_win_call(win, function()
+		return math.max(1, vim.fn.line("$") - vim.api.nvim_win_get_height(0) + 1)
+	end)
+	if vim.fn.line("w0", win) >= max_top then
+		return ""
+	end
+	-- A wheel tick moves several lines, so pull back if it overshot the last line
+	vim.schedule(function()
+		if vim.api.nvim_win_is_valid(win) and vim.fn.line("w0", win) > max_top then
+			vim.api.nvim_win_call(win, function()
+				vim.fn.winrestview({ topline = max_top })
+			end)
+		end
+	end)
+	return "<ScrollWheelDown>"
 end, { expr = true, silent = true })
 
 -- Only allow horizontal scrolling when content is wider than window

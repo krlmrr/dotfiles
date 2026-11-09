@@ -1,5 +1,0 @@
-# Local history only. Run `atuin register` or `atuin login` to start syncing.
-auto_sync = false
-
-# Homebrew keeps atuin up to date.
-update_check = false

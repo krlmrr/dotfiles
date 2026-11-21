@@ -1,40 +1,45 @@
 {
-  "version": 1,
-  "idle": {
-    "screensaver": 150,
-    "lock": 300
-  },
   "bar": {
-    "position": "top",
-    "transparent": true,
-    "centerAnchor": "omarchy.clock",
+    "background": "none",
     "layout": {
-      "left": [
-        {
-          "id": "omarchy.menu"
-        },
-        {
-          "id": "omarchy.workspaces"
-        }
-      ],
       "center": [
         {
-          "id": "omarchy.indicators"
-        },
-        {
-          "id": "omarchy.media"
-        },
-        {
-          "id": "omarchy.clock",
-          "format": "dddd h:mm AP",
+          "format": "ddd d MMM h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
+          "id": "omarchy.clock",
           "verticalFormat": "HH\n—\nmm"
-        },
+        }
+      ],
+      "centerBegin": [
         {
+          "id": "omarchy.indicators"
+        }
+      ],
+      "centerEnd": [
+        {
+          "cities": [
+            {
+              "name": "Chicago",
+              "zone": "America/Chicago"
+            },
+            {
+              "name": "Sao Paulo",
+              "zone": "America/Sao_Paulo"
+            },
+            {
+              "name": "London",
+              "zone": "Europe/London"
+            },
+            {
+              "name": "Dubai",
+              "zone": "Asia/Dubai"
+            },
+            {
+              "name": "Tokyo",
+              "zone": "Asia/Tokyo"
+            }
+          ],
           "id": "omarchy.elsewhen"
-        },
-        {
-          "id": "omarchy.keyboard-layout"
         },
         {
           "id": "omarchy.weather"
@@ -43,28 +48,20 @@
           "id": "omarchy.system-update"
         }
       ],
+      "left": [
+        {
+          "id": "omarchy.menu"
+        },
+        {
+          "id": "omarchy.workspaces"
+        }
+      ],
       "right": [
-        {
-          "id": "okgo.mailpit"
-        },
-        {
-          "id": "okgo.xdebug"
-        },
-        {
-          "id": "karlm.tuple"
-        },
         {
           "id": "omarchy.tray"
         },
         {
-          "id": "netmojo.omdrop"
-        },
-        {
-          "id": "omarchy.tailscale",
-          "recentMullvadRegions": [
-            "USA\nDallas, TX",
-            "USA\nLos Angeles, CA"
-          ]
+          "id": "omarchy.keyboard-layout"
         },
         {
           "id": "omarchy.agents"
@@ -84,12 +81,31 @@
         {
           "id": "omarchy.power"
         }
-      ]
-    }
+      ],
+      "tray": []
+    },
+    "position": "top"
+  },
+  "dock": {
+    "pinned": [
+      "org.gnome.Nautilus",
+      "chromium",
+      "foot",
+      "omacalc",
+      "omawrite",
+      "X",
+      "YouTube"
+    ],
+    "position": "bottom"
+  },
+  "idle": {
+    "lock": 300,
+    "screensaver": 150
   },
   "plugins": [
     {
       "id": "typecraft.omacast"
     }
-  ]
+  ],
+  "version": 1
 }

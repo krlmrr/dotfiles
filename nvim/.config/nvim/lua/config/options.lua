@@ -50,42 +50,54 @@ vim.o.autoread = true
 
 -- Auto-reload files when changed externally (real-time with libuv)
 local watch_handles = {}
-vim.api.nvim_create_autocmd("BufReadPost", {
-	callback = function(args)
-		local bufnr = args.buf
-		local filepath = vim.api.nvim_buf_get_name(bufnr)
-		if filepath == "" or not vim.uv.fs_stat(filepath) then
+
+local function unwatch_buffer(bufnr)
+	local handle = watch_handles[bufnr]
+	if handle then
+		handle:stop()
+		handle:close()
+		watch_handles[bufnr] = nil
+	end
+end
+
+local function watch_buffer(bufnr)
+	unwatch_buffer(bufnr)
+	if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= "" then
+		return
+	end
+	local filepath = vim.api.nvim_buf_get_name(bufnr)
+	if filepath == "" or not vim.uv.fs_stat(filepath) then
+		return
+	end
+
+	local handle = vim.uv.new_fs_event()
+	watch_handles[bufnr] = handle
+	handle:start(filepath, {}, function(err)
+		if err then
 			return
 		end
-
-		-- Clean up existing watcher for this buffer
-		if watch_handles[bufnr] then
-			watch_handles[bufnr]:stop()
-			watch_handles[bufnr] = nil
-		end
-
-		local handle = vim.uv.new_fs_event()
-		watch_handles[bufnr] = handle
-		handle:start(filepath, {}, function(err)
-			if err then
+		vim.defer_fn(function()
+			if not vim.api.nvim_buf_is_valid(bufnr) then
 				return
 			end
-			vim.schedule(function()
-				if vim.api.nvim_buf_is_valid(bufnr) and not vim.bo[bufnr].modified then
-					vim.cmd("checktime " .. bufnr)
-				end
-			end)
-		end)
+			if not vim.bo[bufnr].modified then
+				vim.cmd("checktime " .. bufnr)
+				vim.cmd("redraw")
+			end
+			watch_buffer(bufnr)
+		end, 100)
+	end)
+end
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+	callback = function(args)
+		watch_buffer(args.buf)
 	end,
 })
 
 vim.api.nvim_create_autocmd("BufDelete", {
 	callback = function(args)
-		local handle = watch_handles[args.buf]
-		if handle then
-			handle:stop()
-			watch_handles[args.buf] = nil
-		end
+		unwatch_buffer(args.buf)
 	end,
 })
 

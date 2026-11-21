@@ -182,7 +182,6 @@ nothing links back into this repo:
 | Path | What |
 |------|------|
 | `~/.config/git/identity` | `[user]` name/email, included by `.gitconfig` |
-| `~/.config/jj/conf.d/00-identity.toml` | the same identity for jj |
 
 `~/.zshrc` is stowed from `zsh/.zshrc` like any other file. Tools append to
 that path — Herd rewrites `HERD_PHP_*_INI_SCAN_DIR` on every PHP version

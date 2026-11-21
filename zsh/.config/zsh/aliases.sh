@@ -23,17 +23,6 @@ alias sourcez="source ~/.zshrc"
 alias lzg="lazygit"
 alias yeet="sudo rm -rf"
 alias mkd="mkdir -p"
-function tux {
-    tux-sync 2>/dev/null
-    tuxedo "$@"
-}
-
-# Jujutsu
-alias lzj="lazyjj"
-alias js="jj status"
-alias jl="jj log"
-alias jd="jj diff"
-alias jn="jj new"
 
 # Nvim restart helper
 nvr() { cd "$1" && clear && nvim "${2:-}"; }

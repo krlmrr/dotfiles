@@ -47,6 +47,7 @@ vim.o.cmdheight = 1
 vim.o.swapfile = false
 vim.o.undofile = true
 vim.o.autoread = true
+vim.opt.fillchars:append({ eob = " " })
 
 -- Auto-reload files when changed externally (real-time with libuv)
 local watch_handles = {}

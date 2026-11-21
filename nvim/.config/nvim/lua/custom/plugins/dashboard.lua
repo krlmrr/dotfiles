@@ -1,7 +1,7 @@
 return {
 	"nvimdev/dashboard-nvim",
 	event = "VimEnter",
-	dependencies = { "nvim-tree/nvim-web-devicons" },
+	dependencies = { "nvim-mini/mini.icons" },
 	config = function()
 		-- Highlights are set by config.theme module
 

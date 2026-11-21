@@ -12,7 +12,7 @@ return {
 	cmd = "Neotree", -- Only load when Neotree command is called
 	dependencies = {
 		"nvim-lua/plenary.nvim",
-		"nvim-tree/nvim-web-devicons",
+		"nvim-mini/mini.icons",
 		"MunifTanjim/nui.nvim",
 	},
 	config = function()
@@ -136,6 +136,16 @@ return {
 				},
 				icon = {
 					padding = " ",
+					provider = function(icon, node)
+						local MiniIcons = require("mini.icons")
+						if node.type == "directory" then
+							local glyph, hl = MiniIcons.get("directory", node.name)
+							icon.text = node:is_expanded() and "󰝰" or glyph
+							icon.highlight = hl
+						elseif node.type == "file" or node.type == "terminal" then
+							icon.text, icon.highlight = MiniIcons.get("file", node.type == "terminal" and "terminal" or node.name)
+						end
+					end,
 				},
 				name = {
 					use_git_status_colors = true,

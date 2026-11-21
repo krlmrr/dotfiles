@@ -8,7 +8,9 @@ local function stub(called)
       end
       return stub(false)
     end,
-    __call = function() return stub(true) end,
+    __call = function()
+      return stub(true)
+    end,
   })
 end
 
@@ -16,13 +18,18 @@ local current = "?"
 local records = {}
 
 local function esc(s)
-  return (tostring(s):gsub('\\', '\\\\'):gsub('"', '\\"'))
+  return (tostring(s):gsub("\\", "\\\\"):gsub('"', '\\"'))
 end
 
 hl = stub()
 rawset(hl, "bind", function(keys, _, opts)
   opts = type(opts) == "table" and opts or {}
-  records[#records + 1] = string.format('{"op":"bind","file":"%s","keys":"%s","desc":"%s"}', esc(current), esc(keys), esc(opts.description or ""))
+  records[#records + 1] = string.format(
+    '{"op":"bind","file":"%s","keys":"%s","desc":"%s"}',
+    esc(current),
+    esc(keys),
+    esc(opts.description or "")
+  )
 end)
 rawset(hl, "unbind", function(keys)
   records[#records + 1] = string.format('{"op":"unbind","file":"%s","keys":"%s"}', esc(current), esc(keys))

@@ -71,9 +71,7 @@ function M.setup()
     vim.env.WAYLAND_DISPLAY = display
   end
 
-  local has_wayland = display ~= nil
-    and vim.fn.executable("wl-copy") == 1
-    and vim.fn.executable("wl-paste") == 1
+  local has_wayland = display ~= nil and vim.fn.executable("wl-copy") == 1 and vim.fn.executable("wl-paste") == 1
 
   local function copy(register)
     local emit = osc52.copy(register)

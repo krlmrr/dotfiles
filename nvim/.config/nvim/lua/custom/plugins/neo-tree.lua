@@ -143,7 +143,8 @@ return {
 							icon.text = node:is_expanded() and "󰝰" or glyph
 							icon.highlight = hl
 						elseif node.type == "file" or node.type == "terminal" then
-							icon.text, icon.highlight = MiniIcons.get("file", node.type == "terminal" and "terminal" or node.name)
+							icon.text, icon.highlight =
+								MiniIcons.get("file", node.type == "terminal" and "terminal" or node.name)
 						end
 					end,
 				},

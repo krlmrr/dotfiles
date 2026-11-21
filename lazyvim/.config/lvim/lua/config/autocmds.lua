@@ -15,7 +15,8 @@ local function trim_old_buffers(buf)
   local windows = vim.api.nvim_list_wins()
   local bufs = {}
   for _, b in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_valid(b)
+    if
+      vim.api.nvim_buf_is_valid(b)
       and vim.bo[b].buflisted
       and not vim.bo[b].modified
       and vim.fn.bufname(b) ~= ""
@@ -78,7 +79,8 @@ vim.api.nvim_create_autocmd("BufEnter", {
     end
     local wins = vim.api.nvim_list_wins()
     for _, b in ipairs(vim.api.nvim_list_bufs()) do
-      if b ~= cur
+      if
+        b ~= cur
         and vim.api.nvim_buf_is_valid(b)
         and vim.bo[b].buflisted
         and vim.bo[b].modified == false

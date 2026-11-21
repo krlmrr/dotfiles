@@ -197,17 +197,45 @@ o.bind("SUPER + SHIFT + F", "File manager (cwd)", "omarchy-launch-terminal spf")
 o.bind("SUPER + comma", "Dismiss all notifications", "omarchy-shell notifications dismissAll")
 
 o.bind("SUPER + CTRL + code:13", "Screenshot", "omarchy-capture-screenshot")
-o.bind("SUPER + CTRL + code:14", "Screenrecording", "omarchy-capture-screenrecording --stop-recording || omarchy-menu toggle trigger.capture.screenrecord")
+o.bind(
+  "SUPER + CTRL + code:14",
+  "Screenrecording",
+  "omarchy-capture-screenrecording --stop-recording || omarchy-menu toggle trigger.capture.screenrecord"
+)
 o.bind("SUPER + CTRL + code:15", "Color picker", "pkill hyprpicker || hyprpicker -a")
 
-o.bind("SUPER + SHIFT + M", "Apple Music", "omarchy-launch-or-focus-webapp 'chrome-music\\.apple' https://music.apple.com/us/new")
+o.bind(
+  "SUPER + SHIFT + M",
+  "Apple Music",
+  "omarchy-launch-or-focus-webapp 'chrome-music\\.apple' https://music.apple.com/us/new"
+)
 
 o.bind("XF86MonBrightnessUp", "Brightness up", "brightness-all-displays +5%", { locked = true, repeating = true })
 o.bind("XF86MonBrightnessDown", "Brightness down", "brightness-all-displays 5%-", { locked = true, repeating = true })
-o.bind("SHIFT + XF86MonBrightnessUp", "Brightness maximum", "brightness-all-displays 100%", { locked = true, repeating = true })
-o.bind("SHIFT + XF86MonBrightnessDown", "Brightness minimum", "brightness-all-displays 1%", { locked = true, repeating = true })
-o.bind("ALT + XF86MonBrightnessUp", "Brightness up precise", "brightness-all-displays +1%", { locked = true, repeating = true })
-o.bind("ALT + XF86MonBrightnessDown", "Brightness down precise", "brightness-all-displays 1%-", { locked = true, repeating = true })
+o.bind(
+  "SHIFT + XF86MonBrightnessUp",
+  "Brightness maximum",
+  "brightness-all-displays 100%",
+  { locked = true, repeating = true }
+)
+o.bind(
+  "SHIFT + XF86MonBrightnessDown",
+  "Brightness minimum",
+  "brightness-all-displays 1%",
+  { locked = true, repeating = true }
+)
+o.bind(
+  "ALT + XF86MonBrightnessUp",
+  "Brightness up precise",
+  "brightness-all-displays +1%",
+  { locked = true, repeating = true }
+)
+o.bind(
+  "ALT + XF86MonBrightnessDown",
+  "Brightness down precise",
+  "brightness-all-displays 1%-",
+  { locked = true, repeating = true }
+)
 
 o.bind("ALT + H", "Focus on left window", hl.dsp.focus({ direction = "l" }))
 o.bind("ALT + J", "Focus on below window", hl.dsp.focus({ direction = "d" }))

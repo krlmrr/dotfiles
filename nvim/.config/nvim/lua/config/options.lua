@@ -133,29 +133,52 @@ vim.keymap.set({ "n", "v", "i" }, "<ScrollWheelDown>", function()
 	return "<ScrollWheelDown>"
 end, { expr = true, silent = true })
 
--- Only allow horizontal scrolling when content is wider than window
+local function window_under_mouse()
+	local win = vim.fn.getmousepos().winid
+	if win == 0 then
+		return vim.api.nvim_get_current_win()
+	end
+	return win
+end
+
+local function max_leftcol(win)
+	return vim.api.nvim_win_call(win, function()
+		local text_width = vim.api.nvim_win_get_width(0) - vim.fn.getwininfo(win)[1].textoff
+		local longest = 0
+		for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line("w0") - 1, vim.fn.line("w$"), false)) do
+			longest = math.max(longest, vim.fn.strdisplaywidth(line))
+		end
+		return math.max(0, longest - text_width + 1)
+	end)
+end
+
+local function leftcol(win)
+	return vim.api.nvim_win_call(win, function()
+		return vim.fn.winsaveview().leftcol
+	end)
+end
+
 vim.keymap.set({ "n", "v", "i" }, "<ScrollWheelLeft>", function()
-	local win_width = vim.api.nvim_win_get_width(0)
-	local longest = 0
-	for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line("w0") - 1, vim.fn.line("w$"), false)) do
-		longest = math.max(longest, vim.fn.strdisplaywidth(line))
+	if leftcol(window_under_mouse()) == 0 then
+		return ""
 	end
-	if longest > win_width then
-		return "<ScrollWheelLeft>"
-	end
-	return ""
+	return "<ScrollWheelLeft>"
 end, { expr = true, silent = true })
 
 vim.keymap.set({ "n", "v", "i" }, "<ScrollWheelRight>", function()
-	local win_width = vim.api.nvim_win_get_width(0)
-	local longest = 0
-	for _, line in ipairs(vim.api.nvim_buf_get_lines(0, vim.fn.line("w0") - 1, vim.fn.line("w$"), false)) do
-		longest = math.max(longest, vim.fn.strdisplaywidth(line))
+	local win = window_under_mouse()
+	local limit = max_leftcol(win)
+	if leftcol(win) >= limit then
+		return ""
 	end
-	if longest > win_width then
-		return "<ScrollWheelRight>"
-	end
-	return ""
+	vim.schedule(function()
+		if vim.api.nvim_win_is_valid(win) and leftcol(win) > limit then
+			vim.api.nvim_win_call(win, function()
+				vim.fn.winrestview({ leftcol = limit })
+			end)
+		end
+	end)
+	return "<ScrollWheelRight>"
 end, { expr = true, silent = true })
 
 -- Keep cursor centered after window resize

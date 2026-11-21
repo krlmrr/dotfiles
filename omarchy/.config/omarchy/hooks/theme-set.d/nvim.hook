@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for socket in "${XDG_RUNTIME_DIR:-/run/user/$UID}"/nvim.*.0; do
+  [[ -S $socket ]] || continue
+  timeout 3 nvim --server "$socket" --remote-expr 'execute("lua require(\"config.theme\").apply()")' >/dev/null 2>&1 &
+done
+wait

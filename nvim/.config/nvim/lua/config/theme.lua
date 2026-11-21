@@ -30,8 +30,12 @@ Theme.colors = {
 	},
 }
 
+local omarchy = require("config.omarchy-theme")
+
+local OWN_OMARCHY_THEME = "onedark-flat"
+
 function Theme.get_colors()
-	return Theme.colors[vim.o.background] or Theme.colors.dark
+	return Theme.active or Theme.colors[vim.o.background] or Theme.colors.dark
 end
 
 -- Detect system appearance (returns "dark" or "light")
@@ -143,6 +147,7 @@ end
 
 -- Apply dark theme (onedark, retinted to One Half Dark)
 local function apply_dark_theme()
+	Theme.active = nil
 	vim.o.background = "dark"
 	local colors = Theme.colors.dark
 	require("onedark").setup({
@@ -218,6 +223,7 @@ end
 
 -- Apply light theme (catppuccin latte)
 local function apply_light_theme()
+	Theme.active = nil
 	vim.o.background = "light"
 	require("catppuccin").setup({
 		flavour = "latte",
@@ -238,8 +244,44 @@ local function apply_light_theme()
 	apply_plugin_highlights()
 end
 
+local function apply_omarchy_theme(plugins, colorscheme, palette)
+	vim.o.background = palette.mode == "light" and "light" or "dark"
+	omarchy.load(plugins)
+	vim.cmd.colorscheme(colorscheme)
+	Theme.active = {
+		accent = palette.accent,
+		bg_highlight = palette.lighter_background or palette.selection,
+		fg = palette.foreground,
+		fg_muted = palette.muted or palette.dark_foreground,
+		bg_float = palette.background,
+		inlay_hint = palette.muted or palette.dark_foreground,
+	}
+	apply_plugin_highlights()
+end
+
+local function try_omarchy_theme(name)
+	if not name or name == OWN_OMARCHY_THEME then
+		return false
+	end
+	local plugins, colorscheme = omarchy.current()
+	local palette = omarchy.palette()
+	if not colorscheme or not palette then
+		return false
+	end
+	local ok, err = pcall(apply_omarchy_theme, plugins, colorscheme, palette)
+	if not ok then
+		vim.notify("Omarchy theme " .. name .. " failed: " .. tostring(err), vim.log.levels.WARN)
+	end
+	return ok
+end
+
 -- Apply theme based on current system appearance
 function Theme.apply()
+	local name = omarchy.name()
+	Theme.omarchy_name = name
+	if try_omarchy_theme(name) then
+		return
+	end
 	local appearance = Theme.get_system_appearance()
 	if appearance == "light" then
 		apply_light_theme()
@@ -259,6 +301,12 @@ end
 
 -- Sync with system appearance (call on FocusGained)
 function Theme.sync()
+	if omarchy.name() ~= Theme.omarchy_name then
+		return Theme.apply()
+	end
+	if Theme.active then
+		return
+	end
 	local appearance = Theme.get_system_appearance()
 	local current = vim.o.background
 	if appearance ~= current then

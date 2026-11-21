@@ -78,6 +78,7 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "WinNew", "WinClosed" }
 -- Force 4-space indentation for all filetypes
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "*",
+
 	callback = function()
 		vim.opt_local.tabstop = 4
 		vim.opt_local.shiftwidth = 4
@@ -88,6 +89,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "*",
+
 	callback = function()
 		vim.opt_local.formatoptions:remove({ "r", "o" })
 	end,
@@ -99,6 +101,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
 		vim.highlight.on_yank()
 	end,
+
 	group = highlight_group,
 	pattern = "*",
 })
@@ -121,6 +124,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 
 vim.api.nvim_create_autocmd({ "BufWinEnter", "QuitPre" }, {
 	group = vim.api.nvim_create_augroup("RelativeBufferNames", { clear = true }),
+
 	callback = function()
 		vim.cmd("noautocmd silent! cd .")
 	end,
@@ -128,6 +132,7 @@ vim.api.nvim_create_autocmd({ "BufWinEnter", "QuitPre" }, {
 
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = vim.api.nvim_create_augroup("function-spacing", { clear = true }),
+
 	callback = function(args)
 		require("config.function-spacing").apply(args.buf)
 	end,

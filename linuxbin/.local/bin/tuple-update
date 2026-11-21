@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -euo pipefail
+
+target="$HOME/.local/bin/tuple"
+
+case "$(uname -m)" in
+x86_64) arch=x86_64 ;;
+aarch64 | arm64) arch=arm64 ;;
+*)
+  echo "tuple-update: no Tuple build for $(uname -m)" >&2
+  exit 1
+  ;;
+esac
+
+release=$(curl -fsSL -H 'Accept: application/tuple.app; version=1' \
+  "https://production.tuple.app/latest_version/linux?arch=$arch")
+version=$(jq -r '.version' <<<"$release")
+sha256=$(jq -r '.sha256' <<<"$release")
+
+[[ $version =~ ^v[0-9]{4}_[0-9]{2}_[0-9]{2}\.[0-9]+$ ]] || {
+  echo "tuple-update: unexpected version '$version'" >&2
+  exit 1
+}
+[[ $sha256 =~ ^[0-9a-f]{64}$ ]] || {
+  echo "tuple-update: unexpected sha256 '$sha256'" >&2
+  exit 1
+}
+
+installed=$([[ -x $target ]] && { "$target" --version 2>/dev/null || "$target" 2>/dev/null; } | grep -o -m1 'v[0-9_]*\.[0-9]*' || true)
+if [[ $installed == "$version" ]]; then
+  echo "Tuple $version is already installed."
+  exit 0
+fi
+
+mkdir -p "$(dirname "$target")"
+download="$target.download"
+trap 'rm -f "$download"' EXIT
+curl -fL "https://tuple-client-releases.s3.amazonaws.com/linux/$version/$arch/tuple" -o "$download"
+echo "$sha256  $download" | sha256sum -c -
+chmod +x "$download"
+mv -f "$download" "$target"
+
+echo "Installed Tuple $version${installed:+ (was $installed)}."
+if pgrep -f "$target on" >/dev/null; then
+  echo "The running daemon is still the old version; restart it with: tuple off && tuple on"
+fi

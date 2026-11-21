@@ -179,6 +179,20 @@ if [ "$(uname)" = "Darwin" ]; then
     fi
 fi
 
+OMACAST="$HOME/.config/omarchy/plugins/typecraft.omacast"
+if command -v omarchy-plugin-add >/dev/null 2>&1 && [ ! -d "$OMACAST" ]; then
+    omarchy-plugin-add https://github.com/typecraft-dev/oma-cast --enable --yes \
+        || echo "Could not add the omacast launcher plugin."
+fi
+if [ -x "$OMACAST/bin/omacast" ] && ! command -v omacast >/dev/null 2>&1; then
+    "$OMACAST/bin/omacast" install \
+        || echo "Could not finish installing omacast. Run: $OMACAST/bin/omacast install"
+fi
+
+if [ -x "$HOME/.local/bin/tuple-update" ] && [ ! -x "$HOME/.local/bin/tuple" ]; then
+    "$HOME/.local/bin/tuple-update" || echo "Could not install Tuple. Run: tuple-update"
+fi
+
 if command -v herdr >/dev/null 2>&1 \
     && ! herdr plugin list --json 2>/dev/null | grep -q '"plugin_id": *"heeler"'; then
     herdr plugin install ZingerLittleBee/Heeler/plugin --ref main --yes \

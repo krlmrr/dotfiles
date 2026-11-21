@@ -55,16 +55,24 @@ o.window({ tag = "firefox-based-browser" }, { opacity = "1 1" })
 o.window({ tag = "chromium-based-browser" }, { opacity = "1 1" })
 
 o.window({ class = "^steam$" }, { tile = true })
+o.window({ class = "^steam_app_\\d+$" }, { center = true })
 
+-- These are apps used for communication and should float.
+o.window({ class = "^slack$" }, { float = true })
+o.window({ class = "^discord$" }, { float = true })
+
+-- Hacknet (native FNA build) breaks its own input mapping when it drops out of
+-- fullscreen and gets tiled into a column, so keep it fullscreen and floating.
+o.window({ class = "^Hacknet\\.bin\\.x86_64$" }, { float = true, fullscreen = true, idle_inhibit = "fullscreen" })
 
 hl.config({
-  general = {
-    resize_on_border = true,
-  },
+	general = {
+		resize_on_border = true,
+	},
 
-  decoration = {
-    rounding = 8,
-  },
+	decoration = {
+		rounding = 8,
+	},
 })
 
 -- Opt another application in to Omarchy's standard transparency.

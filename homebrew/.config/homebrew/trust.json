@@ -32,6 +32,7 @@
     "vheissulabs/tqlverify/tql"
   ],
   "trustedcasks": [
+    "ampcode/tap/amp@beta",
     "vheissulabs/tap/gitdifferent"
   ]
 }

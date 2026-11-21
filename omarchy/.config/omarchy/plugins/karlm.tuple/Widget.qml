@@ -93,13 +93,24 @@ Panel {
     Quickshell.execDetached(["bash", "-c", "pactl set-default-source \"$1\"; pactl list source-outputs | awk '/^Source Output #/{id=substr($3,2)} /application\\.(process\\.binary|name) = \"[Tt]uple/{print id}' | while read -r i; do pactl move-source-output \"$i\" \"$1\"; done", "_", name])
   }
 
+  function contactStatus(contact) {
+    var status = String(contact.status || "").replace(/_/g, " ")
+    if (status === "online" || status === "available") return contact.idle ? "idle" : "available"
+    if (status === "busy" || status === "in call") return "in call"
+    return status || "unavailable"
+  }
+
   function parseContacts(text) {
     var list = []
-    var lines = String(text || "").split("\n")
-    for (var i = 0; i < lines.length; i++) {
-      var m = lines[i].match(/^\s*(\d+)\s+(.+?)\s+<[^>]*>\s+\[([^\]]+)\](\s+\(favorite\))?/)
-      if (!m) continue
-      list.push({ id: m[1], name: m[2], status: m[3], favorite: !!m[4] })
+    var parsed = []
+    try {
+      parsed = JSON.parse(String(text || "[]"))
+    } catch (e) {
+      parsed = []
+    }
+    for (var i = 0; i < parsed.length; i++) {
+      var c = parsed[i]
+      list.push({ id: String(c.id), email: c.email, name: c.full_name || c.short_name || c.email, status: contactStatus(c), favorite: !!c.favorited })
     }
     list.sort(function(a, b) {
       if (a.favorite !== b.favorite) return a.favorite ? -1 : 1
@@ -114,7 +125,7 @@ Panel {
   }
 
   function startDaemon() {
-    Quickshell.execDetached(["tuple", "on"])
+    Quickshell.execDetached(["tuple", "start"])
     say("Starting Tuple…")
     refreshSoon.restart()
   }
@@ -134,20 +145,20 @@ Panel {
       say("No Tuple link on your clipboard")
       return
     }
-    tuple(["join", m[0]])
+    tuple(["call", "join", m[0]])
     inCall = true
     say("Joining…")
   }
 
   function callContact(contact) {
-    tuple(["call", contact.id])
+    tuple(["call", "start", contact.email || contact.name])
     inCall = true
     say("Calling " + contact.name + "…")
   }
 
   function toggleMute() {
     if (!inCall) return
-    tuple([muted ? "unmute" : "mute"])
+    tuple(["call", muted ? "unmute" : "mute"])
     muted = !muted
   }
 
@@ -158,7 +169,7 @@ Panel {
   }
 
   function endCall() {
-    tuple(["end"])
+    tuple(["call", "leave"])
     inCall = false
     muted = false
     sharing = false
@@ -197,7 +208,7 @@ Panel {
 
   Process {
     id: callStateProc
-    command: ["bash", "-c", "log=$(ls -t $HOME/.local/share/tuple/*/log.txt 2>/dev/null | head -1); [ -n \"$log\" ] && grep -aE 'call connected|invalidating call' \"$log\" | tail -1 | grep -q 'call connected' && echo in-call; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
+    command: ["bash", "-c", "tuple state --format json 2>/dev/null | jq -e '.in_call == true' >/dev/null && echo in-call; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
     stdout: StdioCollector {
       onStreamFinished: {
         var out = String(text || "")
@@ -227,7 +238,7 @@ Panel {
 
   Process {
     id: contactsProc
-    command: ["tuple", "ls"]
+    command: ["tuple", "contacts", "list", "--format", "json"]
     stdout: StdioCollector {
       onStreamFinished: root.parseContacts(text)
     }
@@ -251,7 +262,7 @@ Panel {
 
   Process {
     id: newProc
-    command: ["bash", "-c", "out=$(tuple new 2>&1); if [[ $out == *'already joining'* ]]; then tuple end >/dev/null 2>&1; sleep 1; out=$(tuple new 2>&1); fi; printf '%s\\n' \"$out\""]
+    command: ["bash", "-c", "out=$(tuple new 2>&1); if [[ $out == *'already joining'* ]]; then tuple call leave >/dev/null 2>&1; sleep 1; out=$(tuple new 2>&1); fi; printf '%s\\n' \"$out\""]
     stdout: StdioCollector {
       onStreamFinished: {
         var output = String(text || "")

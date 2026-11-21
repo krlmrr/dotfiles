@@ -12,4 +12,4 @@ hl.on("hyprland.start", function()
   hl.timer(focus_primary_monitor, { timeout = 2000, type = "oneshot" })
 end)
 
-o.launch_on_start("tuple on")
+o.launch_on_start("tuple start")

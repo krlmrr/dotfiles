@@ -29,7 +29,5 @@ require("default.hypr.toggles")
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
 
--- oma-cast launcher bindings
-require("hypr.oma-cast")
-
+-- Launcher keys live in hypr/launcher-keys.lua.
 require("hypr.launcher-keys")

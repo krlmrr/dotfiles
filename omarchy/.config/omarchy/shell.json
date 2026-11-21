@@ -89,7 +89,7 @@
   },
   "plugins": [
     {
-      "id": "typecraft.oma-cast"
+      "id": "typecraft.omacast"
     }
   ]
 }

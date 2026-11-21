@@ -121,6 +121,24 @@ to one of the two defaults depending on `uname`: Linux gets
 `default-linux.packages`, anything else (including a Mac with no host file of
 its own) gets `default-minimal.packages`.
 
+**A second Omarchy machine needs its own host file.** Only a machine whose
+hostname is exactly `omarchy` gets `hypr`, `omarchy`, `linuxbin`, `wallpapers`,
+`voxtype` and the rest of `hosts/omarchy.packages`. Any other hostname falls
+back to `default-linux.packages`, which has none of them — the install
+succeeds, and Hyprland quietly runs on Omarchy's stock config. Check
+`hostname -s` on the new machine *before* `dot install`, then copy the list:
+
+```bash
+cp hosts/omarchy.packages "hosts/$(hostname -s).packages"
+```
+
+Trim anything machine-specific from the copy. `hypr/.config/hypr/monitors.lua`
+needs a look too, since every host that stows `hypr` shares it: it positions
+this desk's two ASUS displays by name, pins workspaces 1 and 2 to them, and
+mirrors any HDMI output to the VG27AQL1A. On other monitors the named rules
+just don't match, but an HDMI display would try to mirror a screen that isn't
+there.
+
 ## Machine-local files
 
 These are generated per machine and must never be committed, so they are not a
@@ -213,6 +231,25 @@ One habit worth keeping:
 Links are per-file, not per-directory. Editing a linked file is live — it is
 the same file on disk. But *adding* a new file to a package needs `stow -R foo`
 (or `dot install`) before it appears in `$HOME`.
+
+**Link a new file the moment you add it.** Nothing warns you when you forget:
+the file sits in the repo, commits and pushes fine, and simply does not exist
+in `$HOME`. Whatever loads it fails instead. Neovim is the usual victim —
+`nvim/.config/nvim/lua/config/function-spacing.lua` went unlinked for weeks,
+and every save threw `module 'config.function-spacing' not found` because
+`autocmds.lua` (linked) requires it on `BufWritePre`.
+
+To find files that were never linked, dry-run the package and look for `LINK:`
+lines. Anything listed is in the repo but missing from `$HOME`:
+
+```bash
+stow -n -v -t ~ nvim
+```
+
+Then link just that package with `stow -t ~ nvim`. A plain `stow` (no `-R`)
+only adds the missing links and leaves existing ones alone, which matters for
+`hypr`: a restow removes and re-adds every link, and Hyprland can auto-reload
+in the gap with files missing, resetting the monitors.
 
 ## Fonts, wallpapers and themes
 

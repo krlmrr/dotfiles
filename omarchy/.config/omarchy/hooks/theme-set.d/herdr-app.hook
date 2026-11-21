@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+GENERATED="$HOME/.local/state/omarchy/current/theme/herdr-app.json"
+THEMES="$HOME/.config/herdr-app/themes"
+
+[[ -f $GENERATED && -d $THEMES ]] || exit 0
+
+cp "$GENERATED" "$THEMES/.omarchy.json.tmp"
+mv -f "$THEMES/.omarchy.json.tmp" "$THEMES/omarchy.json"

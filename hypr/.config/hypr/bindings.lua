@@ -178,6 +178,8 @@ end
 
 o.bind("SUPER + Q", "Close window", hl.dsp.window.close())
 
+o.bind("SUPER + ALT + T", "Toggle window floating/tiling", hl.dsp.window.float({ action = "toggle" }))
+
 o.bind("SUPER + A", "Universal select all", function()
   if active_window_is_terminal() then
     send_shortcut_once("CTRL SHIFT", "A")
@@ -215,3 +217,9 @@ o.bind("ALT + LEFT", "Focus on left window", hl.dsp.focus({ direction = "l" }))
 o.bind("ALT + DOWN", "Focus on below window", hl.dsp.focus({ direction = "d" }))
 o.bind("ALT + UP", "Focus on above window", hl.dsp.focus({ direction = "u" }))
 o.bind("ALT + RIGHT", "Focus on right window", hl.dsp.focus({ direction = "r" }))
+
+-- Dictation keys from before Alt + Space and Right Alt became the defaults.
+-- Remove these lines to give the keys back to applications.
+if o.dictation_installed and o.dictation_installed() then
+  o.bind("SUPER + CTRL + X", "Toggle dictation", "omarchy-dictation toggle")
+end

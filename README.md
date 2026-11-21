@@ -13,6 +13,40 @@ cd ~/dotfiles && ./bin/.local/bin/dot install
 `dot install` is the whole install. On a fresh Mac, install the Brewfile first
 (see Prerequisites), then run it.
 
+### After `dot install` on a new Omarchy machine
+
+A few things live outside the repo:
+
+1. **omacast launcher.** `shell.json` enables `typecraft.omacast` and
+   `hypr/launcher-keys.lua` binds Super+Space to it, but the plugin is a git
+   clone, not a stow package. `dot install` adds it (`omarchy plugin add`) and
+   runs `omacast install` when it is missing; it needs the Omarchy shell
+   running, so run `dot install` from the desktop, not over SSH. Check it with
+   `omacast doctor`.
+
+   Never run `omacast setup hyprland`: the binding already lives in
+   `launcher-keys.lua`, and setup would add a second one on Alt+Space.
+   `omacast doctor` reports "no hotkey yet" for the same reason; ignore it.
+   Update it later from the Omarchy menu: Update → Plugins.
+
+2. **Tuple.** The Linux client is a single binary, not a package. `dot install`
+   runs `tuple-update` (from `linuxbin`) when `~/.local/bin/tuple` is missing;
+   it fetches the latest release, checks its sha256, and installs it. Run
+   `tuple-update` any time to update, then `tuple off && tuple on`. Sign in once
+   per machine with `tuple login`. `hypr/autostart.lua` starts the daemon and
+   the `karlm.tuple` bar widget drives calls.
+
+3. **Herdr desktop app layout.** The `herdr-app` package brings the `personal`
+   layout, but Herdr only shows it once selected:
+
+   ```bash
+   herdr-app do layout.switch '{"name":"personal"}'
+   ```
+
+4. **owe wallpaper daemon.** Its installer writes
+   `~/.config/omarchy/hooks/theme-set.d/10-owe-sync`, so reinstall owe rather
+   than copying the hook.
+
 ## Prerequisites
 
 The dotfiles are inert without the tools they set up. Install these first.

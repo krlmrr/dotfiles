@@ -28,4 +28,5 @@
   // fields are kept unless overridden.
   // "about": {"icon":"","label":"About","action":"omarchy-launch-or-focus-tui \"zsh -c 'fastfetch; read -k 1'\""},
   "system.trash": {"icon":"󰩹","label":"Empty Trash","description":"Permanently delete everything in the trash","action":"omarchy-launch-or-focus-tui empty-trash"},
+  "update.plugins": {"icon":"󰐱","label":"Plugins","description":"Pull the latest version of every git-installed plugin","action":"omarchy-launch-floating-terminal-with-presentation 'omarchy-plugin-update && omarchy-restart-shell'"},
 }

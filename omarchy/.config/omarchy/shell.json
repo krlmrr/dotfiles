@@ -58,9 +58,6 @@
       ],
       "right": [
         {
-          "id": "karlm.tuple"
-        },
-        {
           "id": "omarchy.tray"
         },
         {
@@ -85,7 +82,11 @@
           "id": "omarchy.power"
         }
       ],
-      "tray": []
+      "tray": [
+        {
+          "id": "karlm.tuple"
+        }
+      ]
     },
     "position": "top"
   },

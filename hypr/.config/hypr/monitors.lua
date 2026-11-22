@@ -28,9 +28,6 @@ for _, hdmi in ipairs({ "HDMI-A-1", "HDMI-A-2" }) do
   })
 end
 
-hl.workspace_rule({ workspace = "1", monitor = "desc:ASUSTek COMPUTER INC VG27AQL1A", default = true })
-hl.workspace_rule({ workspace = "2", monitor = "desc:Ancor Communications Inc ASUS PB278", default = true })
-
 -- Configure a specific monitor.
 -- hl.monitor({ output = "DP-2", mode = "2560x1440@144", position = "0x0", scale = 1 })
 

@@ -28,3 +28,6 @@ export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 
 [ -r "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+
+# Flock (added by `flock install`)
+if [ -d "/home/karlm/.local/share/flock/bin" ]; then export PATH="/home/karlm/.local/share/flock/bin":"/home/karlm/.local/share/flock/node-global/current/bin":"$PATH"; fi

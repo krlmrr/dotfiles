@@ -79,3 +79,6 @@ export HERD_PHP_74_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/c
 
 # Herd injected PHP 8.2 configuration.
 export HERD_PHP_82_INI_SCAN_DIR="/Users/karlm/Library/Application Support/Herd/config/php/82"
+
+# Flock (added by `flock install`)
+if [ -d "/home/karlm/.local/share/flock/bin" ]; then export PATH="/home/karlm/.local/share/flock/bin":"/home/karlm/.local/share/flock/node-global/current/bin":"$PATH"; fi

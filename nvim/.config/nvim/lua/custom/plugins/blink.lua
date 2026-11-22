@@ -31,6 +31,9 @@ return {
 				buffer = { name = "Buffer", max_items = 3 },
 			},
 		},
+		cmdline = {
+			completion = { menu = { auto_show = true } },
+		},
 		signature = { enabled = true, window = { border = "rounded", direction_priority = { "s", "n" } } },
 	},
 }

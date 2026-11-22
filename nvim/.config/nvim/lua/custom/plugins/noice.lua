@@ -63,10 +63,7 @@ return {
 	opts = {
 		views = {
 			cmdline_popup = {
-				position = { row = "50%", col = "50%" },
-			},
-			cmdline_popupmenu = {
-				position = { row = "58%", col = "50%" },
+				position = { row = "20%", col = "50%" },
 			},
 			confirm = {
 				position = { row = "50%", col = "50%" },

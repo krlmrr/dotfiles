@@ -61,6 +61,9 @@ o.window({ class = "^steam_app_\\d+$" }, { center = true })
 o.window({ class = "^slack$" }, { float = true })
 o.window({ class = "^discord$" }, { float = true })
 
+-- Omarchy's Super+C/V send Ctrl+Shift+C/V only to windows tagged as terminals.
+o.window({ class = "^herdr-app$" }, { tag = "+terminal" })
+
 -- Hacknet (native FNA build) breaks its own input mapping when it drops out of
 -- fullscreen and gets tiled into a column, so keep it fullscreen and floating.
 o.window({ class = "^Hacknet\\.bin\\.x86_64$" }, { float = true, fullscreen = true, idle_inhibit = "fullscreen" })

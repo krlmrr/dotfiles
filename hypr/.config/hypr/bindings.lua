@@ -251,3 +251,40 @@ o.bind("ALT + RIGHT", "Focus on right window", hl.dsp.focus({ direction = "r" })
 if o.dictation_installed and o.dictation_installed() then
   o.bind("SUPER + CTRL + X", "Toggle dictation", "omarchy-dictation toggle")
 end
+
+local function show_slot(monitor, slot)
+  local workspace = hl.get_workspace(o.workspaces.workspace_id(monitor, slot))
+  if workspace and workspace.monitor and workspace.monitor.name == monitor.name then
+    monitor:set_workspace({ workspace = workspace.name })
+  else
+    o.workspaces.focus(slot, monitor.name)()
+  end
+end
+
+local function show_slot_on_every_monitor(slot)
+  local active = hl.get_active_monitor()
+  if not active then
+    return
+  end
+
+  for _, monitor in ipairs(hl.get_monitors()) do
+    if not monitor.is_mirror and monitor.name ~= active.name then
+      show_slot(monitor, slot)
+    end
+  end
+
+  o.workspaces.focus(slot, active.name)()
+end
+
+for slot = 1, 10 do
+  local key = "code:" .. tostring(slot + 9)
+
+  o.rebind("SUPER + " .. key, "Switch every monitor to workspace " .. slot, function()
+    show_slot_on_every_monitor(slot)
+  end)
+
+  o.rebind("SUPER + SHIFT + " .. key, "Move window to workspace " .. slot .. " on every monitor", function()
+    o.workspaces.move_window(slot)()
+    show_slot_on_every_monitor(slot)
+  end)
+end

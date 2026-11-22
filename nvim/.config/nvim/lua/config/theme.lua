@@ -32,7 +32,7 @@ Theme.colors = {
 
 local omarchy = require("config.omarchy-theme")
 
-local OWN_OMARCHY_THEME = "onedark-flat"
+local OWN_OMARCHY_THEMES = { ["onedark-flat"] = true, ["one-dark"] = true }
 
 function Theme.get_colors()
 	return Theme.active or Theme.colors[vim.o.background] or Theme.colors.dark
@@ -260,7 +260,7 @@ local function apply_omarchy_theme(plugins, colorscheme, palette)
 end
 
 local function try_omarchy_theme(name)
-	if not name or name == OWN_OMARCHY_THEME then
+	if not name or OWN_OMARCHY_THEMES[name] then
 		return false
 	end
 	local plugins, colorscheme = omarchy.current()

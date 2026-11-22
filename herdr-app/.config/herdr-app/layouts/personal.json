@@ -196,5 +196,6 @@
     12,
     16
   ],
-  "theme": "omarchy"
+  "theme": "omarchy",
+  "font": "MonoLisa"
 }

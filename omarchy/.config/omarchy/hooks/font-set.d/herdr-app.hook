@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+LINK="$HOME/.config/herdr-app/layouts/personal.json"
+LAYOUT="$(readlink -f "$LINK")"
+FONT="$(omarchy-font-current 2>/dev/null || true)"
+
+[[ -f $LAYOUT && -n $FONT ]] || exit 0
+
+jq --arg font "$FONT" '.font = $font' "$LAYOUT" >"$LAYOUT.tmp"
+mv -f "$LAYOUT.tmp" "$LAYOUT"
+touch -h "$LINK"

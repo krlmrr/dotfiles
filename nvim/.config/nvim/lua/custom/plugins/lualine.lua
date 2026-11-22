@@ -30,6 +30,38 @@ return {
 			},
 		}
 
+		local filetype_names = {
+			["neo-tree"] = "",
+			["neo-tree-popup"] = "",
+			snacks_picker_input = "",
+			DressingInput = "",
+			DressingSelect = "",
+			sh = "Shell",
+			php = "PHP",
+			javascript = "JavaScript",
+			typescript = "TypeScript",
+			javascriptreact = "JSX",
+			typescriptreact = "TSX",
+			json = "JSON",
+			jsonc = "JSONC",
+			html = "HTML",
+			css = "CSS",
+			scss = "SCSS",
+			yaml = "YAML",
+			toml = "TOML",
+			xml = "XML",
+			sql = "SQL",
+			csv = "CSV",
+			svg = "SVG",
+			qml = "QML",
+			graphql = "GraphQL",
+			gitcommit = "Git Commit",
+			gitignore = "Git Ignore",
+			gitconfig = "Git Config",
+			dosini = "INI",
+			hyprlang = "Hyprland",
+		}
+
 		require("lualine").setup({
 			options = {
 				icons_enabled = true,
@@ -66,25 +98,7 @@ return {
 							return vim.bo.buftype ~= "terminal"
 						end,
 						fmt = function(str)
-							if str == "neo-tree" then
-								return ""
-							end
-							if str == "neo-tree-popup" then
-								return ""
-							end
-							if str == "snacks_picker_input" then
-								return ""
-							end
-							if str == "DressingInput" then
-								return ""
-							end
-							if str == "DressingSelect" then
-								return ""
-							end
-							if str == "php" then
-								return "PHP"
-							end
-							return str:sub(1, 1):upper() .. str:sub(2)
+							return filetype_names[str] or str:sub(1, 1):upper() .. str:sub(2)
 						end,
 					},
 				},

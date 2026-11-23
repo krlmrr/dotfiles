@@ -85,6 +85,9 @@
       "tray": [
         {
           "id": "karlm.tuple"
+        },
+        {
+          "id": "superwhisper.panel"
         }
       ]
     },

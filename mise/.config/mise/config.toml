@@ -1,4 +1,8 @@
 [tools]
 go = "latest"
+php = "latest"
 
 [settings.upgrade]
+
+[tool_alias]
+php = "github:nunomaduro/static-php-builds"

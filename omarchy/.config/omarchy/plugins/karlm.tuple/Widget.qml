@@ -14,6 +14,7 @@ Panel {
   readonly property string sharingIcon: String.fromCodePoint(0xF1483)
 
   property bool daemonRunning: false
+  property bool signedOut: false
   property bool inCall: false
   property bool muted: false
   property bool sharing: false
@@ -31,6 +32,7 @@ Panel {
   readonly property string barIcon: !inCall ? phoneIcon : (sharing ? sharingIcon : (muted ? mutedIcon : phoneIcon))
   readonly property string statusText: {
     if (!daemonRunning) return "Offline"
+    if (signedOut) return "Signed out"
     if (!inCall) return "Available"
     var parts = ["In a call"]
     if (muted) parts.push("muted")
@@ -64,7 +66,7 @@ Panel {
   function refresh() {
     if (!statusProc.running) statusProc.running = true
     if (!callStateProc.running) callStateProc.running = true
-    if (root.opened && root.daemonRunning && !contactsProc.running) contactsProc.running = true
+    if (root.opened && root.daemonRunning && !root.signedOut && !contactsProc.running) contactsProc.running = true
     if (root.opened && !audioProc.running) audioProc.running = true
   }
 
@@ -127,6 +129,12 @@ Panel {
   function startDaemon() {
     Quickshell.execDetached(["tuple", "start"])
     say("Starting Tuple…")
+    refreshSoon.restart()
+  }
+
+  function signIn() {
+    Quickshell.execDetached(["tuple", "login"])
+    say("Finish signing in in your browser…")
     refreshSoon.restart()
   }
 
@@ -199,6 +207,7 @@ Panel {
     onExited: function(exitCode) {
       root.daemonRunning = exitCode === 0
       if (!root.daemonRunning) {
+        root.signedOut = false
         root.inCall = false
         root.muted = false
         root.sharing = false
@@ -208,11 +217,13 @@ Panel {
 
   Process {
     id: callStateProc
-    command: ["bash", "-c", "tuple state --format json 2>/dev/null | jq -e '.in_call == true' >/dev/null && echo in-call; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
+    command: ["bash", "-c", "tuple state --format json 2>/dev/null | jq -r 'if .in_call == true then \"in-call\" else empty end, if (.user.id // 0) == 0 then \"signed-out\" else empty end'; pw-link -l 2>/dev/null | grep -q 'tuple:input' && echo sharing; true"]
     stdout: StdioCollector {
       onStreamFinished: {
         var out = String(text || "")
         var connected = out.indexOf("in-call") !== -1
+        root.signedOut = out.indexOf("signed-out") !== -1
+        if (root.signedOut) root.contacts = []
         root.sharing = connected && out.indexOf("sharing") !== -1
         if (connected === root.inCall) return
         root.inCall = connected
@@ -342,6 +353,10 @@ Panel {
           if (k === "o") root.startDaemon()
           return
         }
+        if (root.signedOut) {
+          if (k === "l") root.signIn()
+          return
+        }
         if (k === "n") root.newCall()
         if (k === "j") root.joinFromClipboard()
         if (k === "m") root.toggleMute()
@@ -416,8 +431,18 @@ Panel {
           onClicked: root.startDaemon()
         }
 
+        Button {
+          visible: root.daemonRunning && root.signedOut
+          text: "Sign in"
+          fontSize: Style.font.bodySmall
+          foreground: root.bar.foreground
+          fontFamily: root.bar.fontFamily
+          bordered: true
+          onClicked: root.signIn()
+        }
+
         Flow {
-          visible: root.daemonRunning
+          visible: root.daemonRunning && !root.signedOut
           width: parent.width
           spacing: Style.space(6)
 
@@ -606,7 +631,7 @@ Panel {
           visible: root.daemonRunning && root.contacts.length === 0
           width: parent.width
           textFormat: Text.PlainText
-          text: "No contacts yet."
+          text: root.signedOut ? "Signed out of Tuple. Sign in to see your contacts." : "No contacts yet."
           color: Qt.darker(root.bar.foreground, 1.4)
           font.family: root.bar.fontFamily
           font.pixelSize: Style.font.bodySmall
@@ -692,7 +717,7 @@ Panel {
           visible: root.daemonRunning
           width: parent.width
           textFormat: Text.PlainText
-          text: root.inCall ? "m mute · s share · c copy link · e end" : "n new call · j join link · ↵ call contact"
+          text: root.signedOut ? "l sign in" : root.inCall ? "m mute · s share · c copy link · e end" : "n new call · j join link · ↵ call contact"
           color: Qt.darker(root.bar.foreground, 1.6)
           font.family: root.bar.fontFamily
           font.pixelSize: Style.font.caption

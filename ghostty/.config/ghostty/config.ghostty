@@ -39,7 +39,6 @@ keybind = super+shift+h=goto_split:left
 keybind = super+shift+l=goto_split:right
 keybind = super+t=unbind
 keybind = ctrl+shift+x=close_surface
-keybind = global:super+shift+up=toggle_quick_terminal
 keybind = shift+enter=csi:13;2u
 keybind = alt+shift+enter=csi:13;4u
 keybind = ctrl+enter=unbind

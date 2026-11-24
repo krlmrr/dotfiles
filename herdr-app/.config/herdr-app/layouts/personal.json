@@ -39,7 +39,7 @@
               "id": "spaces",
               "type": "block",
               "content": {
-                "mod": "spaces"
+                "mod": "spaces-folders"
               },
               "size": {
                 "weight": 1

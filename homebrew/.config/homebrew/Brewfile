@@ -94,6 +94,7 @@ cask "linear"
 cask "logitech-g-hub" unless File.exist?("/Applications/lghub.app")
 cask "macs-fan-control"
 cask "mactracker"
+cask "omniwm"
 # obsbot-center removed from Homebrew Cask (no replacement token); install manually from obsbot.com
 cask "orbstack"
 cask "ray"

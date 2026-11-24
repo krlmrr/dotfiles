@@ -184,7 +184,7 @@
 	<key>Workspace.terminalCellHeightPercent</key>
 	<real>10.0</real>
 	<key>Workspace.terminalFontName</key>
-	<string>MonoLisa</string>
+	<string>JetBrainsMono Nerd Font</string>
 	<key>Workspace.terminalFontPointSize</key>
 	<real>16.0</real>
 	<key>Workspace.terminalFontSmoothing</key>

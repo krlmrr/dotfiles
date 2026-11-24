@@ -98,8 +98,8 @@
     "prettier.useEditorConfig": false,
     // Mine
     "workbench.colorTheme": "One Dark Pro",
-    "editor.fontFamily": "\"MonoLisa\"",
-    "editor.inlineSuggest.fontFamily": "FiraCode Nerd Font",
+    "editor.fontFamily": "JetBrainsMono Nerd Font",
+    "editor.inlineSuggest.fontFamily": "JetBrainsMono Nerd Font",
     "editor.scrollBeyondLastLine": false,
     "editor.scrollbar.vertical": "auto",
     "editor.scrollbar.horizontal": "auto",
@@ -208,7 +208,7 @@
         ".vscode": true,
         ".tinkerwell": true
     },
-    "terminal.integrated.fontFamily": "\"MonoLisa\"",
+    "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font",
     "terminal.integrated.enableImages": true,
     "workbench.editor.tabActionLocation": "left",
     "workbench.editor.tabActionCloseVisibility": false,

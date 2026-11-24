@@ -243,10 +243,8 @@ One include layers on top, optional:
 | `~/.local/state/omarchy/current/theme/ghostty.conf` | Omarchy, regenerated per theme | colours |
 
 
-The font line lists MonoLisa first and JetBrainsMono Nerd Font second.
-MonoLisa is installed on both machines, so both use it; JetBrains is the
-fallback for a machine that lacks it, since Ghostty skips a family that is
-not installed.
+The font is JetBrainsMono Nerd Font, which has the Nerd Font icons built
+in, so tools like Neo-tree line their icons up with the text.
 
 ## The `bin` package
 
@@ -300,8 +298,7 @@ in the gap with files missing, resetting the monitors.
 ## Fonts, wallpapers and themes
 
 FiraCode and FiraMono come from Homebrew casks rather than being vendored here,
-so they stay updated and do not put ~96MB of binaries in git. MonoLisa is a paid
-per-seat font and is deliberately **not** in this repo; install it by hand.
+so they stay updated and do not put ~96MB of binaries in git.
 
 `wallpapers` is an ordinary stow package — `wallpapers/Pictures/Wallpapers/`
 links per file into `~/Pictures/Wallpapers/`.

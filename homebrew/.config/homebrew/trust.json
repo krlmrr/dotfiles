@@ -28,6 +28,7 @@
     "qmk/qmk/hid_bootloader_cli",
     "qmk/qmk/mdloader",
     "qmk/qmk/qmk",
+    "steipete/tap/imsg",
     "vheissulabs/tap/tql",
     "vheissulabs/tqlverify/tql"
   ],

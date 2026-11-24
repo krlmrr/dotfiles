@@ -1,0 +1,4 @@
+#!/bin/bash
+
+[[ -d $HOME/.config/tuxedo ]] || exit 0
+exec "$HOME/.local/bin/tuxedo-theme"

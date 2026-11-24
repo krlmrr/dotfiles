@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Write tuxedo's "Current" theme from an Omarchy colors.toml.
+
+set -e
+
+COLORS="${1:-$HOME/.local/state/omarchy/current/theme/colors.toml}"
+THEMES="$HOME/.config/tuxedo/themes"
+
+[[ -f $COLORS ]] || exit 0
+
+color() {
+  sed -nE "s/^$1 *= *\"?(#[0-9a-fA-F]{6})\"?.*/\1/p" "$COLORS" | head -1
+}
+
+mkdir -p "$THEMES"
+cat > "$THEMES/.current.toml.tmp" <<THEME
+name = Current
+
+bg = $(color background)
+panel = $(color background)
+border = $(color muted)
+
+fg = $(color foreground)
+dim = $(color muted)
+accent = $(color accent)
+
+cursor = $(color lighter_background)
+selection = $(color selection)
+selected = $(color selection)
+
+statusbar = $(color background)
+status_fg = $(color muted)
+mode_fg = $(color background)
+mode_bg = $(color green)
+
+pri_a = $(color red)
+pri_b = $(color yellow)
+pri_c = $(color green)
+pri_d = $(color blue)
+pri_other = $(color magenta)
+
+project = $(color blue)
+context = $(color cyan)
+
+done = $(color muted)
+matched = $(color yellow)
+due = $(color yellow)
+overdue = $(color red)
+today = $(color red)
+THEME
+mv -f "$THEMES/.current.toml.tmp" "$THEMES/current.toml"

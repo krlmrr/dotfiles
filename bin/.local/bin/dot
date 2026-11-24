@@ -95,6 +95,9 @@ if [ "$(uname)" = "Linux" ] && [ -d "$HOME/.local/state/omarchy" ]; then
             "$HOME/.config/btop/themes/current.theme"
     ln -snf "$HOME/.local/state/omarchy/current/theme/neovim.lua" \
             "$HOME/.config/lvim/lua/plugins/theme.lua"
+    # tuxedo resets a missing theme to its default and saves that into the
+    # config, so write "Current" now rather than waiting for the next switch.
+    [ -d "$HOME/.config/tuxedo" ] && "$DOTFILES/bin/.local/bin/tuxedo-theme"
 fi
 
 if [ "$(uname)" = "Darwin" ]; then
@@ -107,6 +110,10 @@ if [ "$(uname)" = "Darwin" ]; then
     mkdir -p "$HOME/.config/herdr-app/themes"
     ln -snf "$DOTFILES/herdr-app/.config/herdr-app/themes/onedark.json" \
             "$HOME/.config/herdr-app/themes/omarchy.json"
+
+    # tuxedo's "Current" theme comes from an Omarchy hook on Linux; here it is
+    # One Dark, from the same colors Omarchy's one-dark theme uses.
+    "$DOTFILES/bin/.local/bin/tuxedo-theme" "$DOTFILES/tuxedo/.config/tuxedo/onedark-colors.toml"
 fi
 
 # --- Directories that must exist before stowing -----------------------------

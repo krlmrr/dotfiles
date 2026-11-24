@@ -29,5 +29,8 @@ require("default.hypr.toggles")
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
 
+-- Float lazydocker (Super+Shift+D) centred at Omarchy's 875x600 floating size.
+o.window("^org\\.omarchy\\.omarchy-launch-docker-tui$", { tag = "+floating-window" })
+
 -- Launcher keys live in hypr/launcher-keys.lua.
 require("hypr.launcher-keys")

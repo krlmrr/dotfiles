@@ -17,29 +17,24 @@
       ],
       "centerEnd": [
         {
+          "id": "omarchy.elsewhen",
           "cities": [
             {
-              "name": "Chicago",
+              "name": "Houston",
               "zone": "America/Chicago"
             },
             {
-              "name": "Sao Paulo",
-              "zone": "America/Sao_Paulo"
+              "name": "Greece",
+              "zone": "Europe/Athens",
+              "lat": 39,
+              "lon": 22,
+              "region": "GR"
             },
             {
-              "name": "London",
-              "zone": "Europe/London"
-            },
-            {
-              "name": "Dubai",
-              "zone": "Asia/Dubai"
-            },
-            {
-              "name": "Tokyo",
-              "zone": "Asia/Tokyo"
+              "name": "Bucharest",
+              "zone": "Europe/Bucharest"
             }
-          ],
-          "id": "omarchy.elsewhen"
+          ]
         },
         {
           "id": "omarchy.weather"

@@ -52,7 +52,7 @@ top = 10.0
 
 [general]
 animationSpeed = 1.0
-animationsEnabled = false
+animationsEnabled = true
 defaultLayoutType = "dwindle"
 hotkeysEnabled = true
 hyperKeyModifiers = "Control+Option+Shift+Command"

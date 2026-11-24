@@ -188,6 +188,24 @@ o.bind("SUPER + A", "Universal select all", function()
   end
 end)
 
+-- The Herdr desktop app doesn't act on the synthetic Ctrl+Shift+C/V that
+-- Omarchy's universal copy/paste send, so drive its commands directly there.
+local function universal_clipboard(key, herdr_command)
+  return function()
+    local window = hl.get_active_window()
+    if window and window.class == "herdr-app" then
+      hl.exec_cmd("herdr-app do " .. herdr_command)
+    elseif active_window_is_terminal() then
+      send_shortcut_once("CTRL SHIFT", key)
+    else
+      send_shortcut_once("CTRL", key)
+    end
+  end
+end
+
+o.rebind("SUPER + C", "Universal copy", universal_clipboard("C", "terminal.copy"))
+o.rebind("SUPER + V", "Universal paste", universal_clipboard("V", "terminal.paste"))
+
 o.bind("SUPER + S", "Universal save", function()
   send_shortcut_once("CTRL", "S")
 end)

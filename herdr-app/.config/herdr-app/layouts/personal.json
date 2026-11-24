@@ -193,8 +193,8 @@
   },
   "titlebar": "none",
   "traffic_lights": [
-    12,
-    16
+    -200,
+    -200
   ],
   "theme": "omarchy",
   "font": "MonoLisa"

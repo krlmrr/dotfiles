@@ -426,6 +426,27 @@ export default class Spaces extends View {
       .child(svg(`mods/workspace-chrome/chevron-${f.folded ? "right" : "down"}.svg`).size(11).flex_none().text_color(t.dim));
   }
 
+  // Every space's id in the order the sidebar lists it (folders first, folded
+  // ones too), so other mods (goto) can list spaces the same way.
+  sidebarOrder() {
+    const rows = this.ordered();
+    const names = [null, ...[...new Set(rows.map((r) => r.w.machine).filter(Boolean))].sort()];
+    const out = [];
+    for (const m of names) {
+      const folders = this.folders.filter((f) => (f.machine ?? null) === m);
+      const inside = new Map(folders.map((f) => [f.id, []]));
+      const loose = [];
+      let current = null;
+      for (const r of rows.filter((r) => (r.w.machine ?? null) === m)) {
+        if (!r.tree) current = this.folderOf(r.w);
+        (current && inside.has(current.id) ? inside.get(current.id) : loose).push(r.w.id);
+      }
+      for (const f of folders) out.push(...inside.get(f.id));
+      out.push(...loose);
+    }
+    return out;
+  }
+
   // A machine's rows with its folders first, each over its spaces (worktrees
   // follow their checkout), then the spaces in no folder.
   foldered(rows, draw, t, collapsed, m) {
@@ -715,6 +736,11 @@ export default class Spaces extends View {
     }
     if (changed) setShared("space.colors", kept);
     const list = this.grouped(t, collapsed);
+    const order = this.sidebarOrder();
+    if (order.join() !== this.orderKey) {
+      this.orderKey = order.join();
+      setShared("spaces.order", order);
+    }
     // Bring the active space into view when it, or its place in the list, changes; a row already in view stays put.
     const active = sp.find(p => p.active)?.id;
     if (active !== this.revealed || this.activeAt !== this.revealedAt) {

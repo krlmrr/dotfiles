@@ -83,6 +83,10 @@ export default class Picker extends View {
         .filter((c) => !f || [w.name, c.ctx.name, ...c.mine.map((a) => a.program?.name ?? "")].join(" ").toLowerCase().includes(f));
       return { w, ctxs };
     });
+    // The sidebar's order (folders first), when the sidebar shares one.
+    const order = shared("spaces.order") ?? [];
+    const rank = (id) => { const i = order.indexOf(id); return i < 0 ? Infinity : i; };
+    groups.sort((a, b) => rank(a.w.id) - rank(b.w.id));
     const busy = groups.filter((p) => p.w.status && p.ctxs.length);
     const quiet = groups.filter((p) => !p.w.status && p.ctxs.length);
     busy.sort((a, b) => (b.w.status === "blocked") - (a.w.status === "blocked"));

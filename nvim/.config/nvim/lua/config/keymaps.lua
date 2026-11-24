@@ -111,6 +111,7 @@ end, { desc = "Close split or buffer, focus the file tree once none are left" })
 
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
 vim.keymap.set({ "n", "i", "v" }, "<D-s>", "<cmd>w<cr>", { desc = "Save file" })
+vim.keymap.set("x", "<D-c>", '"+y', { desc = "Copy selection" })
 
 vim.keymap.set("n", "<D-Left>", "^", { desc = "Start of line" })
 vim.keymap.set("n", "<D-Right>", "$", { desc = "End of line" })

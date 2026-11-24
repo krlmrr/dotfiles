@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Super+C in the Herdr desktop app. Herdr copies only its own selection, so when
+# nvim has the focus, send it Super+C as well: nvim maps <D-c> to copy its
+# visual selection to the clipboard.
+
+herdr-app do terminal.copy >/dev/null
+
+pane=$(herdr-app status | jq -r '.focused_pane // empty')
+[ -n "$pane" ] || exit 0
+
+terminal=$(herdr-app ls | jq -r --arg pane "$pane" \
+  '.spaces[].tabs[].terminals[] | select(.pane == $pane) | .terminal')
+[ -n "$terminal" ] || exit 0
+
+[ "$(hc get "$terminal" | jq -r '.foreground.name // empty')" = nvim ] || exit 0
+hc keys "$terminal" super+c >/dev/null

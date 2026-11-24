@@ -34,6 +34,8 @@ function place(s, ps) {
 }
 const rowHeight = ({ tree }) => (tree ? 28 : 30);
 const RAIL_CELL = 32;
+// A space in a folder: its avatar under the folder's name (an avatar's width and its gap).
+const FOLDER_INDENT = 27;
 // A space's name and its git tail never shrink below this, so a short one ("api")
 // stays readable instead of turning into an ellipsis next to a long branch.
 const SIDE_MIN = 48;
@@ -407,12 +409,14 @@ export default class Spaces extends View {
         .child(icon)
         .when(Boolean(status), (el) => el.child(div().absolute().right(3).top(0).text_color(tone(t, status)).child(glyph(status)))));
     }
-    return head.px(8).rounded(7)
-      .child(svg(`mods/workspace-chrome/chevron-${f.folded ? "right" : "down"}.svg`).size(11).flex_none())
-      .child(icon)
-      .child(div().flex_1().truncate().child(f.name))
+    // Lined up with a space's row: the icon where an avatar sits, the name where a
+    // space's name starts, and the chevron at the right as on machine headers.
+    return head.h(30).px(8).gap(9).rounded(8)
+      .child(h_flex().w(18).flex_none().justify_center().child(icon.size(15)))
+      .child(div().flex_1().min_w(0).truncate().text_size(13).child(f.name))
       .when(f.folded && Boolean(status), (el) => el.child(div().flex_none().text_color(tone(t, status)).child(glyph(status))))
-      .when(f.folded, (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(String(mine.length))));
+      .when(f.folded, (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(String(mine.length))))
+      .child(svg(`mods/workspace-chrome/chevron-${f.folded ? "right" : "down"}.svg`).size(11).flex_none().text_color(t.dim));
   }
 
   // A machine's rows with its folders first, each over its spaces (worktrees
@@ -435,8 +439,8 @@ export default class Spaces extends View {
       if (f.folded) continue;
       const at = mine.findIndex((r) => r.w.active);
       if (at >= 0) active = items.length + at;
-      if (!mine.length && !collapsed) items.push(div().id(`folder-empty-${f.id}`).h(24).flex_none().pl(34).items_center().flex().text_size(11.5).text_color(t.dim).child("Drag spaces here"));
-      items.push(...mine.map((r) => (collapsed ? draw(r) : div().flex_none().pl(12).child(draw(r)))));
+      if (!mine.length && !collapsed) items.push(div().id(`folder-empty-${f.id}`).h(24).flex_none().pl(8 + FOLDER_INDENT).items_center().flex().text_size(11.5).text_color(t.dim).child("Drag spaces here"));
+      items.push(...mine.map((r) => (collapsed ? draw(r) : div().flex_none().pl(FOLDER_INDENT).child(draw(r)))));
     }
     if (!collapsed && this.editing?.id === "new" && m == null) items.push(this.editRow(t, "folder-new"));
     const at = loose.findIndex((r) => r.w.active);

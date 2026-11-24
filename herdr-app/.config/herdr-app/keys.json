@@ -60,10 +60,7 @@
     "ctrl-shift-l": "layout.switch",
     "f2": "tab.rename",
     "shift-f2": "space.rename",
-    "cmd-q": "app.quit",
-    "cmd-h": "app.hide",
-    "cmd-alt-h": "app.hide_others",
-    "cmd-m": "window.minimize"
+    "cmd-q": "app.quit"
   },
   "terminal": {
     "ctrl-backspace": "send:\u0017",

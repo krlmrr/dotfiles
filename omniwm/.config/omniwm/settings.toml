@@ -42,7 +42,7 @@ raiseOnMouseFocus = false
 
 [gaps]
 fullscreenUsesOuterGaps = true
-size = 12.0
+size = 10.0
 
 [gaps.outer]
 bottom = 10.0
@@ -71,7 +71,7 @@ invertDirection = true
 mouseMoveModifierKey = "option"
 mouseResizeModifierKey = "option"
 mouseWheelSensitivity = 1.0
-overviewGestureEnabled = true
+overviewGestureEnabled = false
 overviewGestureFingerCount = 3
 resizePreviewStyle = "live"
 scrollEnabled = false
@@ -89,7 +89,7 @@ workspaceSwipeEnabled = true
 workspaceSwipeFingerCount = 3
 
 [hiddenBar]
-enabled = true
+enabled = false
 hiddenBundleIDs = []
 rehideIntervalSeconds = 5.0
 
@@ -172,8 +172,16 @@ provider = "ghostty"
 widthPercent = 50.0
 
 [routing]
-arrangements = []
 mode = "macOS"
+
+[[routing.arrangements]]
+id = "0374A1FB-47B5-4639-9BE3-A275822AB570"
+
+[[routing.arrangements.monitors]]
+gridColumn = 0
+gridRow = 0
+monitorDisplayUUID = "058C6EF2-3DCC-4494-92D7-C9FDA7B95F71"
+monitorName = "Studio Display"
 
 [scratchpads]
 

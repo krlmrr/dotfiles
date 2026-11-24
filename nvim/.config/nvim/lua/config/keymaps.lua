@@ -104,8 +104,10 @@ vim.keymap.set("n", "<C-w>", function()
 	else
 		Snacks.bufdelete()
 	end
-	vim.cmd("Neotree focus")
-end, { desc = "Close split or buffer and focus file tree" })
+	if vim.bo.buftype ~= "" or vim.api.nvim_buf_get_name(0) == "" then
+		vim.cmd("Neotree focus")
+	end
+end, { desc = "Close split or buffer, focus the file tree once none are left" })
 
 vim.keymap.set({ "n", "i", "v" }, "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
 vim.keymap.set({ "n", "i", "v" }, "<D-s>", "<cmd>w<cr>", { desc = "Save file" })

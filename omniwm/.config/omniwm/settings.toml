@@ -713,7 +713,7 @@ binding = "Unassigned"
 id = "moveColumnToWorkspace.8"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+Shift+Left Arrow"
 id = "move.left"
 
 [[hotkeys]]
@@ -725,7 +725,7 @@ binding = "Option+Shift+Up Arrow"
 id = "move.up"
 
 [[hotkeys]]
-binding = "Unassigned"
+binding = "Option+Shift+Right Arrow"
 id = "move.right"
 
 [[hotkeys]]
@@ -1021,7 +1021,7 @@ binding = "Unassigned"
 id = "toggleSplit"
 
 [[hotkeys]]
-binding = "Option+Shift+Right Arrow"
+binding = "Unassigned"
 id = "swapSplit"
 
 [[hotkeys]]

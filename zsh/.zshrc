@@ -76,6 +76,7 @@ alias sourcez="source ~/.zshrc"
 
 # Tools
 alias lzg="lazygit"
+alias tux="tuxedo"
 alias yeet="sudo rm -rf"
 alias mkd="mkdir -p"
 

@@ -1,6 +1,6 @@
 # tuxedo config
 theme = Current
-density = comfortable
+density = compact
 sort = priority
 show_left = false
 show_right = false

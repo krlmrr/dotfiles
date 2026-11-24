@@ -87,7 +87,7 @@ official Arch repos:
 
 ```bash
 sudo pacman -S --needed stow git zsh neovim ghostty btop \
-                        lazygit yazi fzf python superfile
+                        lazygit yazi fzf python superfile syncthing
 ```
 
 Three things are not pacman packages and install themselves:
@@ -192,6 +192,15 @@ that path — Herd rewrites `HERD_PHP_*_INI_SCAN_DIR` on every PHP version
 change — so expect it to go dirty after a PHP switch, and commit or discard
 as you like. The Herd block in it is guarded and derives its paths from
 `$HOME`, so it is inert on a machine without Herd.
+
+## Todo list
+
+`~/todo/todo.txt` (tuxedo's `TODO_FILE`) is one list on every machine, kept in
+step by Syncthing rather than git. The pairing is machine state, not dotfiles:
+on a new machine, start Syncthing (`brew services start syncthing`, or
+`systemctl --user enable --now syncthing` on Arch), then add the other machines
+and share the `todo` folder (`~/todo`) with `syncthing cli config`, or in its
+web UI at http://127.0.0.1:8384.
 
 ## Neovim
 

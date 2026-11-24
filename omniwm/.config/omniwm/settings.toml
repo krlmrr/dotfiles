@@ -41,14 +41,14 @@ moveMouseToFocusedWindow = false
 raiseOnMouseFocus = false
 
 [gaps]
-fullscreenUsesOuterGaps = false
+fullscreenUsesOuterGaps = true
 size = 12.0
 
 [gaps.outer]
-bottom = 0.0
-left = 0.0
-right = 0.0
-top = 0.0
+bottom = 10.0
+left = 10.0
+right = 10.0
+top = 10.0
 
 [general]
 animationSpeed = 1.0
@@ -242,6 +242,21 @@ xOffset = 0.0
 yOffset = 0.0
 
 [workspaceBar.iconOverrides]
+
+[[appRules]]
+bundleId = "com.tinyspeck.slackmacgap"
+id = "C4860B11-C344-4429-B4F8-1D7A1AC86F6B"
+layout = "float"
+
+[[appRules]]
+bundleId = "com.hnc.Discord"
+id = "03A98E0D-F5C4-4AB6-8E01-0AB8C33FC07C"
+layout = "float"
+
+[[appRules]]
+bundleId = "com.apple.MobileSMS"
+id = "377CD3F8-8C55-4F52-B359-EC54F9E66461"
+layout = "float"
 
 [[appRules]]
 bundleId = "com.apple.systempreferences"

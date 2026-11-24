@@ -8,8 +8,8 @@ const swap = (direction) => ["pane.swap", { direction }];
 const BINDINGS = {
   "?": ["app.help"],
   "s": ["app.settings"],
-  "w": ["mod.open", { name: "picker" }],
-  "g": ["mod.open", { name: "picker" }],
+  "w": ["mod.open", { name: "goto" }],
+  "g": ["mod.open", { name: "goto" }],
   "shift-n": ["space.new"],
   "shift-w": ["space.rename"],
   "shift-d": ["space.close", { confirmed: true }],

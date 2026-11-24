@@ -49,7 +49,7 @@
     "ctrl-shift-b": "layout.toggle:sidebar",
     "ctrl-shift-n": "space.new",
     "ctrl-shift-t": "tab.new",
-    "ctrl-shift-k": "mod.open:picker",
+    "ctrl-shift-k": "mod.open:goto",
     "ctrl-shift-p": "app.palette",
     "ctrl-,": "app.settings",
     "ctrl-shift-o": "pane.split:right",

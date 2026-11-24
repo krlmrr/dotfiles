@@ -179,9 +179,10 @@ if [ "$(uname)" = "Darwin" ]; then
         fi
     fi
 
-    # OmniWM manages windows; Hammerspoon is off for now, since both want Cmd+1-9.
-    if [ -d /Applications/OmniWM.app ] && ! pgrep -xq OmniWM; then
-        open -a OmniWM
+    # Only when it is not already running: `open -a` on a running Hammerspoon
+    # activates it, and activating it raises the console window.
+    if [ -d /Applications/Hammerspoon.app ] && ! pgrep -xq Hammerspoon; then
+        open -a Hammerspoon
     fi
 fi
 

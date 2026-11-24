@@ -244,6 +244,11 @@ yOffset = 0.0
 [workspaceBar.iconOverrides]
 
 [[appRules]]
+bundleId = "com.apple.finder"
+id = "2CDDEBCF-48A2-4AE8-AF8A-E398E79702EC"
+layout = "float"
+
+[[appRules]]
 bundleId = "com.tinyspeck.slackmacgap"
 id = "C4860B11-C344-4429-B4F8-1D7A1AC86F6B"
 layout = "float"

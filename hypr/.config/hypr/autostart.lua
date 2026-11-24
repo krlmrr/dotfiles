@@ -13,3 +13,6 @@ hl.on("hyprland.start", function()
 end)
 
 o.launch_on_start("tuple start")
+
+-- Deskflow server: share this keyboard and mouse with the MacBook (tray only).
+o.launch_on_start("deskflow")

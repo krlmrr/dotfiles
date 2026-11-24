@@ -6,7 +6,9 @@
 // Cloned from Herdr's `spaces` (0.1.18) to add folders: the folder button by the
 // title makes one, its header folds it, dragging a space onto a header files it
 // there, dropping it on a space outside or on the title takes it out, and
-// right-clicking a header renames or deletes it. A folder keeps spaces by name
+// right-clicking a header renames or deletes it. Each machine has its own folders,
+// made from the folder button on its header (the title's is this computer's), and
+// they hold only that machine's spaces. A folder keeps spaces by name
 // (and machine),
 // so a project closed and reopened lands back in its folder.
 
@@ -111,7 +113,7 @@ export default class Spaces extends View {
       for (const state of Object.values(this.reconnecting)) state.busy = false;
     } catch { this.reconnecting = {}; }
     try { this.folded = new Set(JSON.parse(localStorage.getItem("machines.folded") ?? "[]")); } catch { this.folded = new Set(); }
-    // [{ id, name, members: [space names], folded }], in the order they're drawn.
+    // [{ id, name, machine (null: this computer), members: [memberKey()s], folded }], in the order they're drawn.
     try { this.folders = JSON.parse(localStorage.getItem("folders") ?? "[]"); } catch { this.folders = []; }
     if (!Array.isArray(this.folders)) this.folders = [];
     this.overFolder = null; // a folder header a dragged space is over, or "out" for the title
@@ -336,23 +338,27 @@ export default class Spaces extends View {
     this.saveFolders();
   }
 
-  edit(id, value, cx) {
+  edit(id, value, cx, machine = null) {
     const input = InputState.new({ value, placeholder: "Folder name" });
     if (value) input.set_selected_range({ start: 0, end: value.length });
     input.on("submit", (_e, cx) => this.commitEdit(cx));
     input.on("blur", (_e, cx) => { if (this.editing?.input === input) { this.editing = null; cx.notify(); } });
-    this.editing = { id, input };
+    this.editing = { id, input, machine };
+    if (machine && this.folded.has(machine)) {
+      this.folded.delete(machine);
+      localStorage.setItem("machines.folded", JSON.stringify([...this.folded]));
+    }
     input.focus();
     cx.timer.after(100, () => input.focus());
     cx.notify();
   }
 
   commitEdit(cx) {
-    const { id, input } = this.editing ?? {};
+    const { id, input, machine } = this.editing ?? {};
     this.editing = null;
     const name = input?.value().trim();
     if (name) {
-      if (id === "new") this.folders.push({ id: `f${Date.now().toString(36)}`, name, members: [], folded: false });
+      if (id === "new") this.folders.push({ id: `f${Date.now().toString(36)}`, name, machine: machine ?? null, members: [], folded: false });
       else { const f = this.folders.find((f) => f.id === id); if (f) f.name = name; }
       this.saveFolders();
     }
@@ -391,15 +397,16 @@ export default class Spaces extends View {
     if (!collapsed && this.editing?.id === f.id) return this.editRow(t, id);
     const holdsActive = mine.some((r) => r.w.active);
     const status = ["blocked", "done"].find((s) => mine.some((r) => r.w.status === s));
+    const fits = (id) => (spaces().find((s) => s.id === id)?.machine ?? null) === (f.machine ?? null);
     const target = this.pressed !== null && this.overFolder === f.id;
     const head = h_flex().id(id).h(28).flex_none().gap(7).items_center()
       .text_size(12).text_color(holdsActive && f.folded ? t.foreground : t.muted)
       .cursor_pointer().hover((s) => s.bg(t.hover))
       .when(target, (el) => el.bg(t.selected).border_1().border_color(t.accent))
       .on_mouse_move((_e, cx) => {
-        if (this.pressed !== null && this.overFolder !== f.id) { this.overFolder = f.id; this.over = null; cx.notify(); }
+        if (this.pressed !== null && this.overFolder !== f.id && fits(this.pressed)) { this.overFolder = f.id; this.over = null; cx.notify(); }
       })
-      .on_mouse_up("left", (_e, cx) => { if (this.pressed !== null) this.dropInto(f.id, cx); })
+      .on_mouse_up("left", (_e, cx) => { if (this.pressed !== null && fits(this.pressed)) this.dropInto(f.id, cx); })
       .on_click((_e, cx) => { f.folded = !f.folded; this.saveFolders(); cx.notify(); })
       .on_mouse_down("right", (_e, cx) => { if (!collapsed) this.edit(f.id, f.name, cx); });
     const icon = svg("mods/files/folder.svg").size(13).flex_none();
@@ -420,21 +427,20 @@ export default class Spaces extends View {
   }
 
   // A machine's rows with its folders first, each over its spaces (worktrees
-  // follow their checkout), then the spaces in no folder. `all`: also draw the
-  // folders with nothing here (this computer's block, where folders are made).
-  foldered(rows, draw, t, collapsed, m, all) {
+  // follow their checkout), then the spaces in no folder.
+  foldered(rows, draw, t, collapsed, m) {
     const items = [];
     let active = -1;
-    const inside = new Map(this.folders.map((f) => [f.id, []]));
+    const folders = this.folders.filter((f) => (f.machine ?? null) === (m ?? null));
+    const inside = new Map(folders.map((f) => [f.id, []]));
     const loose = [];
     let current = null;
     for (const r of rows) {
       if (!r.tree) current = this.folderOf(r.w);
-      (current ? inside.get(current.id) : loose).push(r);
+      (current && inside.has(current.id) ? inside.get(current.id) : loose).push(r);
     }
-    for (const f of this.folders) {
+    for (const f of folders) {
       const mine = inside.get(f.id);
-      if (!all && !mine.length) continue;
       items.push(this.folderHead(f, mine, t, collapsed, m));
       if (f.folded) continue;
       const at = mine.findIndex((r) => r.w.active);
@@ -442,7 +448,7 @@ export default class Spaces extends View {
       if (!mine.length && !collapsed) items.push(div().id(`folder-empty-${f.id}`).h(24).flex_none().pl(8 + FOLDER_INDENT).items_center().flex().text_size(11.5).text_color(t.dim).child("Drag spaces here"));
       items.push(...mine.map((r) => (collapsed ? draw(r) : div().flex_none().pl(FOLDER_INDENT).child(draw(r)))));
     }
-    if (!collapsed && this.editing?.id === "new" && m == null) items.push(this.editRow(t, "folder-new"));
+    if (!collapsed && this.editing?.id === "new" && (this.editing.machine ?? null) === (m ?? null)) items.push(this.editRow(t, `folder-new-${m ?? "local"}`));
     const at = loose.findIndex((r) => r.w.active);
     if (at >= 0) active = items.length + at;
     items.push(...loose.map(draw));
@@ -516,7 +522,7 @@ export default class Spaces extends View {
     const loadingRow = m => h_flex().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(collapsed ? 0 : 8).items_center().when(collapsed, el => el.justify_center()).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
     if (!remote.length) {
       if (loading(null) && !rows.length && !this.folders.length) return [loadingRow(null)];
-      const { items, active } = this.foldered(rows, draw, t, collapsed, null, true);
+      const { items, active } = this.foldered(rows, draw, t, collapsed, null);
       this.activeAt = active;
       return items;
     }
@@ -554,6 +560,9 @@ export default class Spaces extends View {
               .tooltip(repair?.error || "This machine was rebuilt or replaced. Click to connect to the new one.")
               .on_click((_e, cx) => { cx.stop_propagation(); this.reconnect(machine, cx); })
               .child(repair?.busy ? "Connecting…" : "Connect"))))
+          .when(connected, el => el.child(div().id(`machine-folder-${m ?? "local"}`).flex_none().px(3).rounded(4).flex().items_center().hover(s => s.bg(t.hover).text_color(t.foreground))
+            .tooltip(`New folder on ${m ?? "this computer"}`)
+            .on_click((_e, cx) => { cx.stop_propagation(); this.edit("new", "", cx, m); }).child(svg("mods/files/folder.svg").size(12))))
           .when(connected, el => el.child(div().id(`machine-add-${m ?? "local"}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
             .on_click((_e, cx) => { cx.stop_propagation(); run("space.new", { machine: m ?? "" }); }).child("+")))
           .child(div().size(6).rounded(3).flex_none().bg(connected ? t.ansi2 : t.dim))
@@ -575,7 +584,7 @@ export default class Spaces extends View {
             .text_size(11).text_color(t.foreground).bg(t.raised).cursor_pointer().hover(s => s.bg(t.hover))
             .on_click((_e, cx) => { cx.stop_propagation(); cx.write_to_clipboard(login); this.copiedLogin = login; cx.notify(); })
             .child(this.copiedLogin === login ? "Copied" : "Copy")))] : [];
-      const inner = folded ? { items: [], active: -1 } : mine.length || (!m && this.folders.length) ? this.foldered(mine, draw, t, collapsed, m, !m) : { items: [loading(m) ? loadingRow(m) : cell(empty)], active: -1 };
+      const inner = folded ? { items: [], active: -1 } : mine.length || this.folders.some(f => (f.machine ?? null) === m) || this.editing?.machine === m ? this.foldered(mine, draw, t, collapsed, m) : { items: [loading(m) ? loadingRow(m) : cell(empty)], active: -1 };
       const items = [cell(head), ...guidance, ...inner.items];
       const first = inner.active;
       if (first >= 0) this.activeAt = before + 1 + guidance.length + first;

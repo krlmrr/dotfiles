@@ -52,7 +52,7 @@ top = 10.0
 
 [general]
 animationSpeed = 1.0
-animationsEnabled = true
+animationsEnabled = false
 defaultLayoutType = "dwindle"
 hotkeysEnabled = true
 hyperKeyModifiers = "Control+Option+Shift+Command"
@@ -71,10 +71,10 @@ invertDirection = true
 mouseMoveModifierKey = "option"
 mouseResizeModifierKey = "option"
 mouseWheelSensitivity = 1.0
-overviewGestureEnabled = false
-overviewGestureFingerCount = 4
+overviewGestureEnabled = true
+overviewGestureFingerCount = 3
 resizePreviewStyle = "live"
-scrollEnabled = true
+scrollEnabled = false
 scrollModifierKey = "optionShift"
 scrollSensitivity = 5.0
 trackpadScrollStyle = "snap"
@@ -83,9 +83,9 @@ windowMoveEnabled = false
 windowMoveFingerCount = 4
 windowResizeEnabled = false
 windowResizeFingerCount = 3
-workspaceSwipeAxis = "vertical"
-workspaceSwipeEdgeBehavior = "cycle"
-workspaceSwipeEnabled = false
+workspaceSwipeAxis = "horizontal"
+workspaceSwipeEdgeBehavior = "none"
+workspaceSwipeEnabled = true
 workspaceSwipeFingerCount = 3
 
 [hiddenBar]

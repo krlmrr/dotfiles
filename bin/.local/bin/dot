@@ -101,6 +101,11 @@ if [ "$(uname)" = "Darwin" ]; then
     mkdir -p "$HOME/.config/btop/themes"
     ln -snf "$DOTFILES/btop/.config/btop/themes/onehalfdark.theme" \
             "$HOME/.config/btop/themes/current.theme"
+    # The personal herdr-app layout asks for the "omarchy" theme, which an
+    # Omarchy hook writes on Linux. With no Omarchy here, it is One Half Dark.
+    mkdir -p "$HOME/.config/herdr-app/themes"
+    ln -snf "$DOTFILES/herdr-app/.config/herdr-app/themes/onehalfdark.json" \
+            "$HOME/.config/herdr-app/themes/omarchy.json"
 fi
 
 # --- Directories that must exist before stowing -----------------------------

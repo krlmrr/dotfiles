@@ -43,6 +43,9 @@ A few things live outside the repo:
    herdr-app do layout.switch '{"name":"personal"}'
    ```
 
+   The layout uses the `omarchy` theme, which an Omarchy hook writes on Linux.
+   On macOS `dot install` links it to the package's One Half Dark theme instead.
+
 4. **owe wallpaper daemon.** Its installer writes
    `~/.config/omarchy/hooks/theme-set.d/10-owe-sync`, so reinstall owe rather
    than copying the hook.

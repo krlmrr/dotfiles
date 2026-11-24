@@ -34,6 +34,8 @@ function spaceColor(t, p) {
   return c.startsWith("#") ? c : (MARK[c] ?? t[c]);
 }
 
+const avatar = (t, w) => h_flex().size(18).flex_none().rounded(5).bg(spaceColor(t, w)).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?");
+
 export default class Picker extends View {
   init(_props, cx) {
     this.filter = "";
@@ -91,7 +93,9 @@ export default class Picker extends View {
     const quiet = groups.filter((p) => !p.w.status && p.ctxs.length);
     busy.sort((a, b) => (b.w.status === "blocked") - (a.w.status === "blocked"));
     const out = [];
+    // A space with one tab is one row, named after the space; more tabs go under its name.
     const add = (p) => {
+      if (p.w.tabs.length === 1 && p.ctxs.length === 1) return out.push({ kind: "ctx", flat: true, ...p.ctxs[0] });
       out.push({ kind: "head", w: p.w });
       for (const c of p.ctxs) out.push({ kind: "ctx", ...c });
     };
@@ -179,7 +183,7 @@ export default class Picker extends View {
           .text_size(11)
           .font_semibold()
           .text_color(t.dim)
-          .child(h_flex().size(18).rounded(5).bg(spaceColor(t, r.w)).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...r.w.name][0]?.toUpperCase() ?? "?"))
+          .child(avatar(t, r.w))
           .child(r.w.name);
       }
       if (r.kind === "earlier") {
@@ -233,7 +237,8 @@ export default class Picker extends View {
         .hover((s) => s.bg(t.hover))
         .on_click(() => this.go(r))
         .child(this.glyph(t, r.ctx.status))
-        .child(div().flex_1().truncate().text_color(t.foreground).when(here, (d) => d.font_semibold()).child(r.ctx.name))
+        .when(Boolean(r.flat), (el) => el.child(avatar(t, r.w)))
+        .child(div().flex_1().truncate().text_color(t.foreground).when(here, (d) => d.font_semibold()).child(r.flat ? r.w.name : r.ctx.name))
         .when(r.ctx.status === "blocked", (el) => el.child(div().text_size(11).text_color(t.blocked).child("needs you")))
         .when(r.ctx.status === "done", (el) => el.child(div().text_size(11).text_color(t.done).child("finished")))
         .child(div().text_size(11).text_color(t.dim).child(who + (r.team ? `  +${r.team}` : "")));

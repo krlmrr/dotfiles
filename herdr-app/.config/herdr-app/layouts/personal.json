@@ -11,6 +11,15 @@
       "type": "column",
       "children": [
         {
+          "id": "sidebar-top",
+          "type": "column",
+          "size": {
+            "px": 8
+          },
+          "window_drag": true,
+          "children": []
+        },
+        {
           "id": "brand",
           "type": "block",
           "content": {

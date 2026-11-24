@@ -44,7 +44,8 @@ A few things live outside the repo:
    ```
 
    The layout uses the `omarchy` theme, which an Omarchy hook writes on Linux.
-   On macOS `dot install` links it to the package's One Half Dark theme instead.
+   On macOS `dot install` links it to the package's One Dark theme instead, a copy
+   of what Omarchy's one-dark theme generates.
 
 4. **owe wallpaper daemon.** Its installer writes
    `~/.config/omarchy/hooks/theme-set.d/10-owe-sync`, so reinstall owe rather

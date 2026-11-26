@@ -57,9 +57,8 @@ usage_seg=""
 pct_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty | floor')
 pct_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty | floor')
 reset_5h=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty | strflocaltime("%-I:%M%p") | ascii_downcase | rtrimstr("m")')
-reset_7d=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty | strflocaltime("%a")')
 if [ -n "$pct_5h" ] && [ -n "$pct_7d" ]; then
-  usage_seg=$(printf "📊 ${yellow}5h:${reset} ${white}${pct_5h}%%${reset}${reset_5h:+ ${grey}↻${reset_5h}${reset}}  ${yellow}7d:${reset} ${white}${pct_7d}%%${reset}${reset_7d:+ ${grey}↻${reset_7d}${reset}}")
+  usage_seg=$(printf "📊 ${yellow}5h:${reset} ${white}${pct_5h}%%${reset}${reset_5h:+ ${grey}↻${reset_5h}${reset}}  ${yellow}7d:${reset} ${white}${pct_7d}%%${reset}")
 fi
 
 model_seg=""

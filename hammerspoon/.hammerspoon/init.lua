@@ -34,7 +34,16 @@ for i = 1, 9 do
   )
 end
 
-local FOCUS_KEYS = { h = "West", j = "South", k = "North", l = "East" }
+local FOCUS_KEYS = {
+  h = "West",
+  j = "South",
+  k = "North",
+  l = "East",
+  left = "West",
+  down = "South",
+  up = "North",
+  right = "East",
+}
 
 local function focusToward(direction)
   return function()
